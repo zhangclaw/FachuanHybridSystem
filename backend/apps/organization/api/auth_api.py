@@ -75,6 +75,7 @@ def register_view(request: HttpRequest, payload: RegisterIn) -> RegisterOut:
             username=payload.username,
             password=payload.password,
             real_name=payload.real_name,
+            phone=payload.phone,
         )
         user = result.user
         is_first = user.is_active  # 首位用户自动激活
