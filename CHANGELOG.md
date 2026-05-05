@@ -4,7 +4,9 @@
 
 ## [26.43.0] - 2026-05-05
 
-### 新功能
+### 前端
+
+#### 新功能
 
 - **Cmd+K 全局搜索**：新增 `CommandPalette` 组件，支持通过快捷键唤起全局搜索，可检索案件、当事人、合同等业务数据
 - **案件管理全面对齐后端**：
@@ -39,12 +41,27 @@
 - **侧边栏和导航优化**：菜单配置重构，新增工具子菜单，导航体验改进
 - **列表页统一规范**：统一 ID 列展示，分页改为客户端分页
 
-### 新增 UI 组件
+#### 新增组件
 
 - **项目级共享组件**：CommandPalette、DataTable、EmptyState、InfoGrid、CollapsibleCard、DetailCardGrid、InlineCrudTable、PageFooter、RadioPillGroup、StatusBadge、Timeline、TopbarIcons
 - **shadcn/ui 组件**：Breadcrumb、Calendar、Checkbox、Collapsible、Command、Popover、ScrollArea、Sheet、Switch、Textarea
 
-### 后端新增
+#### 移除
+
+- **公开营销页面**：删除首页（HomePage）、定价页（PricingPage）、教程页（TutorialPage）及所有相关组件（HeroSection、FeaturesSection、CTASection、CaseFlowDemo、ChatRecordDemo、SMSFlowDemo、TechStackSection、Footer、Navigation 等）
+- **TopNavMenu 组件**：删除顶部导航菜单组件
+- **AnimatedLink、RippleButton 组件**：清理未使用的旧组件
+- **PublicLayout**：删除公开页面布局
+
+#### 依赖变更
+
+- 新增 `cmdk`：CommandPalette 命令面板
+- 新增 `radix-ui`：统一 Radix UI 组件包
+- 新增 `react-day-picker`：Calendar 日期选择器
+
+### 后端
+
+#### 新增
 
 - 全局搜索 API（search_api）：支持跨模块业务数据检索
 - 任务队列 API（task_queue_api）：支持查看和管理后台异步任务
@@ -54,21 +71,11 @@
 - 密码重置 API：支持忘记密码和重置密码流程
 - 律师注册 API：完善注册流程
 
-### 移除
+#### 依赖升级
 
-- **公开营销页面**：删除首页（HomePage）、定价页（PricingPage）、教程页（TutorialPage）及所有相关组件（HeroSection、FeaturesSection、CTASection、CaseFlowDemo、ChatRecordDemo、SMSFlowDemo、TechStackSection、Footer、Navigation 等）
-- **TopNavMenu 组件**：删除顶部导航菜单组件
-- **AnimatedLink、RippleButton 组件**：清理未使用的旧组件
-- **PublicLayout**：删除公开页面布局
-
-### 依赖变更
-
-- 新增 `cmdk`：CommandPalette 命令面板
-- 新增 `radix-ui`：统一 Radix UI 组件包
-- 新增 `react-day-picker`：Calendar 日期选择器
-- **Python 依赖批量升级**（29 个包）：
+- 批量升级 29 个 Python 依赖：
   - 直接依赖：psycopg 3.3.4、reportlab 4.5.0、playwright 1.59.0、django-q2 1.10.0、cryptography 48.0.0、gunicorn 26.0.0
-  - 传递依赖：openai 2.32.0、sentry-sdk 2.58.0、icalendar 7.1.0、certifi、click、greenlet、idna、packaging、pypdfium2、sse-starlette、typer、zope-interface、pyopenssl、mpmath、types-requests、cbor2 6.0.1
+  - 传递依赖：openai 2.32.0、sentry-sdk 2.58.0、icalendar 7.1.0、cbor2 6.0.1、certifi、click、greenlet、idna、packaging、pypdfium2、sse-starlette、typer、zope-interface、pyopenssl、mpmath、types-requests
 
 ## [26.42.3] - 2026-05-04
 
