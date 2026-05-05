@@ -24,14 +24,14 @@ class LawyerManager(UserManager):
     此管理器确保无 email 时存为 NULL（PostgreSQL 允许多个 NULL）。
     """
 
-    def _create_user(self, username: str, email: str | None, password: str, **extra_fields: object) -> "Lawyer":  # type: ignore[override]
+    def _create_user(self, username: str, email: str | None, password: str, **extra_fields: object) -> "Lawyer":
         if email is None:
             # 跳过 normalize_email，直接传 None 给 model，确保数据库存 NULL
             user = self.model(username=username, email=None, **extra_fields)
             user.set_password(password)
             user.save(using=self._db)
             return user  # type: ignore[return-value]
-        return super()._create_user(username, email, password, **extra_fields)  # type: ignore[misc]
+        return super()._create_user(username, email, password, **extra_fields)  # type: ignore[misc,no-any-return]
 
 
 class Lawyer(AbstractUser):
