@@ -60,6 +60,7 @@ export const CLUE_TYPE_LABELS: Record<ClueType, string> = {
 // ============================================================================
 
 export interface IdentityDoc {
+  id: number
   doc_type: DocType
   file_path: string
   uploaded_at: string
@@ -196,22 +197,10 @@ export interface ParseTextResult {
 // ============================================================================
 
 export interface ClientListParams {
-  page?: number
-  page_size?: number
   client_type?: ClientType
   is_our_client?: boolean
   search?: string
 }
-
-export interface PaginatedResponse<T> {
-  items: T[]
-  total: number
-  page: number
-  page_size: number
-  total_pages: number
-}
-
-export type ClientListResponse = PaginatedResponse<Client>
 
 export interface OcrRecognizeResult {
   success: boolean
@@ -241,3 +230,29 @@ export interface OcrResult {
 }
 
 export type ClientFormMode = 'create' | 'edit'
+
+// ============================================================================
+// 关联案件/合同
+// ============================================================================
+
+export interface RelatedCase {
+  id: number
+  name: string
+  case_type: string | null
+  status: string | null
+  current_stage: string | null
+  legal_status: string | null
+}
+
+export interface RelatedContract {
+  id: number
+  name: string
+  case_type: string | null
+  status: string | null
+  role: string | null
+}
+
+export interface RelatedItems {
+  cases: RelatedCase[]
+  contracts: RelatedContract[]
+}

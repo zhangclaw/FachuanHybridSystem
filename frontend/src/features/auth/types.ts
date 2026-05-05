@@ -54,7 +54,7 @@ export interface TokenRefreshResponse {
 export interface RegisterRequest {
   username: string
   password: string
-  real_name: string
+  real_name?: string
   phone?: string
 }
 
@@ -63,7 +63,7 @@ export interface RegisterRequest {
  */
 export interface RegisterResponse {
   success: boolean
-  user: User
+  user?: User
   requires_approval: boolean
   message: string
 }
@@ -85,6 +85,28 @@ export interface PendingUser {
 export interface ApprovalResponse {
   success: boolean
   message: string
+}
+
+/**
+ * 密码重置请求/响应
+ */
+export interface PasswordResetOut {
+  success: boolean
+  message: string
+  data?: {
+    is_valid?: boolean
+    username?: string
+  } | null
+}
+
+/**
+ * 密码重置确认请求
+ */
+export interface PasswordResetConfirmRequest {
+  uid: string
+  token: string
+  new_password: string
+  confirm_password: string
 }
 
 /**

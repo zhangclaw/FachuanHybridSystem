@@ -57,7 +57,8 @@ class AuthService:
         self,
         username: str,
         password: str,
-        real_name: str,
+        real_name: str | None = None,
+        phone: str | None = None,
         bootstrap_token: str | None = None,
     ) -> RegisterResult:
         is_first_user = not Lawyer.objects.exists()
@@ -76,7 +77,9 @@ class AuthService:
         user = Lawyer.objects.create_user(
             username=username,
             password=password,
+            email=None,
             real_name=real_name,
+            phone=phone,
             is_superuser=should_grant_admin,
             is_staff=should_grant_admin,
             is_admin=should_grant_admin,
@@ -95,6 +98,7 @@ class AuthService:
         user = Lawyer.objects.create_user(
             username=AUTO_REGISTER_BOOTSTRAP_USERNAME,
             password=AUTO_REGISTER_BOOTSTRAP_PASSWORD,
+            email=None,
             real_name=AUTO_REGISTER_BOOTSTRAP_USERNAME,
             is_superuser=True,
             is_staff=True,

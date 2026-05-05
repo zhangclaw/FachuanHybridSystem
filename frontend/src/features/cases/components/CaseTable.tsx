@@ -5,8 +5,8 @@
  */
 
 import { useNavigate } from 'react-router'
-import { Briefcase, FolderOpen } from 'lucide-react'
-import { format } from 'date-fns'
+import { FolderOpen } from 'lucide-react'
+import { formatDateOnly } from '@/lib/date'
 
 import {
   Table,
@@ -20,7 +20,6 @@ import { Badge } from '@/components/ui/badge'
 import { generatePath } from '@/routes/paths'
 import {
   type Case,
-  type SimpleCaseType,
   type CaseStatus,
   SIMPLE_CASE_TYPE_LABELS,
   CASE_STATUS_LABELS,
@@ -38,10 +37,11 @@ export interface CaseTableProps {
 // ============================================================================
 
 function TableSkeleton() {
+  const widths = [12, 48, 24, 20, 20, 24, 20, 24]
   return (
     <>{Array.from({ length: 5 }).map((_, i) => (
       <TableRow key={i}>
-        {[12, 48, 20, 20, 24, 20, 24].map((w, j) => (
+        {widths.map((w, j) => (
           <TableCell key={j}><div className={`bg-muted h-4 w-${w} animate-pulse rounded`} /></TableCell>
         ))}
       </TableRow>
@@ -49,10 +49,10 @@ function TableSkeleton() {
   )
 }
 
-function EmptyState() {
+function EmptyState({ colSpan }: { colSpan: number }) {
   return (
     <TableRow>
-      <TableCell colSpan={7} className="h-48">
+      <TableCell colSpan={colSpan} className="h-48">
         <div className="flex flex-col items-center justify-center gap-3">
           <div className="bg-muted flex size-12 items-center justify-center rounded-full">
             <FolderOpen className="text-muted-foreground size-6" />
@@ -68,14 +68,6 @@ function EmptyState() {
 // Helpers
 // ============================================================================
 
-function formatDate(dateStr: string | null | undefined): string {
-  if (!dateStr) return '-'
-  try {
-    return format(new Date(dateStr), 'yyyy-MM-dd')
-  } catch {
-    return dateStr
-  }
-}
 
 function getLawyerDisplay(c: Case): string {
   const assignments = c.assignments ?? []
@@ -93,6 +85,8 @@ function getLawyerDisplay(c: Case): string {
 export function CaseTable({ cases, isLoading }: CaseTableProps) {
   const navigate = useNavigate()
 
+  const colSpan = 8
+
   return (
     <div className="overflow-x-auto rounded-md border">
       <Table className="min-w-[700px]">
@@ -100,6 +94,7 @@ export function CaseTable({ cases, isLoading }: CaseTableProps) {
           <TableRow>
             <TableHead className="w-[60px]">ID</TableHead>
             <TableHead>案件名称</TableHead>
+            <TableHead className="w-[160px]">立案号</TableHead>
             <TableHead className="w-[100px]">案件类型</TableHead>
             <TableHead className="w-[80px]">状态</TableHead>
             <TableHead className="w-[100px]">负责律师</TableHead>
@@ -108,7 +103,7 @@ export function CaseTable({ cases, isLoading }: CaseTableProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {isLoading ? <TableSkeleton /> : cases.length === 0 ? <EmptyState /> : (
+          {isLoading ? <TableSkeleton /> : cases.length === 0 ? <EmptyState colSpan={colSpan} /> : (
             cases.map((c) => {
               const stageKey = c.current_stage as CaseStage | null
               const stageLabel = stageKey ? (CASE_STAGE_LABELS[stageKey]?.zh ?? c.current_stage) : '-'
@@ -129,6 +124,9 @@ export function CaseTable({ cases, isLoading }: CaseTableProps) {
                       {c.is_filed && <Badge variant="secondary" className="shrink-0 text-xs">已建档</Badge>}
                     </div>
                   </TableCell>
+                  <TableCell className="font-mono text-sm text-muted-foreground">
+                    {c.filing_number || '-'}
+                  </TableCell>
                   <TableCell>
                     {typeLabel
                       ? <Badge variant="outline" className="text-xs">{typeLabel}</Badge>
@@ -143,7 +141,7 @@ export function CaseTable({ cases, isLoading }: CaseTableProps) {
                   </TableCell>
                   <TableCell className="text-sm">{getLawyerDisplay(c)}</TableCell>
                   <TableCell className="text-muted-foreground text-sm">{stageLabel}</TableCell>
-                  <TableCell className="text-muted-foreground font-mono text-sm">{formatDate(c.start_date)}</TableCell>
+                  <TableCell className="text-muted-foreground font-mono text-sm">{formatDateOnly(c.start_date)}</TableCell>
                 </TableRow>
               )
             })

@@ -4,12 +4,12 @@
  * 编辑模式：表单 + 财产线索 Tab + 证件管理 Tab
  */
 
-import { useEffect, useCallback } from 'react'
+import { useEffect, useCallback, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useNavigate } from 'react-router'
-import { Loader2, Save, X } from 'lucide-react'
+import { Loader2, Save, X, Upload } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
@@ -25,6 +25,7 @@ import {
 
 import { useClient } from '../hooks/use-client'
 import { useClientMutations } from '../hooks/use-client-mutations'
+import { clientApi } from '../api'
 import { EnterpriseSearch } from './EnterpriseSearch'
 import { TextParser } from './TextParser'
 import { PropertyClueList } from './PropertyClueList'
@@ -78,6 +79,10 @@ export function ClientForm({ clientId, mode }: ClientFormProps) {
   const idNumberLabel = clientType === 'natural' ? '身份证号' : '统一社会信用代码'
   const legalRepLabel = clientType === 'non_legal_org' ? '负责人' : '法定代表人'
 
+  // 新建模式下的证件上传
+  const [pendingDocs, setPendingDocs] = useState<{ docType: string; file: File }[]>([])
+  const docFileRef = useRef<HTMLInputElement>(null)
+
   useEffect(() => {
     if (isEditMode && client) {
       form.reset({
@@ -108,7 +113,27 @@ export function ClientForm({ clientId, mode }: ClientFormProps) {
     if (data.phone) form.setValue('phone', data.phone || '', { shouldValidate: true })
     if (data.address) form.setValue('address', data.address || '', { shouldValidate: true })
     if (data.legal_representative) form.setValue('legal_representative', data.legal_representative || '', { shouldValidate: true })
+    if (data.legal_representative_id_number) form.setValue('legal_representative_id_number', data.legal_representative_id_number || '', { shouldValidate: true })
   }, [form])
+
+  // 身份证号验证（自然人输入时自动校验）
+  const idCardTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
+  const idNumber = form.watch('id_number')
+  useEffect(() => {
+    if (clientType !== 'natural' || !idNumber || idNumber.length !== 18) return
+    clearTimeout(idCardTimerRef.current)
+    idCardTimerRef.current = setTimeout(async () => {
+      try {
+        const res = await clientApi.validateIdCard(idNumber)
+        if (!res.valid) {
+          form.setError('id_number', { message: res.message })
+        } else {
+          form.clearErrors('id_number')
+        }
+      } catch { /* ignore network errors */ }
+    }, 800)
+    return () => clearTimeout(idCardTimerRef.current)
+  }, [idNumber, clientType, form])
 
   const onSubmit = (data: ClientFormData) => {
     const submitData: ClientInput = {
@@ -126,6 +151,18 @@ export function ClientForm({ clientId, mode }: ClientFormProps) {
       updateClient.mutate({ id: clientId, data: submitData }, {
         onSuccess: (c) => { toast.success('保存成功'); navigate(generatePath.clientDetail(c.id)) },
         onError: (e) => toast.error(e instanceof Error ? e.message : '保存失败'),
+      })
+    } else if (pendingDocs.length > 0) {
+      // 创建当事人并同时上传证件
+      clientApi.createWithDocs(
+        submitData,
+        pendingDocs.map(d => d.docType),
+        pendingDocs.map(d => d.file),
+      ).then((c) => {
+        toast.success('创建成功')
+        navigate(generatePath.clientDetail(c.id))
+      }).catch((e) => {
+        toast.error(e instanceof Error ? e.message : '创建失败')
       })
     } else {
       createClient.mutate(submitData, {
@@ -248,6 +285,46 @@ export function ClientForm({ clientId, mode }: ClientFormProps) {
         <EnterpriseSearch onPrefill={handleEnterprisePrefill} />
         <TextParser onParsed={handleTextParsed} />
         {formContent}
+
+        {/* 证件上传（可选，创建时一并上传） */}
+        <Card>
+          <CardHeader><CardTitle className="text-base">证件上传（可选）</CardTitle></CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground mb-3 text-sm">可在创建当事人时一并上传证件，节省后续操作。</p>
+            <input
+              ref={docFileRef}
+              type="file"
+              accept=".jpg,.jpeg,.png,.pdf"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0]
+                if (file) {
+                  setPendingDocs(prev => [...prev, { docType: 'id_card', file }])
+                }
+                e.target.value = ''
+              }}
+            />
+            <Button type="button" variant="outline" size="sm" onClick={() => docFileRef.current?.click()}>
+              <Upload className="mr-1.5 size-4" />添加证件
+            </Button>
+            {pendingDocs.length > 0 && (
+              <div className="mt-3 space-y-2">
+                {pendingDocs.map((doc, i) => (
+                  <div key={i} className="bg-muted/50 flex items-center justify-between rounded px-3 py-2 text-sm">
+                    <div className="flex items-center gap-2">
+                      <Upload className="size-4" />
+                      <span>{doc.file.name}</span>
+                      <span className="text-muted-foreground text-xs">({(doc.file.size / 1024).toFixed(0)} KB)</span>
+                    </div>
+                    <Button variant="ghost" size="sm" onClick={() => setPendingDocs(prev => prev.filter((_, j) => j !== i))}>
+                      <X className="size-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     )
   }

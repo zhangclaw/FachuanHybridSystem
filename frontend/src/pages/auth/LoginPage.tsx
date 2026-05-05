@@ -8,7 +8,7 @@
  * @validates Requirements 5.7 - 支持明暗主题切换（通过 AuthLayout 实现）
  */
 
-import { useNavigate, Link } from 'react-router'
+import { useNavigate, useSearchParams, Link } from 'react-router'
 import { toast } from 'sonner'
 
 import { LoginForm } from '@/features/auth/components/LoginForm'
@@ -33,14 +33,16 @@ import { AuthLayoutCard } from '@/layouts/AuthLayout'
  */
 export function LoginPage() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
 
   /**
    * 登录成功处理
-   * Validates: Requirement 5.5 - 登录成功跳转到 /dashboard 页面
+   * 优先跳回 redirect 参数指定的页面，否则跳转到 /dashboard
    */
   const handleSuccess = () => {
     toast.success('登录成功')
-    navigate('/dashboard')
+    const redirect = searchParams.get('redirect')
+    navigate(redirect || '/dashboard', { replace: true })
   }
 
   /**
@@ -61,6 +63,16 @@ export function LoginPage() {
         onSuccess={handleSuccess}
         onError={handleError}
       />
+
+      {/* 忘记密码链接 */}
+      <div className="mt-4 text-center text-sm">
+        <Link
+          to="/forgot-password"
+          className="text-muted-foreground hover:text-primary transition-colors"
+        >
+          忘记密码？
+        </Link>
+      </div>
 
       {/* 注册页面链接 - Validates: Requirement 5.6 */}
       <div className="mt-6 text-center text-sm text-muted-foreground">

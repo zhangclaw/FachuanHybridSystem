@@ -7,6 +7,7 @@ import {
   Plus, Trash2, Edit, Paperclip, Upload, FileText, ChevronDown, ChevronUp,
 } from 'lucide-react'
 import { toast } from 'sonner'
+import { formatDateOnly } from '@/lib/date'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -49,7 +50,7 @@ export function PropertyClueList({ clientId }: Props) {
   const toggleExpand = useCallback((id: number) => {
     setCollapsedIds((prev) => {
       const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
+      if (next.has(id)) { next.delete(id) } else { next.add(id) }
       return next
     })
   }, [])
@@ -197,7 +198,7 @@ export function PropertyClueList({ clientId }: Props) {
 
                   {/* 时间 */}
                   <p className="text-muted-foreground mt-2 text-xs">
-                    创建于 {new Date(clue.created_at).toLocaleDateString('zh-CN')}
+                    创建于 {formatDateOnly(clue.created_at)}
                   </p>
                 </CardContent>
               </Card>

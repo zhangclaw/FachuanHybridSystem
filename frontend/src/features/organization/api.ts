@@ -6,7 +6,7 @@
  * Requirements: 8.1-8.21
  */
 
-import ky from 'ky'
+import { createApiClient } from '@/lib/api'
 
 import type {
   LawFirm,
@@ -24,29 +24,8 @@ import type {
   CredentialUpdateInput,
   CredentialListParams,
 } from './types'
-import { getAccessToken } from '@/lib/token'
 
-/**
- * API 基础路径
- */
-const API_BASE = 'http://localhost:8002/api/v1/organization'
-
-/**
- * 创建带 JWT 认证的 Ky 实例
- */
-const api = ky.create({
-  prefixUrl: API_BASE,
-  hooks: {
-    beforeRequest: [
-      (request) => {
-        const token = getAccessToken()
-        if (token) {
-          request.headers.set('Authorization', `Bearer ${token}`)
-        }
-      },
-    ],
-  },
-})
+const api = createApiClient({ prefixUrl: `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8002/api/v1'}/organization` })
 
 // ============================================================================
 // 律所 API
@@ -178,44 +157,22 @@ export const lawyerApi = {
    *
    * Requirements: 8.8
    */
-  create: async (data: LawyerCreateInput, licensePdf?: File): Promise<Lawyer> => {
-    if (licensePdf) {
-      // 使用 FormData 上传文件
+  create: async (data: LawyerCreateInput, licensePdf?: File, avatar?: File): Promise<Lawyer> => {
+    if (licensePdf || avatar) {
       const formData = new FormData()
-
-      // 添加 JSON 数据字段
       Object.entries(data).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
           if (Array.isArray(value)) {
-            // 数组字段需要特殊处理
-            value.forEach((item) => {
-              formData.append(key, String(item))
-            })
+            value.forEach((item) => formData.append(key, String(item)))
           } else {
             formData.append(key, String(value))
           }
         }
       })
-
-      // 添加文件
-      formData.append('license_pdf', licensePdf)
-
-      const token = getAccessToken()
-      const headers: Record<string, string> = {}
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`
-      }
-
-      return ky
-        .post(`${API_BASE}/lawyers`, {
-          body: formData,
-          headers,
-          // 不设置 Content-Type，让浏览器自动设置 multipart/form-data
-        })
-        .json<Lawyer>()
+      if (licensePdf) formData.append('license_pdf', licensePdf)
+      if (avatar) formData.append('avatar', avatar)
+      return api.post('lawyers', { body: formData }).json<Lawyer>()
     }
-
-    // 无文件时使用 JSON
     return api.post('lawyers', { json: data }).json<Lawyer>()
   },
 
@@ -235,45 +192,24 @@ export const lawyerApi = {
   update: async (
     id: number | string,
     data: LawyerUpdateInput,
-    licensePdf?: File
+    licensePdf?: File,
+    avatar?: File,
   ): Promise<Lawyer> => {
-    if (licensePdf) {
-      // 使用 FormData 上传文件
+    if (licensePdf || avatar) {
       const formData = new FormData()
-
-      // 添加 JSON 数据字段
       Object.entries(data).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
           if (Array.isArray(value)) {
-            // 数组字段需要特殊处理
-            value.forEach((item) => {
-              formData.append(key, String(item))
-            })
+            value.forEach((item) => formData.append(key, String(item)))
           } else {
             formData.append(key, String(value))
           }
         }
       })
-
-      // 添加文件
-      formData.append('license_pdf', licensePdf)
-
-      const token = getAccessToken()
-      const headers: Record<string, string> = {}
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`
-      }
-
-      return ky
-        .put(`${API_BASE}/lawyers/${id}`, {
-          body: formData,
-          headers,
-          // 不设置 Content-Type，让浏览器自动设置 multipart/form-data
-        })
-        .json<Lawyer>()
+      if (licensePdf) formData.append('license_pdf', licensePdf)
+      if (avatar) formData.append('avatar', avatar)
+      return api.put(`lawyers/${id}`, { body: formData }).json<Lawyer>()
     }
-
-    // 无文件时使用 JSON
     return api.put(`lawyers/${id}`, { json: data }).json<Lawyer>()
   },
 

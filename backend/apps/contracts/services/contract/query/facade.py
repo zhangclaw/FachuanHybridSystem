@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import math
 from typing import Any
 
 from django.db.models import QuerySet
@@ -52,33 +51,26 @@ class ContractQueryFacade:
         self,
         case_type: str | None = None,
         status: str | None = None,
+        search: str | None = None,
+        fee_mode: str | None = None,
         is_filed: bool | None = None,
         user: Any | None = None,
         org_access: dict[str, Any] | None = None,
         perm_open_access: bool = False,
-        page: int = 1,
-        page_size: int = 20,
-    ) -> dict[str, Any]:
+    ) -> list[Contract]:
         qs = self.query_service.list_contracts(
             case_type=case_type,
             status=status,
+            search=search,
+            fee_mode=fee_mode,
             is_filed=is_filed,
             user=user,
             org_access=org_access,
             perm_open_access=perm_open_access,
         )
-        total = qs.count()
-        total_pages = math.ceil(total / page_size) if total > 0 else 1
-        start = (page - 1) * page_size
-        contracts = list(qs[start : start + page_size])
+        contracts = list(qs)
         self.list_assembler.enrich(contracts)
-        return {
-            "items": contracts,
-            "total": total,
-            "page": page,
-            "page_size": page_size,
-            "total_pages": total_pages,
-        }
+        return contracts
 
     def list_contracts_ctx(
         self,
@@ -86,12 +78,16 @@ class ContractQueryFacade:
         ctx: AccessContext,
         case_type: str | None = None,
         status: str | None = None,
+        search: str | None = None,
+        fee_mode: str | None = None,
         is_filed: bool | None = None,
     ) -> list[Contract]:
         qs = self.query_service.list_contracts_ctx(
             ctx=ctx,
             case_type=case_type,
             status=status,
+            search=search,
+            fee_mode=fee_mode,
             is_filed=is_filed,
         )
         contracts = list(qs)

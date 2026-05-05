@@ -3,17 +3,11 @@
  * 集中管理所有路由路径，避免硬编码
  */
 export const PATHS = {
-  // 公开页面
-  HOME: '/',
-  ABOUT: '/about',
-  PRICING: '/pricing',
-  TUTORIAL: '/tutorial',
-  PORTAL: '/portal/:token',
-
   // 认证页面
   LOGIN: '/login',
   REGISTER: '/register',
   FORGOT_PASSWORD: '/forgot-password',
+  RESET_PASSWORD: '/reset-password',
 
   // 后台页面 - 使用 /admin 前缀
   ADMIN_DASHBOARD: '/admin/dashboard',
@@ -33,7 +27,6 @@ export const PATHS = {
   ADMIN_CLIENT_EDIT: '/admin/clients/:id/edit',
   ADMIN_DOCUMENTS: '/admin/documents',
   ADMIN_REMINDERS: '/admin/reminders',
-  ADMIN_SETTINGS: '/admin/settings',
 
   // 组织管理
   ADMIN_ORGANIZATION: '/admin/organization',
@@ -64,6 +57,25 @@ export const PATHS = {
   ADMIN_AUTOMATION_RECOGNITION: '/admin/automation/document-recognition',
   ADMIN_AUTOMATION_RECOGNITION_DETAIL: '/admin/automation/document-recognition/:id',
 
+  // Phase 3: 新功能模块
+  ADMIN_TEMPLATES: '/admin/templates',
+  ADMIN_TEMPLATE_DETAIL: '/admin/templates/:id',
+  ADMIN_TEMPLATE_NEW: '/admin/templates/new',
+  ADMIN_MESSAGE_SOURCES: '/admin/message-sources',
+  ADMIN_TASK_QUEUE: '/admin/task-queue',
+  ADMIN_LOGS: '/admin/logs',
+  ADMIN_TOOLS_COURT_SMS: '/admin/tools/court-sms',
+  ADMIN_TOOLS_COURT_SMS_DETAIL: '/admin/tools/court-sms/:id',
+  ADMIN_TOOLS_COURIER: '/admin/tools/courier-tracking',
+  ADMIN_TOOLS_ELEMENT: '/admin/tools/element-convert',
+  ADMIN_TOOLS_LPR: '/admin/tools/lpr-calculator',
+
+  // Phase 4: 设置重构
+  ADMIN_SETTINGS_LAW_FIRM: '/admin/settings/law-firm',
+  ADMIN_SETTINGS_TEAM: '/admin/settings/team',
+  ADMIN_SETTINGS_LAWYER: '/admin/settings/lawyer',
+  ADMIN_SETTINGS_CONFIG: '/admin/settings/config/:category',
+
   // 外部链接
   GITHUB: 'https://github.com/huangsong/fachuanai',
 } as const
@@ -72,7 +84,6 @@ export const PATHS = {
  * 生成带参数的路由路径
  */
 export const generatePath = {
-  portal: (token: string) => `/portal/${token}`,
   inboxDetail: (id: string | number) => `/admin/inbox/${id}`,
   caseDetail: (id: string) => `/admin/cases/${id}`,
   caseEdit: (id: string) => `/admin/cases/${id}/edit`,
@@ -89,4 +100,8 @@ export const generatePath = {
   // 自动化工具
   quoteDetail: (id: string | number) => `/admin/automation/preservation-quotes/${id}`,
   recognitionDetail: (id: string | number) => `/admin/automation/document-recognition/${id}`,
+  // 模板管理
+  templateDetail: (id: string | number) => `/admin/templates/${id}`,
+  // 法院短信
+  courtSmsDetail: (id: number) => `/admin/tools/court-sms/${id}`,
 } as const

@@ -13,10 +13,10 @@ export const CASE_TYPE_LABELS: Record<CaseType, string> = {
   labor: '劳动仲裁', intl: '商事仲裁', special: '专项服务', advisor: '常法顾问',
 }
 
-export type ContractStatus = 'unsigned' | 'active' | 'archived'
+export type ContractStatus = 'unsigned' | 'active' | 'closed' | 'archived'
 
 export const CONTRACT_STATUS_LABELS: Record<ContractStatus, string> = {
-  unsigned: '未签约', active: '在办', archived: '已归档',
+  unsigned: '未签约', active: '在办', closed: '已结案', archived: '已归档',
 }
 
 export type FeeMode = 'FIXED' | 'SEMI_RISK' | 'FULL_RISK' | 'CUSTOM'
@@ -110,6 +110,7 @@ export interface ContractPayment {
   note: string | null
   created_at: string | null
   updated_at: string | null
+  invoices: Invoice[]
 }
 
 export interface SupplementaryAgreementParty {
@@ -129,6 +130,75 @@ export interface SupplementaryAgreement {
   parties: SupplementaryAgreementParty[]
   created_at: string
   updated_at: string
+}
+
+export interface Invoice {
+  id: number
+  payment: number
+  amount: number
+  invoice_no: string | null
+  invoice_number: string | null
+  total_amount: number | null
+  original_filename: string | null
+  uploaded_at: string | null
+  issued_at: string | null
+  note: string | null
+  created_at: string | null
+}
+
+export interface ClientPaymentRecord {
+  id: number
+  contract: number
+  amount: number
+  received_at: string | null
+  note: string | null
+  image_url: string | null
+  image_path: string | null
+  created_at: string | null
+}
+
+export interface FinalizedMaterial {
+  id: number
+  category: string
+  category_label: string
+  filename: string
+  original_filename: string
+  file_url: string
+  file_size: number | null
+  source: string
+  source_label: string
+  order: number
+  archive_item_code: string | null
+  remark: string | null
+  uploaded_at: string | null
+  created_at: string | null
+}
+
+export type MaterialCategory =
+  | 'contract_original'
+  | 'supplementary_agreement'
+  | 'invoice'
+  | 'archive_doc'
+  | 'supervision_card'
+  | 'auth_doc'
+  | 'other'
+
+export const MATERIAL_CATEGORY_LABELS: Record<MaterialCategory, string> = {
+  contract_original: '合同原件',
+  supplementary_agreement: '补充协议',
+  invoice: '发票',
+  archive_doc: '归档文件',
+  supervision_card: '监督卡',
+  auth_doc: '授权材料',
+  other: '其他',
+}
+
+export interface ArchiveChecklistItem {
+  category: MaterialCategory
+  label: string
+  required: boolean
+  done: boolean
+  materials: FinalizedMaterial[]
 }
 
 export interface Contract {
@@ -152,6 +222,8 @@ export interface Contract {
   reminders: Reminder[]
   payments: ContractPayment[]
   supplementary_agreements: SupplementaryAgreement[]
+  client_payment_records: ClientPaymentRecord[]
+  can_archive: boolean
   total_received: number
   total_invoiced: number
   unpaid_amount: number | null
@@ -160,6 +232,10 @@ export interface Contract {
   matched_document_template: string | null
   matched_folder_templates: string | null
   has_matched_templates: boolean
+  finalized_materials: FinalizedMaterial[]
+  filing_number: string | null
+  law_firm_oa_url: string | null
+  law_firm_oa_case_number: string | null
 }
 
 // ============================================================================
@@ -352,6 +428,9 @@ export interface ContractListParams {
   page_size?: number
   case_type?: CaseType
   status?: ContractStatus
+  search?: string
+  fee_mode?: FeeMode
+  is_filed?: boolean
 }
 
 export interface ContractPartySource {
