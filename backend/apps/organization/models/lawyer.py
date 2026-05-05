@@ -24,20 +24,20 @@ class LawyerManager(UserManager):
     此管理器确保无 email 时存为 NULL（PostgreSQL 允许多个 NULL）。
     """
 
-    def _create_user(self, username, email, password, **extra_fields):
+    def _create_user(self, username: str, email: str | None, password: str, **extra_fields: object) -> "Lawyer":  # type: ignore[override]
         if email is None:
             # 跳过 normalize_email，直接传 None 给 model，确保数据库存 NULL
             user = self.model(username=username, email=None, **extra_fields)
             user.set_password(password)
             user.save(using=self._db)
-            return user
-        return super()._create_user(username, email, password, **extra_fields)
+            return user  # type: ignore[return-value]
+        return super()._create_user(username, email, password, **extra_fields)  # type: ignore[misc]
 
 
 class Lawyer(AbstractUser):
     """律师模型，扩展自 Django AbstractUser，代表系统用户。"""
 
-    objects = LawyerManager()
+    objects: LawyerManager = LawyerManager()  # type: ignore[misc]
 
     real_name = models.CharField(max_length=255, null=True, blank=True, verbose_name=_("真实姓名"))
     law_firm_id: int | None  # 外键ID字段
