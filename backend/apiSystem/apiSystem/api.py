@@ -263,6 +263,10 @@ def _register_app_routers() -> None:
 
     api_v1.add_router("/search", search_router, auth=JWTOrSessionAuth(), tags=["全局搜索"])
 
+    from apps.workbench.api import router as workbench_router
+
+    api_v1.add_router("/workbench", workbench_router, auth=JWTOrSessionAuth(), tags=["工作台"])
+
     api_v1.add_router("/court-filing", court_filing_router, auth=JWTOrSessionAuth(), tags=["一张网立案"])
     api_v1.add_router("/court-guarantee", court_guarantee_router, auth=JWTOrSessionAuth(), tags=["一张网担保"])
 
