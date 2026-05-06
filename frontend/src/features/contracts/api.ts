@@ -170,11 +170,14 @@ export const contractApi = {
 
   // ==================== Document Generation ====================
 
-  generateContract: async (contractId: number | string): Promise<Blob> =>
-    contractApi_.get(`${contractId}/generate-doc`).blob(),
+  generateContract: async (contractId: number | string, splitFee = false): Promise<Response> =>
+    api.get(`documents/contracts/${contractId}/download`, { searchParams: splitFee ? { split_fee: 'true' } : {} }),
 
-  generateSupplementaryAgreement: async (agreementId: number): Promise<Blob> =>
-    contractApi_.get(`supplementary-agreements/${agreementId}/generate-doc`).blob(),
+  generateFolder: async (contractId: number | string): Promise<Blob> =>
+    api.get(`documents/contracts/${contractId}/folder/download`).blob(),
+
+  generateSupplementaryAgreement: async (contractId: number | string, agreementId: number): Promise<Response> =>
+    api.get(`documents/contracts/${contractId}/supplementary-agreements/${agreementId}/download`),
 
   // ==================== Contract Actions ====================
 
