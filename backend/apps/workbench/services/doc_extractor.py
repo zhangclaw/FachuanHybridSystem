@@ -22,7 +22,7 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
-MAX_TEXT_LENGTH = 30000
+MAX_TEXT_LENGTH = 100000  # 上限保护，长文档由 tasks.py 分段处理
 BATCH_CONVERT_SIZE = 25  # 每批转换的文件数
 
 
@@ -249,6 +249,92 @@ class DocTextExtractor:
                         logger.error("单文件转换失败: %s - %s", doc_path, e)
 
         logger.info("批量转换完成: %d/%d 成功", len(result), len(doc_paths))
+        self._batch_converted.update(result)
+        return result
+
+    async def batch_convert_doc_to_docx_async(
+        self,
+        doc_paths: list[str],
+        output_dir: str | None = None,
+        parallel_batches: int = 3,
+    ) -> dict[str, str]:
+        """异步批量将 .doc 转换为 .docx
+
+        用 asyncio.create_subprocess_exec 并行运行多个 LibreOffice 批次。
+
+        Args:
+            doc_paths: .doc 文件路径列表
+            output_dir: 输出目录
+            parallel_batches: 并行批次数
+
+        Returns:
+            {原始 .doc 路径: 转换后的 .docx 路径}
+        """
+        import asyncio
+
+        if not doc_paths:
+            return {}
+
+        soffice = self._find_libreoffice()
+        if not soffice:
+            raise RuntimeError(
+                "未找到 LibreOffice，无法转换 .doc 文件。请安装 LibreOffice: https://www.libreoffice.org/"
+            )
+
+        if output_dir is None:
+            output_dir = tempfile.mkdtemp(prefix="workbench_batch_")
+            self._batch_temp_dir = output_dir
+
+        output_path = Path(output_dir)
+        output_path.mkdir(parents=True, exist_ok=True)
+
+        # 分批
+        batches: list[list[str]] = []
+        for i in range(0, len(doc_paths), BATCH_CONVERT_SIZE):
+            batches.append(doc_paths[i : i + BATCH_CONVERT_SIZE])
+
+        result: dict[str, str] = {}
+
+        # 并行执行批次
+        for batch_group_start in range(0, len(batches), parallel_batches):
+            group = batches[batch_group_start : batch_group_start + parallel_batches]
+            logger.info(
+                "LibreOffice 异步批量转换: 第 %d-%d 批 (共 %d 批)",
+                batch_group_start + 1,
+                min(batch_group_start + parallel_batches, len(batches)),
+                len(batches),
+            )
+
+            async def run_batch(batch: list[str]) -> None:
+                cmd = [soffice, "--headless", "--convert-to", "docx", "--outdir", str(output_path)] + batch
+                proc = await asyncio.create_subprocess_exec(
+                    *cmd,
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.PIPE,
+                )
+                stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=120)
+                if proc.returncode != 0:
+                    logger.error("LibreOffice 异步转换失败: %s", stderr.decode(errors="replace"))
+                    # 回退到同步逐个转换
+                    for doc_path in batch:
+                        try:
+                            docx_path = self._convert_single_doc(doc_path)
+                            result[doc_path] = docx_path
+                        except Exception as e:
+                            logger.error("单文件转换失败: %s - %s", doc_path, e)
+                    return
+
+                for doc_path in batch:
+                    doc_name = Path(doc_path).stem + ".docx"
+                    docx_path = output_path / doc_name
+                    if docx_path.exists():
+                        result[doc_path] = str(docx_path)
+                    else:
+                        logger.warning("转换后文件未找到: %s", docx_path)
+
+            await asyncio.gather(*(run_batch(b) for b in group))
+
+        logger.info("异步批量转换完成: %d/%d 成功", len(result), len(doc_paths))
         self._batch_converted.update(result)
         return result
 

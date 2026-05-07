@@ -135,6 +135,11 @@ export interface BatchJob {
   error_message: string
   created_at: string
   updated_at: string
+  started_at: string | null
+  finished_at: string | null
+  started_processing_at: string | null
+  eta_seconds: number | null
+  speed_per_minute: number
 }
 
 export interface BatchJobItem {
@@ -146,7 +151,14 @@ export interface BatchJobItem {
   duration_ms: number | null
 }
 
+export interface FailedItemDetail {
+  id: string
+  file_name: string
+  error: string
+}
+
 export interface BatchProgress {
   job: BatchJob
   items: BatchJobItem[]
+  failed_items_detail: FailedItemDetail[]
 }

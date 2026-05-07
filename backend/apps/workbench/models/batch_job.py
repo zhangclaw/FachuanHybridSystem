@@ -56,12 +56,11 @@ class BatchJob(models.Model):
     cancel_requested = models.BooleanField(_("请求取消"), default=False)
     task_id = models.CharField(_("Django Q2 任务ID"), max_length=255, blank=True, default="")
     summary = models.TextField(_("汇总结论"), blank=True, default="")
-    summary_file = models.FileField(
-        _("汇总文件"), upload_to=DatedUUIDPath("workbench_summary"), blank=True, default=""
-    )
+    summary_file = models.FileField(_("汇总文件"), upload_to=DatedUUIDPath("workbench_summary"), blank=True, default="")
     metadata = models.JSONField(_("元数据"), default=dict, blank=True)
     error_message = models.TextField(_("错误信息"), blank=True, default="")
     started_at = models.DateTimeField(_("开始时间"), null=True, blank=True)
+    started_processing_at = models.DateTimeField(_("首个文件开始处理时间"), null=True, blank=True)
     finished_at = models.DateTimeField(_("完成时间"), null=True, blank=True)
     created_at = models.DateTimeField(_("创建时间"), auto_now_add=True)
     updated_at = models.DateTimeField(_("更新时间"), auto_now=True)

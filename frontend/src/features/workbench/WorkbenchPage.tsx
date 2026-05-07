@@ -2,7 +2,7 @@
 
 import { useEffect, useCallback, useState, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router'
-import { Bot, Plus, Trash2, Loader2, Pencil, Search, X, PanelLeftClose, PanelLeft, Menu } from 'lucide-react'
+import { Bot, Plus, Trash2, Loader2, Pencil, Search, X, PanelLeftClose, PanelLeft, Menu, History } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
@@ -15,6 +15,8 @@ import { ContextUsageBar } from './components/ContextUsageBar'
 import { ApprovalDialog } from './components/ApprovalDialog'
 import { BatchAnalysisDialog } from './components/BatchAnalysisDialog'
 import { BatchProgressCard } from './components/BatchProgressCard'
+import { BatchHistoryPanel } from './components/BatchHistoryPanel'
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet'
 import { deleteSession, updateSession } from './api'
 import { generatePath } from '@/routes/paths'
 
@@ -43,6 +45,7 @@ export function WorkbenchPage() {
   const setAdminSidebarCollapsed = useUIStore((s) => s.setSidebarCollapsed)
 
   const [isCreating, setIsCreating] = useState(false)
+  const [historyOpen, setHistoryOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768)
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
@@ -295,6 +298,17 @@ export function WorkbenchPage() {
               disabled={isStreaming}
             />
           )}
+          {currentSession && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setHistoryOpen(true)}
+              className="size-7"
+              title="批量分析历史"
+            >
+              <History className="size-3.5" />
+            </Button>
+          )}
           <ModelSelector disabled={isStreaming} />
         </div>
 
@@ -310,6 +324,7 @@ export function WorkbenchPage() {
                   job={batchProgress.job}
                   items={batchProgress.items}
                   onCancel={cancelBatchAnalysis}
+                  failedItemsDetail={batchProgress.failed_items_detail}
                 />
               </div>
             )}
@@ -349,6 +364,21 @@ export function WorkbenchPage() {
           </div>
         )}
       </div>
+
+      {/* 批量分析历史侧边面板 */}
+      {currentSession && (
+        <Sheet open={historyOpen} onOpenChange={setHistoryOpen}>
+          <SheetContent className="w-[360px] sm:w-[400px]">
+            <SheetHeader>
+              <SheetTitle>批量分析历史</SheetTitle>
+              <SheetDescription>查看当前会话的批量分析任务记录</SheetDescription>
+            </SheetHeader>
+            <div className="mt-4 overflow-y-auto max-h-[calc(100vh-8rem)]">
+              <BatchHistoryPanel sessionId={currentSession.id} />
+            </div>
+          </SheetContent>
+        </Sheet>
+      )}
     </div>
   )
 }

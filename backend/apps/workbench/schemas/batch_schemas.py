@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Any
 from uuid import UUID
 
 from pydantic import BaseModel, field_validator
@@ -35,6 +36,13 @@ class BatchJobOut(BaseModel):
     error_message: str
     created_at: datetime | None = None
     updated_at: datetime | None = None
+    started_at: datetime | None = None
+    finished_at: datetime | None = None
+    started_processing_at: datetime | None = None
+
+    # 计算字段
+    eta_seconds: float | None = None
+    speed_per_minute: float = 0.0
 
     model_config = {"from_attributes": True}
 
@@ -52,3 +60,4 @@ class BatchJobOut(BaseModel):
 class BatchProgressOut(BaseModel):
     job: BatchJobOut
     items: list[BatchItemOut]
+    failed_items_detail: list[dict[str, Any]] = []

@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 from typing import Any
 from uuid import UUID
 
+from asgiref.sync import sync_to_async
 from django.http import FileResponse, Http404, StreamingHttpResponse
 from ninja import File, Form, Router, Schema
 from ninja.files import UploadedFile
@@ -268,9 +270,11 @@ def get_batch_progress(request: Any, job_id: UUID) -> dict[str, Any]:
     job, items = _batch_service.get_job_progress(job_id)
     # 验证权限：job 关联的 session 必须属于当前用户
     _get_user_session(request.user, job.session_id)
+    failed_detail = _batch_service.get_failed_items_detail(job_id)
     return {
         "job": BatchJobOut.model_validate(job),
         "items": [BatchItemOut.model_validate(item) for item in items],
+        "failed_items_detail": failed_detail,
     }
 
 
@@ -309,6 +313,7 @@ def download_batch_summary(request: Any, job_id: UUID) -> FileResponse:
 
 class BatchMessageItemIn(Schema):
     """批量消息持久化请求体"""
+
     file_name: str
     content: str
     metadata: dict[str, Any] = {}
@@ -334,6 +339,74 @@ def save_batch_messages(request: Any, job_id: UUID, payload: list[BatchMessageIt
         created.append(msg.id)
 
     return {"success": True, "created_count": len(created)}
+
+
+# ─── 批量分析增强 API ────────────────────────────────────────────────────────
+
+
+@router.get("/batch/{job_id}/stream")
+async def stream_batch_progress(request: Any, job_id: UUID) -> StreamingHttpResponse:
+    """SSE 流式推送批量分析进度
+
+    前端通过此端点实时获取 item 完成事件和进度更新，替代轮询。
+    """
+    try:
+        job = await BatchJob.objects.aget(id=job_id)
+    except BatchJob.DoesNotExist:
+        raise Http404("任务不存在")
+    _get_user_session(request.user, job.session_id)
+
+    async def event_generator() -> Any:
+        from django.core.cache import cache
+
+        last_event_idx = 0
+        while True:
+            events = await sync_to_async(cache.get)(f"batch_sse:{job_id}") or []
+            # 发送新事件
+            for event in events[last_event_idx:]:
+                yield f"data: {json.dumps(event, ensure_ascii=False)}\n\n"
+            last_event_idx = len(events)
+
+            # 检查终态
+            status = await sync_to_async(lambda: BatchJob.objects.values_list("status", flat=True).get(id=job_id))()
+            if status in ("completed", "failed", "cancelled"):
+                yield f"data: {json.dumps({'type': 'done', 'status': status})}\n\n"
+                break
+
+            await asyncio.sleep(0.5)
+
+    return StreamingHttpResponse(
+        event_generator(),
+        content_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",
+        },
+    )
+
+
+@router.post("/batch/{job_id}/retry")
+def retry_failed_items(request: Any, job_id: UUID) -> dict[str, Any]:
+    """重试批量分析中失败的文件"""
+    job = _batch_service.get_job_progress(job_id)[0]
+    _get_user_session(request.user, job.session_id)
+    result = _batch_service.retry_failed(job_id)
+    return result
+
+
+@router.get("/sessions/{session_id}/batch-jobs")
+def list_batch_jobs(request: Any, session_id: int, page: int = 1) -> dict[str, Any]:
+    """获取会话的批量分析任务历史"""
+    _get_user_session(request.user, session_id)
+    qs = BatchJob.objects.filter(session_id=session_id).order_by("-created_at")
+    page_size = 20
+    offset = (page - 1) * page_size
+    total = qs.count()
+    items = list(qs[offset : offset + page_size])
+    return {
+        "items": [BatchJobOut.model_validate(j).model_dump() for j in items],
+        "count": total,
+    }
 
 
 # ─── 模型列表 API ────────────────────────────────────────────────────────────
