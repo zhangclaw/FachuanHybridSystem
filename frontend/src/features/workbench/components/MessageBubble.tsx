@@ -1,6 +1,6 @@
 /** 消息气泡组件 */
 
-import { useState, useRef, useEffect, useCallback } from 'react'
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import {
   Bot,
   User,
@@ -12,6 +12,7 @@ import {
   Loader2,
   ArrowRight,
   Copy,
+  Check,
   RefreshCw,
   ThumbsUp,
   ThumbsDown,
@@ -20,6 +21,13 @@ import {
 } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import rehypeHighlight from 'rehype-highlight'
+import hljs from 'highlight.js/lib/core'
+import json from 'highlight.js/lib/languages/json'
+import 'highlight.js/styles/github-dark.css'
+
+// 只注册 json 语言（工具调用 JSON 高亮用）
+hljs.registerLanguage('json', json)
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import { Textarea } from '@/components/ui/textarea'
@@ -185,6 +193,17 @@ function InlineToolCalls({ toolCalls }: { toolCalls: WorkbenchMessage[] }) {
   )
 }
 
+/** JSON 语法高亮块 */
+function JsonBlock({ data }: { data: unknown }) {
+  const json = typeof data === 'string' ? data : JSON.stringify(data, null, 2)
+  const html = hljs.highlight(json, { language: 'json' }).value
+  return (
+    <pre className="whitespace-pre-wrap break-words bg-background/50 rounded p-1.5 text-[11px] overflow-x-auto">
+      <code dangerouslySetInnerHTML={{ __html: html }} />
+    </pre>
+  )
+}
+
 /** 单个内联工具调用（可折叠） */
 function InlineToolCall({ tool }: { tool: WorkbenchMessage }) {
   const [expanded, setExpanded] = useState(false)
@@ -214,17 +233,13 @@ function InlineToolCall({ tool }: { tool: WorkbenchMessage }) {
           {Object.keys(tool.tool_input).length > 0 && (
             <div>
               <div className="text-muted-foreground mb-1">输入</div>
-              <pre className="whitespace-pre-wrap break-words bg-background/50 rounded p-1.5 text-[11px]">
-                {JSON.stringify(tool.tool_input, null, 2)}
-              </pre>
+              <JsonBlock data={tool.tool_input} />
             </div>
           )}
           {Object.keys(tool.tool_output).length > 0 && (
             <div>
               <div className="text-muted-foreground mb-1">输出</div>
-              <pre className="whitespace-pre-wrap break-words bg-background/50 rounded p-1.5 text-[11px]">
-                {JSON.stringify(tool.tool_output, null, 2)}
-              </pre>
+              <JsonBlock data={tool.tool_output} />
             </div>
           )}
         </div>
@@ -430,29 +445,79 @@ function preprocessContent(content: string): string {
   ).trim()
 }
 
-/** Markdown 内容渲染 */
-function MarkdownContent({ content, isSystem }: { content: string; isSystem?: boolean }) {
+/** 代码块（带语言标签 + 复制按钮） */
+function CodeBlockWithCopy({ children, ...props }: React.HTMLAttributes<HTMLPreElement>) {
+  const codeRef = useRef<HTMLElement>(null)
+  const [copied, setCopied] = useState(false)
+
+  const codeChild = React.Children.only(children) as React.ReactElement<{ className?: string }>
+  const className = codeChild?.props?.className || ''
+  const language = className.replace('hljs language-', '').replace('language-', '') || ''
+
+  const handleCopy = () => {
+    const text = codeRef.current?.textContent || ''
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true)
+      toast.success('已复制')
+      setTimeout(() => setCopied(false), 2000)
+    })
+  }
+
+  return (
+    <div className="relative group/code my-2">
+      <div className="flex items-center justify-between rounded-t-md border border-border/50 border-b-0 bg-card px-3 py-1 text-[11px] text-muted-foreground">
+        <span>{language || 'code'}</span>
+        <button
+          onClick={handleCopy}
+          className="flex items-center justify-center rounded p-0.5 hover:bg-accent hover:text-foreground transition-colors"
+          title="复制代码"
+        >
+          {copied ? <Check className="size-3" /> : <Copy className="size-3" />}
+        </button>
+      </div>
+      <pre
+        {...props}
+        className="!rounded-t-none !mt-0 !border-t-0 whitespace-pre-wrap break-words border border-border/50 bg-card p-3 text-xs overflow-x-auto"
+      >
+        {React.cloneElement(codeChild as React.ReactElement<Record<string, unknown>>, { ref: codeRef })}
+      </pre>
+    </div>
+  )
+}
+
+/** Markdown 内容渲染（memo 优化，避免 streaming 时历史消息重渲染） */
+const MarkdownContent = React.memo(function MarkdownContent({
+  content,
+  isSystem,
+}: {
+  content: string
+  isSystem?: boolean
+}) {
+  const processed = useMemo(() => preprocessContent(content), [content])
+
   return (
     <div
       className={cn(
         'prose prose-sm dark:prose-invert max-w-none break-words overflow-hidden',
         'prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0',
-        'prose-pre:my-2 prose-pre:rounded-md prose-pre:border prose-pre:border-border/50 prose-pre:bg-card prose-pre:p-3 prose-pre:text-xs prose-pre:overflow-x-auto',
         'prose-code:before:content-none prose-code:after:content-none',
         'prose-code:bg-card prose-code:border prose-code:border-border/50 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-xs',
         'prose-table:text-xs prose-th:px-2 prose-th:py-1 prose-td:px-2 prose-td:py-1',
         'prose-hr:my-2 prose-blockquote:my-1 prose-blockquote:border-l-2',
-        // 统一文字颜色，确保所有元素清晰可读
         'text-foreground',
         isSystem && 'prose-red',
       )}
     >
-      <ReactMarkdown remarkPlugins={[remarkGfm]}>
-        {preprocessContent(content)}
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        rehypePlugins={[rehypeHighlight]}
+        components={{ pre: CodeBlockWithCopy }}
+      >
+        {processed}
       </ReactMarkdown>
     </div>
   )
-}
+})
 
 /** 批量分析汇总：CSV 下载按钮 */
 function BatchDownloadButton({ jobId }: { jobId: string }) {

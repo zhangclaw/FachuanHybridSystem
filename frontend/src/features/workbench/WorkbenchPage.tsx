@@ -2,7 +2,7 @@
 
 import { useEffect, useCallback, useState, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router'
-import { Bot, Plus, Trash2, Loader2, Pencil, Search, X, PanelLeftClose, PanelLeft, Menu, History } from 'lucide-react'
+import { Bot, Plus, Trash2, Loader2, Pencil, Search, X, PanelLeftClose, PanelLeft, Menu, History, Download, AlertTriangle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
@@ -16,8 +16,13 @@ import { ApprovalDialog } from './components/ApprovalDialog'
 import { BatchAnalysisDialog } from './components/BatchAnalysisDialog'
 import { BatchProgressCard } from './components/BatchProgressCard'
 import { BatchHistoryPanel } from './components/BatchHistoryPanel'
+import { SuggestedPrompts } from './components/SuggestedPrompts'
+import { WorkbenchCommandPalette } from './components/WorkbenchCommandPalette'
+import { useContextUsage } from './hooks/use-context-usage'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet'
 import { deleteSession, updateSession } from './api'
+import { exportToMarkdown, downloadFile } from './utils/export'
+import { toast } from 'sonner'
 import { generatePath } from '@/routes/paths'
 
 export function WorkbenchPage() {
@@ -37,7 +42,12 @@ export function WorkbenchPage() {
     batchProgress,
     submitBatchAnalysis,
     cancelBatchAnalysis,
+    messages,
+    messagesLoading,
+    abortStream,
   } = useWorkbenchStore()
+
+  const { percent: contextPercent } = useContextUsage()
 
   const { sessionId } = useParams<{ sessionId: string }>()
   const navigate = useNavigate()
@@ -46,6 +56,7 @@ export function WorkbenchPage() {
 
   const [isCreating, setIsCreating] = useState(false)
   const [historyOpen, setHistoryOpen] = useState(false)
+  const [commandOpen, setCommandOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768)
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
@@ -90,6 +101,35 @@ export function WorkbenchPage() {
       setIsCreating(false)
     }
   }, [createSession, navigate])
+
+  // 全局快捷键
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const mod = e.metaKey || e.ctrlKey
+      if (mod && e.shiftKey && e.key.toLowerCase() === 'k') {
+        e.preventDefault()
+        setCommandOpen((prev) => !prev)
+      }
+      if (mod && e.key === '.') {
+        e.preventDefault()
+        if (isStreaming) abortStream()
+      }
+      if (mod && e.key === 'n') {
+        e.preventDefault()
+        handleNewSession()
+      }
+      if (mod && e.key === 'e') {
+        e.preventDefault()
+        if (currentSession && messages.length > 0) {
+          const md = exportToMarkdown(messages, currentSession.title || '对话')
+          downloadFile(md, `${currentSession.title || '对话'}.md`, 'text/markdown;charset=utf-8')
+          toast.success('已导出 Markdown')
+        }
+      }
+    }
+    document.addEventListener('keydown', handler)
+    return () => document.removeEventListener('keydown', handler)
+  }, [isStreaming, abortStream, currentSession, messages, handleNewSession])
 
   const handleDeleteSession = useCallback(
     async (id: number) => {
@@ -309,6 +349,21 @@ export function WorkbenchPage() {
               <History className="size-3.5" />
             </Button>
           )}
+          {currentSession && messages.length > 0 && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => {
+                const md = exportToMarkdown(messages, currentSession.title || '对话')
+                downloadFile(md, `${currentSession.title || '对话'}.md`, 'text/markdown;charset=utf-8')
+                toast.success('已导出 Markdown')
+              }}
+              className="size-7"
+              title="导出对话"
+            >
+              <Download className="size-3.5" />
+            </Button>
+          )}
           <ModelSelector disabled={isStreaming} />
         </div>
 
@@ -316,6 +371,11 @@ export function WorkbenchPage() {
         {currentSession ? (
           <>
             <MessageList />
+
+            {/* 空状态建议提示 */}
+            {messages.length === 0 && !messagesLoading && !isStreaming && (
+              <SuggestedPrompts onSelect={handleSend} />
+            )}
 
             {/* 批量分析进度 */}
             {batchProgress && (
@@ -336,6 +396,17 @@ export function WorkbenchPage() {
                   approval={pendingApproval}
                   onRespond={respondApproval}
                 />
+              </div>
+            )}
+
+            {/* 上下文窗口溢出警告 */}
+            {contextPercent >= 90 && (
+              <div className="mx-4 mb-2 flex items-center gap-2 rounded-md bg-yellow-500/10 border border-yellow-500/20 px-3 py-2 text-xs text-yellow-700 dark:text-yellow-400">
+                <AlertTriangle className="size-3.5 shrink-0" />
+                <span>上下文窗口已使用 {contextPercent}%，建议新建会话以获得更好的回复质量</span>
+                <Button size="sm" variant="outline" onClick={handleNewSession} className="ml-auto text-xs h-6">
+                  新建会话
+                </Button>
               </div>
             )}
 
@@ -379,6 +450,16 @@ export function WorkbenchPage() {
           </SheetContent>
         </Sheet>
       )}
+
+      {/* 命令面板 */}
+      <WorkbenchCommandPalette
+        open={commandOpen}
+        onOpenChange={setCommandOpen}
+        onNewSession={() => {
+          setCommandOpen(false)
+          handleNewSession()
+        }}
+      />
     </div>
   )
 }
