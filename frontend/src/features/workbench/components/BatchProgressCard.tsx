@@ -77,13 +77,6 @@ export function BatchProgressCard({ job, items, onCancel }: BatchProgressCardPro
         <span className="text-muted-foreground">待处理: {job.total_items - job.completed_items - job.failed_items}</span>
       </div>
 
-      {/* 汇总结果 */}
-      {isCompleted && job.summary && (
-        <div className="rounded-md bg-muted p-3 text-sm whitespace-pre-wrap max-h-60 overflow-y-auto">
-          {job.summary}
-        </div>
-      )}
-
       {/* 错误信息 */}
       {(isFailed || isCancelled) && job.error_message && (
         <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">

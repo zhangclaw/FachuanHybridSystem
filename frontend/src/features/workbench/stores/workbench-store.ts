@@ -19,6 +19,8 @@ const SELECTED_AGENT_KEY = 'workbench_selected_agent'
 
 // 用于中断正在进行的流式请求
 let _abortController: AbortController | null = null
+// 跟踪已展示的批量分析 item ID，避免重复注入消息
+let _shownBatchItemIds: Set<string> = new Set()
 
 function loadFavoriteModel(): string {
   try {
@@ -492,6 +494,7 @@ export const useWorkbenchStore = create<WorkbenchState>()((set, get) => ({
     const { currentSession, selectedModel } = get()
     if (!currentSession) return
 
+    _shownBatchItemIds = new Set()
     const job = await api.submitBatchAnalysis(currentSession.id, prompt, selectedModel, files)
     set({ activeBatchJobId: job.id, batchProgress: { job, items: [] }, batchPolling: true })
 
@@ -504,6 +507,29 @@ export const useWorkbenchStore = create<WorkbenchState>()((set, get) => ({
         const progress = await api.getBatchProgress(activeBatchJobId)
         set({ batchProgress: progress })
 
+        // 将新完成的 item 注入对话
+        const newCompleted = progress.items.filter(
+          (item) => item.status === 'completed' && item.result && !_shownBatchItemIds.has(item.id),
+        )
+        if (newCompleted.length > 0) {
+          const newMessages: WorkbenchMessage[] = newCompleted.map((item) => {
+            _shownBatchItemIds.add(item.id)
+            return {
+              id: Date.now() + Math.random(),
+              role: 'assistant',
+              content: `### ${item.file_name}\n\n${item.result}`,
+              llm_model: '',
+              tool_call_id: '',
+              tool_name: '',
+              tool_input: {},
+              tool_output: {},
+              metadata: { source: 'batch_item', job_id: progress.job.id },
+              created_at: new Date().toISOString(),
+            }
+          })
+          set((state) => ({ messages: [...state.messages, ...newMessages] }))
+        }
+
         // 终态停止轮询
         if (['completed', 'failed', 'cancelled'].includes(progress.job.status)) {
           set({ batchPolling: false })
@@ -511,7 +537,7 @@ export const useWorkbenchStore = create<WorkbenchState>()((set, get) => ({
           // 完成时将汇总报告插入对话，方便后续讨论
           if (progress.job.status === 'completed' && progress.job.summary) {
             const summaryMsg: WorkbenchMessage = {
-              id: Date.now(),
+              id: Date.now() + 1,
               role: 'assistant',
               content: progress.job.summary,
               llm_model: '',
@@ -554,6 +580,7 @@ export const useWorkbenchStore = create<WorkbenchState>()((set, get) => ({
       _abortController.abort()
       _abortController = null
     }
+    _shownBatchItemIds = new Set()
     set({
       currentSession: null,
       messages: [],

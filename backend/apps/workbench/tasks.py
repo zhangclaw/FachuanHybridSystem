@@ -51,6 +51,13 @@ SUMMARY_SYSTEM_PROMPT = (
     f"6. 报告日期使用今天的实际日期（{datetime.now(UTC).strftime('%Y年%m月%d日')}），不要编造日期\n"
     "7. 最后要添加附件部分，把每个案例的分析结论和案号、案由、法官和书记员姓名、关于用户查询的问题在本案中的结论列出来"
 )
+BATCH_SUMMARY_PROMPT = (
+    "你是一位法律研究助理。请根据以下案例分析结论，撰写一份简要的批次摘要。"
+    "摘要应当提炼出这批案例的关键规律、争议焦点和裁判倾向。"
+    "仅使用提供的内容，禁止引入外部案例。"
+)
+BATCH_SIZE = 20  # 分批汇总每批的案例数
+DIRECT_THRESHOLD = 40000  # 低于此字符数直接汇总，否则分批
 
 
 def run_batch_analysis(job_id: str) -> None:
@@ -248,24 +255,57 @@ async def _generate_summary(
     prompt: str,
     completed_items: list[BatchJobItem],
 ) -> str:
-    """汇总所有分析结论，生成综合报告"""
-    conclusions = []
-    for item in completed_items:
-        conclusions.append(f"## {item.file_name}\n{item.result}")
+    """汇总所有分析结论，生成综合报告
 
-    all_conclusions = "\n\n---\n\n".join(conclusions)
+    案例少时直接汇总；案例多时分批摘要再合并，避免截断丢失信息。
+    """
+    conclusions = [f"## {item.file_name}\n{item.result}" for item in completed_items]
+    all_text = "\n\n---\n\n".join(conclusions)
 
-    if len(all_conclusions) > 50000:
-        all_conclusions = all_conclusions[:50000] + "\n\n...(已截断)"
+    if len(all_text) <= DIRECT_THRESHOLD:
+        # 案例较少，直接汇总
+        content = (
+            f"原始分析要求：{prompt}\n\n"
+            f"以下是 {len(completed_items)} 个案例的分析结论（仅使用以下内容，不要添加任何外部案例）：\n\n"
+            f"{all_text}\n\n请基于以上内容撰写综合研究报告。"
+        )
+    else:
+        # 案例较多，分批摘要再合并
+        logger.info("案例文本过长 (%d 字符)，启用分批汇总", len(all_text))
+        batch_summaries: list[str] = []
+        for i in range(0, len(conclusions), BATCH_SIZE):
+            batch = conclusions[i : i + BATCH_SIZE]
+            batch_text = "\n\n---\n\n".join(batch)
+            batch_num = i // BATCH_SIZE + 1
+            total_batches = (len(conclusions) + BATCH_SIZE - 1) // BATCH_SIZE
+            logger.info("汇总批次 %d/%d (%d 个案例)", batch_num, total_batches, len(batch))
+
+            summary = await sync_to_async(_sync_llm_chat)(
+                llm,
+                messages=[
+                    {"role": "system", "content": BATCH_SUMMARY_PROMPT},
+                    {
+                        "role": "user",
+                        "content": f"以下是第 {batch_num} 批（共 {total_batches} 批）的 {len(batch)} 个案例分析结论：\n\n{batch_text}\n\n请提炼这批案例的关键规律和裁判倾向。",
+                    },
+                ],
+                model=model,
+                temperature=0.3,
+            )
+            batch_summaries.append(f"### 批次 {batch_num} 摘要\n{summary}")
+
+        combined = "\n\n".join(batch_summaries)
+        content = (
+            f"原始分析要求：{prompt}\n\n"
+            f"以下是 {len(completed_items)} 个案例的分批摘要（共 {len(batch_summaries)} 批）：\n\n"
+            f"{combined}\n\n请基于以上摘要撰写一份综合研究报告。"
+        )
 
     result = await sync_to_async(_sync_llm_chat)(
         llm,
         messages=[
             {"role": "system", "content": SUMMARY_SYSTEM_PROMPT},
-            {
-                "role": "user",
-                "content": f"原始分析要求：{prompt}\n\n以下是 {len(completed_items)} 个案例的分析结论（仅使用以下内容，不要添加任何外部案例）：\n\n{all_conclusions}\n\n请基于以上内容撰写综合研究报告。",
-            },
+            {"role": "user", "content": content},
         ],
         model=model,
         temperature=0.3,
