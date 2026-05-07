@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 import time
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from apps.automation.services.scraper.config.browser_config import BrowserConfig
 from apps.automation.services.scraper.core.browser_manager import BrowserManager
@@ -60,7 +60,7 @@ class WeChatPublisher:
             logger.error("Publish failed for task %d: %s", self.task.pk, e, exc_info=True)
             raise PublishError(f"发布失败: {e}") from e
 
-    def _execute_publish(self, page, context) -> dict:
+    def _execute_publish(self, page: Any, context: Any) -> dict:
         """在浏览器上下文中执行发布流程。"""
         # Step 1: 加载 Cookie 并检查登录状态
         self._update_status("logging_in")
@@ -118,7 +118,7 @@ class WeChatPublisher:
 
         return result
 
-    def _navigate_to_new_article(self, page) -> None:
+    def _navigate_to_new_article(self, page: Any) -> None:
         """导航到新建图文页面。"""
         try:
             # 点击"新的创作"按钮
@@ -143,7 +143,7 @@ class WeChatPublisher:
         except Exception as e:
             raise PublishError(f"无法打开新建图文页面: {e}") from e
 
-    def _fill_title(self, page, title: str) -> None:
+    def _fill_title(self, page: Any, title: str) -> None:
         """填写文章标题。"""
         try:
             # 公众号编辑器的标题输入框
@@ -168,7 +168,7 @@ class WeChatPublisher:
         except Exception as e:
             raise PublishError(f"填写标题失败: {e}") from e
 
-    def _inject_content(self, page, html_content: str) -> None:
+    def _inject_content(self, page: Any, html_content: str) -> None:
         """将 HTML 内容注入到编辑器。"""
         try:
             # 公众号编辑器使用 contenteditable div
@@ -206,7 +206,7 @@ class WeChatPublisher:
         except Exception as e:
             raise PublishError(f"注入内容失败: {e}") from e
 
-    def _upload_cover(self, page, cover_path: str) -> None:
+    def _upload_cover(self, page: Any, cover_path: str) -> None:
         """上传封面图。"""
         try:
             # 查找封面图上传区域
@@ -235,7 +235,7 @@ class WeChatPublisher:
         except Exception:
             logger.warning("Failed to upload cover image", exc_info=True)
 
-    def _save_draft(self, page) -> dict:
+    def _save_draft(self, page: Any) -> dict:
         """保存为草稿。"""
         try:
             draft_selectors = [
@@ -264,7 +264,7 @@ class WeChatPublisher:
         except Exception as e:
             raise PublishError(f"保存草稿失败: {e}") from e
 
-    def _publish_article(self, page) -> dict:
+    def _publish_article(self, page: Any) -> dict:
         """直接发布文章。"""
         try:
             publish_selectors = [

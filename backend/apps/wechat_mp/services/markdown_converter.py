@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 
-import markdown
+import markdown  # type: ignore[import-untyped]
 from django.utils.html import escape
 
 logger = logging.getLogger(__name__)

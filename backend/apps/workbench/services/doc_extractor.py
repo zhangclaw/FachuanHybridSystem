@@ -70,7 +70,14 @@ class DocTextExtractor:
             {"case_number", "court", "judgment_date", "cause", "judge", "clerk"}
         """
         docx_path, need_cleanup = self._resolve_docx_path(file_path)
-        empty = {"case_number": None, "court": None, "judgment_date": None, "cause": None, "judge": None, "clerk": None}
+        empty: dict[str, str | None] = {
+            "case_number": None,
+            "court": None,
+            "judgment_date": None,
+            "cause": None,
+            "judge": None,
+            "clerk": None,
+        }
         if not docx_path:
             return empty
 
@@ -240,11 +247,11 @@ class DocTextExtractor:
 
                 for doc_path in batch:
                     doc_name = Path(doc_path).stem + ".docx"
-                    docx_path = output_path / doc_name
-                    if docx_path.exists():
-                        result[doc_path] = str(docx_path)
+                    docx_out = output_path / doc_name
+                    if docx_out.exists():
+                        result[doc_path] = str(docx_out)
                     else:
-                        logger.warning("转换后文件未找到: %s", docx_path)
+                        logger.warning("转换后文件未找到: %s", docx_out)
 
             await asyncio.gather(*(run_batch(b) for b in group))
 

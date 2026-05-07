@@ -51,7 +51,7 @@ class BatchJobOut(BaseModel):
     def _resolve_summary_file(cls, v: object) -> str:
         if v and hasattr(v, "url"):
             try:
-                return str(v.url)  # type: ignore[union-attr]
+                return str(v.url)
             except ValueError:
                 return ""
         return ""

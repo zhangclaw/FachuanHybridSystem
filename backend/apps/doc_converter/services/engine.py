@@ -129,11 +129,11 @@ def batch_convert(
 
             for doc_path in batch:
                 doc_name = Path(doc_path).stem + ".docx"
-                docx_path = Path(output_dir) / doc_name
-                if docx_path.exists():
-                    result[doc_path] = str(docx_path)
+                docx_out = Path(output_dir) / doc_name
+                if docx_out.exists():
+                    result[doc_path] = str(docx_out)
                 else:
-                    logger.warning("转换后文件未找到: %s", docx_path)
+                    logger.warning("转换后文件未找到: %s", docx_out)
 
         except subprocess.TimeoutExpired:
             logger.error("LibreOffice 转换超时")
