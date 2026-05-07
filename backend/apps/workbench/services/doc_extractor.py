@@ -29,6 +29,10 @@ BATCH_CONVERT_SIZE = 25  # 每批转换的文件数
 class DocTextExtractor:
     """文档文本提取器"""
 
+    def __init__(self) -> None:
+        self._batch_converted: dict[str, str] = {}  # .doc 路径 → 转换后的 .docx 路径
+        self._batch_temp_dir: str | None = None  # 批量转换的临时目录
+
     def extract_text(self, file_path: str) -> str:
         """根据文件扩展名选择提取策略
 
@@ -54,6 +58,48 @@ class DocTextExtractor:
         else:
             raise ValueError(f"不支持的文件格式: {ext}")
 
+    def extract_first_lines(self, file_path: str, n: int = 20) -> str:
+        """提取文档前 N 行文本（用于案号提取等）"""
+        path = Path(file_path)
+        if not path.exists():
+            return ""
+
+        ext = path.suffix.lower()
+        docx_path = file_path
+        need_cleanup = False
+
+        if ext == ".doc":
+            docx_path = self._batch_converted.get(file_path) or self._convert_single_doc(file_path)
+            if docx_path != self._batch_converted.get(file_path):
+                need_cleanup = True
+
+        try:
+            from docx import Document
+
+            doc = Document(docx_path)
+            lines: list[str] = []
+            for para in doc.paragraphs:
+                text = para.text.strip()
+                if text:
+                    lines.append(text)
+                if len(lines) >= n:
+                    break
+            return "\n".join(lines)
+        except Exception:
+            logger.warning("提取文档前 %d 行失败: %s", n, file_path, exc_info=True)
+            return ""
+        finally:
+            if need_cleanup and docx_path != file_path:
+                Path(docx_path).unlink(missing_ok=True)
+
+    @staticmethod
+    def extract_case_number(text: str) -> str | None:
+        """从文本中提取第一个案号（如 (2019)粤0106民初24736号）"""
+        from apps.automation.utils.text_utils import TextUtils
+
+        numbers = TextUtils.extract_case_numbers(text)
+        return numbers[0] if numbers else None
+
     def _extract_docx(self, path: str) -> str:
         """用 python-docx 提取 .docx 文本"""
         from docx import Document
@@ -67,6 +113,11 @@ class DocTextExtractor:
 
     def _extract_doc(self, path: str) -> str:
         """将 .doc 转换为 .docx 后提取文本"""
+        # 优先使用批量转换的缓存结果
+        cached = self._batch_converted.get(path)
+        if cached and Path(cached).exists():
+            return self._extract_docx(cached)
+
         docx_path = self._convert_single_doc(path)
         try:
             return self._extract_docx(docx_path)
@@ -96,12 +147,12 @@ class DocTextExtractor:
         soffice = self._find_libreoffice()
         if not soffice:
             raise RuntimeError(
-                "未找到 LibreOffice，无法转换 .doc 文件。"
-                "请安装 LibreOffice: https://www.libreoffice.org/"
+                "未找到 LibreOffice，无法转换 .doc 文件。请安装 LibreOffice: https://www.libreoffice.org/"
             )
 
         if output_dir is None:
             output_dir = tempfile.mkdtemp(prefix="workbench_batch_")
+            self._batch_temp_dir = output_dir
 
         output_path = Path(output_dir)
         output_path.mkdir(parents=True, exist_ok=True)
@@ -111,7 +162,12 @@ class DocTextExtractor:
         # 分批转换
         for i in range(0, len(doc_paths), BATCH_CONVERT_SIZE):
             batch = doc_paths[i : i + BATCH_CONVERT_SIZE]
-            logger.info("LibreOffice 批量转换: 第 %d-%d/%d 个文件", i + 1, min(i + BATCH_CONVERT_SIZE, len(doc_paths)), len(doc_paths))
+            logger.info(
+                "LibreOffice 批量转换: 第 %d-%d/%d 个文件",
+                i + 1,
+                min(i + BATCH_CONVERT_SIZE, len(doc_paths)),
+                len(doc_paths),
+            )
 
             cmd = [soffice, "--headless", "--convert-to", "docx", "--outdir", str(output_path)] + batch
             try:
@@ -152,6 +208,7 @@ class DocTextExtractor:
                         logger.error("单文件转换失败: %s - %s", doc_path, e)
 
         logger.info("批量转换完成: %d/%d 成功", len(result), len(doc_paths))
+        self._batch_converted.update(result)
         return result
 
     def _convert_single_doc(self, doc_path: str) -> str:
@@ -208,3 +265,15 @@ class DocTextExtractor:
                     return p
 
         return None
+
+    def cleanup(self) -> None:
+        """清理批量转换产生的临时目录"""
+        if self._batch_temp_dir:
+            import shutil
+
+            temp_path = Path(self._batch_temp_dir)
+            if temp_path.exists():
+                shutil.rmtree(temp_path, ignore_errors=True)
+                logger.info("已清理批量转换临时目录: %s", self._batch_temp_dir)
+            self._batch_temp_dir = None
+        self._batch_converted.clear()

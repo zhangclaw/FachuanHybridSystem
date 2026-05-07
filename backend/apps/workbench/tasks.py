@@ -37,7 +37,8 @@ ANALYSIS_SYSTEM_PROMPT = (
     "3. 给出清晰的分析结论\n"
     "4. 使用专业但易懂的语言\n"
     "5. 使用清晰的结构化格式\n"
-    "6. 最后详细列出所有案例的案号、案由、法官和书记员姓名、关于用户查询的问题在本案中的结论"
+    "6. 如果用户提供了案号，请在分析中使用该案号，不要编造其他案号\n"
+    "7. 最后详细列出案例的案号、案由、法官和书记员姓名、关于用户查询的问题在本案中的结论"
 )
 SUMMARY_SYSTEM_PROMPT = (
     "你是一位法律研究助理。请根据多个案例的分析结论，撰写一份综合研究报告。"
@@ -87,11 +88,11 @@ async def _run_batch_async(job_id: UUID) -> None:
         started_at=timezone.now(),
     )
 
+    extractor = DocTextExtractor()
     try:
         items = [item async for item in BatchJobItem.objects.filter(job_id=job_id)]
 
         # ── Phase 1: 批量文本提取 ──
-        extractor = DocTextExtractor()
         doc_items = [
             i for i in items if i.file_name.lower().endswith(".doc") and not i.file_name.lower().endswith(".docx")
         ]
@@ -126,6 +127,11 @@ async def _run_batch_async(job_id: UUID) -> None:
                 # 提取文本（在 sync 线程中）
                 text = await sync_to_async(extractor.extract_text)(item.file.path)
 
+                # 从文件头部提取案号
+                header_text = await sync_to_async(extractor.extract_first_lines)(item.file.path, 20)
+                case_number = await sync_to_async(extractor.extract_case_number)(header_text)
+                case_info = f"本案案号：{case_number}\n" if case_number else ""
+
                 # LLM 分析（在线程池中执行，避免 async 上下文 ORM 问题）
                 result_text = await loop.run_in_executor(
                     thread_pool,
@@ -135,7 +141,7 @@ async def _run_batch_async(job_id: UUID) -> None:
                             {"role": "system", "content": ANALYSIS_SYSTEM_PROMPT},
                             {
                                 "role": "user",
-                                "content": f"分析要求：{job.prompt}\n\n以下是从文件「{item.file_name}」中提取的内容：\n\n{text}\n\n请根据以上分析要求，对本文档内容进行分析并给出结论。",
+                                "content": f"{case_info}分析要求：{job.prompt}\n\n以下是从文件「{item.file_name}」中提取的内容：\n\n{text}\n\n请根据以上分析要求，对本文档内容进行分析并给出结论。",
                             },
                         ],
                         model=job.llm_model,
@@ -202,6 +208,8 @@ async def _run_batch_async(job_id: UUID) -> None:
             error_message=str(e)[:4000],
             finished_at=timezone.now(),
         )
+    finally:
+        extractor.cleanup()
 
 
 async def _is_cancelled(job_id: UUID) -> bool:
