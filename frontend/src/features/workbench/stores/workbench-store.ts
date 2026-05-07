@@ -507,6 +507,26 @@ export const useWorkbenchStore = create<WorkbenchState>()((set, get) => ({
         // 终态停止轮询
         if (['completed', 'failed', 'cancelled'].includes(progress.job.status)) {
           set({ batchPolling: false })
+
+          // 完成时将汇总报告插入对话，方便后续讨论
+          if (progress.job.status === 'completed' && progress.job.summary) {
+            const summaryMsg: WorkbenchMessage = {
+              id: Date.now(),
+              role: 'assistant',
+              content: progress.job.summary,
+              llm_model: '',
+              tool_call_id: '',
+              tool_name: '',
+              tool_input: {},
+              tool_output: {},
+              metadata: { source: 'batch_analysis', job_id: progress.job.id },
+              created_at: new Date().toISOString(),
+            }
+            set((state) => ({
+              messages: [...state.messages, summaryMsg],
+              batchProgress: null,
+            }))
+          }
           return
         }
       } catch {
