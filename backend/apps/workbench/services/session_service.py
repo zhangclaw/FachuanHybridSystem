@@ -68,7 +68,7 @@ class WorkbenchSessionService(PermissionMixin):
         cache_key = f"workbench:sessions:user={user.id}:page={page}"
         cached = cache.get(cache_key)
         if cached is not None:
-            return cached  # type: ignore[return-value]
+            return cached  # type: ignore[no-any-return]
 
         qs = WorkbenchSession.objects.filter(user=user).order_by("-updated_at")
 

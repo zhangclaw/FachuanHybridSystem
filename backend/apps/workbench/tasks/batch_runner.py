@@ -88,10 +88,16 @@ def _sync_llm_chat(llm: Any, messages: list[dict[str, str]], model: str, tempera
 
 async def _increment_counter(job_id: UUID, field: str) -> None:
     """原子递增计数器并更新进度百分比（2 次查询代替原来 3 次）"""
-    job = await sync_to_async(
-        lambda: BatchJob.objects.filter(id=job_id).values(
-            "total_items", "completed_items", "failed_items",
-        ).first()
+    job: dict[str, Any] | None = await sync_to_async(
+        lambda: (
+            BatchJob.objects.filter(id=job_id)
+            .values(
+                "total_items",
+                "completed_items",
+                "failed_items",
+            )
+            .first()
+        )
     )()
     if not job or job["total_items"] == 0:
         return
@@ -99,10 +105,14 @@ async def _increment_counter(job_id: UUID, field: str) -> None:
     # 计算新的已完成+失败数（当前值 + 本次递增的 1）
     new_processed = job["completed_items"] + job["failed_items"] + 1
     new_progress = min(int(new_processed * 100 / job["total_items"]), 100)
-    await sync_to_async(lambda: BatchJob.objects.filter(id=job_id).update(**{
-        field: new_count,
-        "progress": new_progress,
-    }))()
+    await sync_to_async(
+        lambda: BatchJob.objects.filter(id=job_id).update(
+            **{
+                field: new_count,
+                "progress": new_progress,
+            }
+        )
+    )()
 
 
 # ─── 单文件分析 ──────────────────────────────────────────────────────────────
@@ -384,18 +394,22 @@ async def _run_batch_retry_async(job_id: UUID, item_ids: list[UUID]) -> None:
                 )()
                 # 重试成功后更新 progress
                 job_info = await sync_to_async(
-                    lambda: BatchJob.objects.filter(id=job_id).values(
-                        "total_items", "completed_items", "failed_items",
-                    ).first()
+                    lambda: (
+                        BatchJob.objects.filter(id=job_id)
+                        .values(
+                            "total_items",
+                            "completed_items",
+                            "failed_items",
+                        )
+                        .first()
+                    )
                 )()
                 if job_info and job_info["total_items"] > 0:
                     new_progress = min(
                         int((job_info["completed_items"] + job_info["failed_items"]) * 100 / job_info["total_items"]),
                         100,
                     )
-                    await sync_to_async(
-                        lambda: BatchJob.objects.filter(id=job_id).update(progress=new_progress)
-                    )()
+                    await sync_to_async(lambda: BatchJob.objects.filter(id=job_id).update(progress=new_progress))()
 
             except asyncio.CancelledError:
                 return
