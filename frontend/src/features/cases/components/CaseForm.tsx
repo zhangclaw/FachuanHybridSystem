@@ -259,12 +259,13 @@ export function CaseForm({ caseId, mode }: CaseFormProps) {
       <Form {...form}>
         <form id="case-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
           {/* 案件信息 — 3列紧凑网格 */}
-          <Card className="py-3">
+          <Card className="py-4">
             <CardContent className="px-4">
-              <div className="grid gap-x-4 gap-y-2 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="text-xs font-medium text-muted-foreground mb-3">案件信息</div>
+              <div className="grid gap-x-4 gap-y-3 sm:grid-cols-2 lg:grid-cols-3">
                 <FormField control={form.control} name="name" render={({ field }) => (
                   <FormItem className="lg:col-span-2">
-                    <FormLabel>案件名称 <span className="text-destructive">*</span></FormLabel>
+                    <FormLabel className="text-xs text-muted-foreground">案件名称 <span className="text-destructive">*</span></FormLabel>
                     <FormControl>
                       <Input placeholder="请输入案件名称" disabled={isPending} {...field} />
                     </FormControl>
@@ -274,7 +275,7 @@ export function CaseForm({ caseId, mode }: CaseFormProps) {
 
                   <FormField control={form.control} name="case_type" render={({ field }) => (
                     <FormItem>
-                      <FormLabel>案件类型</FormLabel>
+                      <FormLabel className="text-xs text-muted-foreground">案件类型</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value ?? ''} disabled={isPending}>
                         <FormControl>
                           <SelectTrigger className="w-full"><SelectValue placeholder="请选择案件类型" /></SelectTrigger>
@@ -291,7 +292,7 @@ export function CaseForm({ caseId, mode }: CaseFormProps) {
 
                   <FormField control={form.control} name="status" render={({ field }) => (
                     <FormItem>
-                      <FormLabel>状态</FormLabel>
+                      <FormLabel className="text-xs text-muted-foreground">状态</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value} disabled={isPending}>
                         <FormControl>
                           <SelectTrigger className="w-full"><SelectValue placeholder="请选择状态" /></SelectTrigger>
@@ -308,7 +309,7 @@ export function CaseForm({ caseId, mode }: CaseFormProps) {
 
                   <FormField control={form.control} name="cause_of_action" render={({ field }) => (
                     <FormItem>
-                      <FormLabel>案由</FormLabel>
+                      <FormLabel className="text-xs text-muted-foreground">案由</FormLabel>
                       <FormControl>
                         <CauseSelector value={field.value ?? null} onChange={field.onChange} caseType={watchCaseType} disabled={isPending} />
                       </FormControl>
@@ -318,7 +319,7 @@ export function CaseForm({ caseId, mode }: CaseFormProps) {
 
                   <FormField control={form.control} name="current_stage" render={({ field }) => (
                     <FormItem>
-                      <FormLabel>当前阶段</FormLabel>
+                      <FormLabel className="text-xs text-muted-foreground">当前阶段</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value ?? ''} disabled={isPending}>
                         <FormControl>
                           <SelectTrigger className="w-full"><SelectValue placeholder="请选择阶段" /></SelectTrigger>
@@ -334,7 +335,7 @@ export function CaseForm({ caseId, mode }: CaseFormProps) {
                   )} />
                 <FormField control={form.control} name="effective_date" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>生效日期</FormLabel>
+                    <FormLabel className="text-xs text-muted-foreground">生效日期</FormLabel>
                     <FormControl>
                       <Input type="date" disabled={isPending} value={field.value ?? ''} onChange={(e) => field.onChange(e.target.value || null)} />
                     </FormControl>
@@ -344,7 +345,7 @@ export function CaseForm({ caseId, mode }: CaseFormProps) {
 
                 <FormField control={form.control} name="specified_date" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>指定日期</FormLabel>
+                    <FormLabel className="text-xs text-muted-foreground">指定日期</FormLabel>
                     <FormControl>
                       <Input type="date" disabled={isPending} value={field.value ?? ''} onChange={(e) => field.onChange(e.target.value || null)} />
                     </FormControl>
@@ -354,7 +355,7 @@ export function CaseForm({ caseId, mode }: CaseFormProps) {
 
                 <FormField control={form.control} name="target_amount" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>标的金额</FormLabel>
+                    <FormLabel className="text-xs text-muted-foreground">标的金额</FormLabel>
                     <FormControl>
                       <Input type="number" placeholder="请输入" disabled={isPending} value={field.value ?? ''} onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)} />
                     </FormControl>
@@ -364,7 +365,7 @@ export function CaseForm({ caseId, mode }: CaseFormProps) {
 
                 <FormField control={form.control} name="preservation_amount" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>保全金额</FormLabel>
+                    <FormLabel className="text-xs text-muted-foreground">保全金额</FormLabel>
                     <FormControl>
                       <Input type="number" placeholder="请输入" disabled={isPending} value={field.value ?? ''} onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)} />
                     </FormControl>
@@ -379,7 +380,7 @@ export function CaseForm({ caseId, mode }: CaseFormProps) {
                     </FormControl>
                     <div className="flex items-center gap-1.5">
                       <FileCheck className="size-3.5 text-muted-foreground" />
-                      <FormLabel className="text-xs font-normal cursor-pointer">已建档</FormLabel>
+                      <FormLabel className="text-xs text-muted-foreground font-normal cursor-pointer">已建档</FormLabel>
                     </div>
                     <FormMessage />
                   </FormItem>
@@ -402,7 +403,7 @@ export function CaseForm({ caseId, mode }: CaseFormProps) {
           {!isEditMode && (
             <>
               <div className="grid gap-3 lg:grid-cols-2">
-                <Card className="py-3">
+                <Card className="py-4">
                   <CardHeader className="px-4 py-0 pb-1.5">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-xs font-medium text-muted-foreground">当事人</CardTitle>
@@ -445,7 +446,7 @@ export function CaseForm({ caseId, mode }: CaseFormProps) {
                   </CardContent>
                 </Card>
 
-                <Card className="py-3">
+                <Card className="py-4">
                   <CardHeader className="px-4 py-0 pb-1.5">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-xs font-medium text-muted-foreground">指派律师</CardTitle>
@@ -475,7 +476,7 @@ export function CaseForm({ caseId, mode }: CaseFormProps) {
                 </Card>
               </div>
 
-              <Card className="py-3">
+              <Card className="py-4">
                 <CardHeader className="px-4 py-0 pb-1.5">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-xs font-medium text-muted-foreground">主管机关</CardTitle>
@@ -525,14 +526,14 @@ export function CaseForm({ caseId, mode }: CaseFormProps) {
       {isEditMode && caseData && (
         <>
           <div className="grid gap-3 lg:grid-cols-2">
-            <Card className="py-3">
+            <Card className="py-4">
               <CardContent className="px-4">
                 <div className="text-xs font-medium text-muted-foreground mb-1.5">案件当事人</div>
                 <CasePartySection parties={caseData.parties ?? []} editable caseId={caseData.id} />
               </CardContent>
             </Card>
 
-            <Card className="py-3">
+            <Card className="py-4">
               <CardContent className="px-4">
                 <div className="text-xs font-medium text-muted-foreground mb-1.5">律师指派</div>
                 <CaseAssignmentSection assignments={caseData.assignments ?? []} editable caseId={caseData.id} />
@@ -540,7 +541,7 @@ export function CaseForm({ caseId, mode }: CaseFormProps) {
             </Card>
           </div>
 
-          <Card className="py-3">
+          <Card className="py-4">
             <CardContent className="px-4">
               <div className="flex items-center justify-between mb-1.5">
                 <span className="text-xs font-medium text-muted-foreground">案件日志</span>
@@ -553,7 +554,7 @@ export function CaseForm({ caseId, mode }: CaseFormProps) {
           </Card>
 
           <div className="grid gap-3 lg:grid-cols-2">
-            <Card className="py-3">
+            <Card className="py-4">
               <CardContent className="px-4">
                 <div className="flex items-center justify-between mb-1.5">
                   <span className="text-xs font-medium text-muted-foreground">案号</span>
@@ -565,7 +566,7 @@ export function CaseForm({ caseId, mode }: CaseFormProps) {
               </CardContent>
             </Card>
 
-            <Card className="py-3">
+            <Card className="py-4">
               <CardContent className="px-4">
                 <div className="text-xs font-medium text-muted-foreground mb-1.5">主管机关</div>
                 <AuthoritySection authorities={caseData.supervising_authorities ?? []} editable caseId={caseData.id} />
