@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
   ArrowLeft, Edit, Trash2, FileWarning, Hash, Building2, MessageSquare,
-  FileText, FolderOpen, Paperclip, Plus, Users, FileCheck, Shield,
+  FileText, FolderOpen, Paperclip, Plus, FileCheck, Shield,
 } from 'lucide-react'
 import { formatDateOnly } from '@/lib/date'
 import { formatAmount } from '@/lib/format'
@@ -32,7 +32,7 @@ import { CaseMaterialSection } from './CaseMaterialSection'
 import { CaseTemplateSection } from './CaseTemplateSection'
 import { CaseFolderSection } from './CaseFolderSection'
 import { AuthoritySection } from './AuthoritySection'
-import { CaseContactSection } from '@/features/contacts'
+import { CaseContactSection, type CaseContactSectionRef } from '@/features/contacts'
 import { CourtFilingSection } from './CourtFilingSection'
 import { CourtGuaranteeSection } from './CourtGuaranteeSection'
 import { AuthorizationMaterialsSection } from './AuthorizationMaterialsSection'
@@ -169,6 +169,7 @@ export function CaseDetail({ caseId }: CaseDetailProps) {
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [activeTab, setActiveTab] = useState('basic')
   const logSectionRef = useRef<CaseLogSectionRef>(null)
+  const contactSectionRef = useRef<CaseContactSectionRef>(null)
 
   const isOurPartyAllDefendant = useMemo(() => {
     const ourParties = caseData?.parties?.filter(p => p.client_detail?.is_our_client) ?? []
@@ -392,8 +393,13 @@ export function CaseDetail({ caseId }: CaseDetailProps) {
               </DetailCard>
             </div>
 
-            <DetailCard title="案件工作人员" extra={<Users className="text-muted-foreground size-4" />}>
+            <DetailCard title="案件工作人员" extra={
+              <Button size="xs" variant="outline" className="h-6 px-2 text-[11px]" onClick={() => contactSectionRef.current?.openDialog()}>
+                <Plus className="size-3 mr-0.5" /> 添加
+              </Button>
+            }>
               <CaseContactSection
+                ref={contactSectionRef}
                 contacts={caseData.contacts ?? []}
                 caseId={Number(caseId)}
                 editable={true}
