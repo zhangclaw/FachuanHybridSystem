@@ -1,5 +1,5 @@
 import { forwardRef, useImperativeHandle, useMemo, useState } from 'react'
-import { Paperclip, Clock, Trash2, Loader2, Download, Bell } from 'lucide-react'
+import { Paperclip, Trash2, Loader2, Download, Bell } from 'lucide-react'
 import { formatDate } from '@/lib/date'
 import { resolveMediaUrl } from '@/lib/api'
 import { toast } from 'sonner'
@@ -145,12 +145,7 @@ export const CaseLogSection = forwardRef<CaseLogSectionRef, CaseLogSectionProps>
       )}
 
       {sortedLogs.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-8">
-          <div className="bg-muted flex size-10 items-center justify-center rounded-full">
-            <Clock className="text-muted-foreground size-5" />
-          </div>
-          <p className="text-muted-foreground mt-3 text-sm">暂无案件日志</p>
-        </div>
+        <p className="text-muted-foreground text-xs">暂无案件日志</p>
       ) : (
         <div className="relative">
           {/* Timeline vertical line */}
@@ -163,17 +158,17 @@ export const CaseLogSection = forwardRef<CaseLogSectionRef, CaseLogSectionProps>
               const reminderCount = log.reminders?.length ?? 0
 
               return (
-                <div key={log.id} className="group relative pl-7 pb-5 last:pb-0">
+                <div key={log.id} className="group relative pl-7 pb-3 last:pb-0">
                   {/* Timeline dot */}
-                  <div className={`absolute left-0 top-[7px] size-[15px] rounded-full border-2 bg-background ${
+                  <div className={`absolute left-0 top-[5px] size-[11px] rounded-full border-2 bg-background ${
                     index === 0 ? 'border-primary' : 'border-border'
                   }`}>
-                    {index === 0 && <div className="absolute inset-[3px] rounded-full bg-primary" />}
+                    {index === 0 && <div className="absolute inset-[2px] rounded-full bg-primary" />}
                   </div>
 
                   {/* Header: actor + time + delete */}
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <span className="text-sm font-medium text-foreground">{actorName}</span>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-xs font-medium text-foreground">{actorName}</span>
                     <span className="text-xs text-muted-foreground">{formatDate(log.created_at)}</span>
                     {editable && caseId && (
                       <AlertDialog>
@@ -197,11 +192,11 @@ export const CaseLogSection = forwardRef<CaseLogSectionRef, CaseLogSectionProps>
                   </div>
 
                   {/* Content */}
-                  <p className="text-[13px] leading-relaxed whitespace-pre-wrap text-foreground">{log.content}</p>
+                  <p className="text-[13px] leading-snug whitespace-pre-wrap text-foreground">{log.content}</p>
 
                   {/* Reminders */}
                   {reminderCount > 0 && (
-                    <div className="mt-2 flex items-center gap-1.5 flex-wrap">
+                    <div className="mt-1.5 flex items-center gap-1.5 flex-wrap">
                       {log.reminders?.map((r) => (
                         <span key={r.id} className="inline-flex items-center gap-1 rounded-md border border-amber-200 bg-amber-50 px-2 py-0.5 text-[11px] text-amber-700">
                           <Bell className="size-3" />

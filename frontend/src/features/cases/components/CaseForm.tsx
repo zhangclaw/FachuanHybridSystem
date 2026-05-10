@@ -30,6 +30,7 @@ import { FeeCalculator } from './FeeCalculator'
 import { CasePartySection } from './CasePartySection'
 import { CaseAssignmentSection } from './CaseAssignmentSection'
 import { CaseLogSection } from './CaseLogSection'
+import type { CaseLogSectionRef } from './CaseLogSection'
 import { CaseNumberSection } from './CaseNumberSection'
 import type { CaseNumberSectionRef } from './CaseNumberSection'
 import { AuthoritySection } from './AuthoritySection'
@@ -193,6 +194,7 @@ export function CaseForm({ caseId, mode }: CaseFormProps) {
   }
 
   const caseNumberRef = useRef<CaseNumberSectionRef>(null)
+  const caseLogRef = useRef<CaseLogSectionRef>(null)
 
   if (isEditMode && isLoadingCase) {
     return (
@@ -540,8 +542,13 @@ export function CaseForm({ caseId, mode }: CaseFormProps) {
 
           <Card className="py-3">
             <CardContent className="px-4">
-              <div className="text-xs font-medium text-muted-foreground mb-1.5">案件日志</div>
-              <CaseLogSection logs={caseData.logs ?? []} editable caseId={caseData.id} />
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-xs font-medium text-muted-foreground">案件日志</span>
+                <Button type="button" variant="outline" size="xs" className="h-5 px-1.5 text-[11px]" onClick={() => caseLogRef.current?.openDialog()}>
+                  <Plus className="size-3 mr-0.5" /> 添加
+                </Button>
+              </div>
+              <CaseLogSection ref={caseLogRef} logs={caseData.logs ?? []} editable caseId={caseData.id} />
             </CardContent>
           </Card>
 
