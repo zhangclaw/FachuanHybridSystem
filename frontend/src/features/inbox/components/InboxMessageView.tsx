@@ -5,7 +5,6 @@ import { ArrowLeft, Download, Eye, Paperclip, FileText, Image, File, RotateCcw }
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { PATHS } from '@/routes/paths'
@@ -73,6 +72,12 @@ function getEffectiveFilename(att: AttachmentMeta): string {
   return att.filename
 }
 
+function splitFilename(name: string): { base: string; ext: string } {
+  const dot = name.lastIndexOf('.')
+  if (dot <= 0) return { base: name, ext: '' }
+  return { base: name.slice(0, dot), ext: name.slice(dot) }
+}
+
 interface AttachmentCardProps {
   att: AttachmentMeta
   messageId: number
@@ -80,16 +85,23 @@ interface AttachmentCardProps {
 }
 
 function AttachmentCard({ att, messageId, onRenamed }: AttachmentCardProps) {
-  const [editValue, setEditValue] = useState(() => getEffectiveFilename(att))
-  const [saving, setSaving] = useState(false)
-  const original = att.original_filename || att.filename
   const effective = getEffectiveFilename(att)
-  const isDirty = editValue !== effective
+  const { base: defaultBase, ext } = splitFilename(effective)
+  const original = att.original_filename || att.filename
+  const { base: originalBase } = splitFilename(original)
+  const [editBase, setEditBase] = useState(defaultBase)
+  const [saving, setSaving] = useState(false)
+  const isDirty = editBase !== defaultBase
 
   const handleSave = useCallback(async () => {
+    const fullName = editBase.trim() + ext
+    if (!editBase.trim()) {
+      toast.error('文件名不能为空')
+      return
+    }
     setSaving(true)
     try {
-      await inboxApi.renameAttachment(messageId, att.part_index, editValue)
+      await inboxApi.renameAttachment(messageId, att.part_index, fullName)
       toast.success('附件已重命名')
       onRenamed()
     } catch (e) {
@@ -97,11 +109,11 @@ function AttachmentCard({ att, messageId, onRenamed }: AttachmentCardProps) {
     } finally {
       setSaving(false)
     }
-  }, [messageId, att.part_index, editValue, onRenamed])
+  }, [messageId, att.part_index, editBase, ext, onRenamed])
 
   const handleReset = useCallback(() => {
-    setEditValue(original)
-  }, [original])
+    setEditBase(originalBase)
+  }, [originalBase])
 
   const Icon = getFileIcon(att.content_type)
 
@@ -128,13 +140,18 @@ function AttachmentCard({ att, messageId, onRenamed }: AttachmentCardProps) {
 
       {/* 重命名编辑器 */}
       <div className="mt-3 flex items-center gap-2">
-        <Input
-          value={editValue}
-          onChange={(e) => setEditValue(e.target.value)}
-          placeholder="下载文件名"
-          className="h-9 flex-1"
-          disabled={saving}
-        />
+        <div className="flex-1 flex items-center h-9 rounded-md border border-input bg-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
+          <input
+            value={editBase}
+            onChange={(e) => setEditBase(e.target.value)}
+            placeholder="文件名"
+            className="flex-1 h-full bg-transparent px-3 py-1 text-sm outline-none min-w-0"
+            disabled={saving}
+          />
+          {ext && (
+            <span className="pr-3 text-sm text-muted-foreground shrink-0 select-none">{ext}</span>
+          )}
+        </div>
         {isDirty && (
           <Button variant="ghost" size="sm" className="h-9 px-2.5" onClick={handleReset} disabled={saving} title="恢复原名">
             <RotateCcw className="size-3.5" />
