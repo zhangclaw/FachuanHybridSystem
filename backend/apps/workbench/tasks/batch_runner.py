@@ -79,7 +79,10 @@ def run_batch_retry(job_id: str, item_ids: list[str]) -> None:
 
 def _sync_llm_chat(llm: Any, messages: list[dict[str, str]], model: str, temperature: float) -> str:
     """同步调用 LLM（在线程池中运行，使用同步 chat() 方法避免 async 上下文问题）"""
-    response = llm.chat(messages=messages, model=model, temperature=temperature)
+    from apps.core.llm.config import LLMConfig
+
+    backend = LLMConfig.resolve_backend_for_model(model)
+    response = llm.chat(messages=messages, model=model, temperature=temperature, backend=backend, fallback=False)
     return response.content  # type: ignore[no-any-return]
 
 
