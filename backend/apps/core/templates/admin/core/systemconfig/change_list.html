@@ -170,12 +170,11 @@
     {{ block.super }}
 {% endblock %}
 
-{% block content %}
+{% block result_list %}
 <div class="config-groups">
     {% for group in grouped_configs %}
     <div class="config-group{% if forloop.first %} expanded{% endif %}" data-category="{{ group.category }}">
         <div class="config-group-header" onclick="toggleGroup(this)">
-            <span class="group-icon">{{ group.icon }}</span>
             <span class="group-title">{{ group.label }}</span>
             <span class="group-count">{{ group.count }} 项</span>
             <span class="toggle-icon">▶</span>
@@ -230,9 +229,4 @@ document.addEventListener('keydown', function(e) {
     }
 });
 </script>
-
-{# 隐藏原始的 changelist 表单 #}
-<style>
-    #changelist { display: none; }
-</style>
 {% endblock %}

@@ -130,20 +130,6 @@ class SystemConfigAdmin(admin.ModelAdmin):
 
         # 构建分组数据
         category_labels = dict(SystemConfig.Category.choices)
-        category_icons = {
-            "general": "⚙️",
-            "email": "📧",
-            "feishu": "🐦",
-            "dingtalk": "🔔",
-            "wechat_work": "💬",
-            "telegram": "✈️",
-            "court_sms": "📱",
-            "ai": "🤖",
-            "llm": "🧠",
-            "enterprise_data": "🏢",
-            "scraper": "🕷️",
-            "ocr": "👁️",
-        }
 
         groups = []
         for category in SystemConfig.Category.values:
@@ -152,7 +138,6 @@ class SystemConfigAdmin(admin.ModelAdmin):
                 groups.append({
                     "category": category,
                     "label": category_labels.get(category, category),
-                    "icon": category_icons.get(category, "📋"),
                     "count": len(configs),
                     "configs": configs,
                 })
