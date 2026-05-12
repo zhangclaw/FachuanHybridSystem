@@ -170,7 +170,7 @@ export function CourtGuaranteeSection({ caseId }: Props) {
 
           <div className="px-4 py-3">
             {/* 参数选择 */}
-            <div className="grid gap-2.5 sm:grid-cols-3 mb-3">
+            <div className="grid gap-2.5 sm:grid-cols-2 mb-3">
               {guaranteeInfo?.insurance_options && guaranteeInfo.insurance_options.length > 0 && (
                 <Select value={insurerId} onValueChange={setInsurerId}>
                   <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="选择保险公司" /></SelectTrigger>
@@ -191,13 +191,6 @@ export function CourtGuaranteeSection({ caseId }: Props) {
                   </SelectContent>
                 </Select>
               )}
-              <input
-                type="text"
-                className="border-input bg-background placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-8 rounded-md border px-3 text-xs shadow-xs outline-none focus-visible:ring-[3px]"
-                placeholder="顾问代码（可选）"
-                value={consultantCode}
-                onChange={(e) => setConsultantCode(e.target.value)}
-              />
             </div>
 
             {/* 询价结果 */}
@@ -298,7 +291,16 @@ export function CourtGuaranteeSection({ caseId }: Props) {
           </div>
           <div className="px-4 py-3">
             {hasQuote ? (
-              <p className="text-xs text-muted-foreground">已获取报价，点击「开始申请」提交保全申请</p>
+              <div className="space-y-2.5">
+                <input
+                  type="text"
+                  className="border-input bg-background placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-8 w-full rounded-md border px-3 text-xs shadow-xs outline-none focus-visible:ring-[3px]"
+                  placeholder="顾问代码（可选）"
+                  value={consultantCode}
+                  onChange={(e) => setConsultantCode(e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground">已获取报价，填写顾问代码后点击「开始申请」提交保全申请</p>
+              </div>
             ) : (
               <div className="text-center py-3">
                 <Play className="size-6 text-muted-foreground/30 mx-auto mb-1.5" />
