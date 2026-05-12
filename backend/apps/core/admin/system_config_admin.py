@@ -135,12 +135,14 @@ class SystemConfigAdmin(admin.ModelAdmin):
         for category in SystemConfig.Category.values:
             configs = grouped_configs.get(category, [])
             if configs:
-                groups.append({
-                    "category": category,
-                    "label": category_labels.get(category, category),
-                    "count": len(configs),
-                    "configs": configs,
-                })
+                groups.append(
+                    {
+                        "category": category,
+                        "label": category_labels.get(category, category),
+                        "count": len(configs),
+                        "configs": configs,
+                    }
+                )
 
         extra_context["grouped_configs"] = groups
         return super().changelist_view(request, extra_context=extra_context)
