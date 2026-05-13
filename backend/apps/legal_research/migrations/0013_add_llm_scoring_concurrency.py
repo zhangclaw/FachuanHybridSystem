@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
                 migrations.AddField(
                     model_name='legalresearchtask',
                     name='llm_scoring_concurrency',
-                    field=models.PositiveIntegerField(default=5, help_text='同时并发的 LLM 评分线程数。默认 5，397B 模型建议 100。', verbose_name='LLM评分并发数'),
+                    field=models.PositiveIntegerField(default=5, help_text='同时并发的 LLM 评分线程数。默认 5，kimi26 模型建议 100。', verbose_name='LLM评分并发数'),
                 ),
             ],
             database_operations=[
