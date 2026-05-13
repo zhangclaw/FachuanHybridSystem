@@ -8,6 +8,7 @@ from datetime import date
 from decimal import Decimal, InvalidOperation
 from typing import TYPE_CHECKING
 
+from apps.core.exceptions import ValidationException
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import render
@@ -160,7 +161,7 @@ class CaseAdminViewsMixin:
     def preview_log_attachment_view(self, request: HttpRequest, object_id: int, attachment_id: int) -> HttpResponse:
         from pathlib import Path
 
-        from django.http import HttpResponse as DjangoHttpResponse, JsonResponse
+        from django.http import HttpResponse as DjangoHttpResponse
 
         from apps.cases.models import CaseLogAttachment
         from apps.cases.services.log.case_log_attachment_storage_service import CaseLogAttachmentStorageService
@@ -169,18 +170,32 @@ class CaseAdminViewsMixin:
             raise PermissionDenied
 
         try:
+            case = Case.objects.filter(pk=object_id).first()
             attachment = (
                 CaseLogAttachment.objects.select_related("log")
                 .filter(pk=attachment_id, log__case_id=object_id)
                 .first()
             )
             if not attachment:
-                return JsonResponse({"success": False, "error": "附件不存在"}, status=404)
+                return self._render_attachment_preview_error(
+                    request,
+                    case=case,
+                    title="附件不存在",
+                    message="该附件记录不存在，或不属于当前案件。",
+                    status=404,
+                )
 
             resolved = CaseLogAttachmentStorageService().resolve_attachment(attachment)
             file_path = Path(resolved.abs_path) if resolved.abs_path else None
             if not resolved.exists or file_path is None or not file_path.exists():
-                return JsonResponse({"success": False, "error": "文件不存在"}, status=404)
+                return self._render_attachment_preview_error(
+                    request,
+                    case=case,
+                    title="文件无法预览",
+                    message="系统找到了附件记录，但没有找到对应的物理文件。请确认案件绑定文件夹仍可访问，或重新上传/替换该材料。",
+                    filename=attachment.original_filename or "",
+                    status=404,
+                )
 
             content = file_path.read_bytes()
             suffix = file_path.suffix.lower()
@@ -202,9 +217,50 @@ class CaseAdminViewsMixin:
             encoded_filename = urllib.parse.quote(str(filename).encode("utf-8"))
             response["Content-Disposition"] = f"inline; filename*=UTF-8''{encoded_filename}"
             return response
+        except ValidationException as e:
+            logger.warning("预览案件日志附件路径不可用: attachment_id=%s, error=%s", attachment_id, e)
+            return self._render_attachment_preview_error(
+                request,
+                case=Case.objects.filter(pk=object_id).first(),
+                title="文件无法预览",
+                message="附件记录指向的文件不在当前案件绑定文件夹内，或绑定文件夹路径已变化。请重新绑定文件夹，或重新上传/替换该材料。",
+                detail=str(e.message),
+                status=400,
+            )
         except Exception as e:
             logger.exception("预览案件日志附件失败: attachment_id=%s", attachment_id)
-            return JsonResponse({"success": False, "error": str(e)}, status=500)
+            return self._render_attachment_preview_error(
+                request,
+                case=Case.objects.filter(pk=object_id).first(),
+                title="文件无法预览",
+                message="预览时发生异常，请确认案件绑定文件夹路径、文件权限或文件是否仍存在。",
+                detail=str(e),
+                status=500,
+            )
+
+    def _render_attachment_preview_error(
+        self,
+        request: HttpRequest,
+        *,
+        case: Case | None,
+        title: str,
+        message: str,
+        filename: str = "",
+        detail: str = "",
+        status: int = 400,
+    ) -> HttpResponse:
+        context = self.admin_site.each_context(request)  # type: ignore[attr-defined]
+        context.update(
+            {
+                "title": title,
+                "opts": self.model._meta,  # type: ignore[attr-defined]
+                "case": case,
+                "message": message,
+                "filename": filename,
+                "detail": detail,
+            }
+        )
+        return render(request, "admin/cases/case/attachment_preview_error.html", context, status=status)
 
     def mock_trial_view(self, request: HttpRequest, object_id: int) -> HttpResponse:
         case = self._get_case_with_relations(object_id)

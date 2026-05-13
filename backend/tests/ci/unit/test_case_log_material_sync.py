@@ -9,6 +9,7 @@ from django.contrib.auth import get_user_model
 from django.test import RequestFactory
 from django.urls import reverse
 
+from apps.cases.admin.case_admin import CaseAdmin
 from apps.cases.admin.caselog_admin import CaseLogAdmin, CaseLogAttachmentInlineForm
 from apps.cases.models import (
     Case,
@@ -249,6 +250,27 @@ def test_case_material_view_uses_preview_url_and_clean_filename_for_absolute_bou
     assert item["file_url"] == reverse("admin:cases_case_preview_log_attachment", args=[case.id, attachment.id])
     assert "/media/" not in item["file_url"]
     assert "C:" not in item["file_url"]
+
+
+@pytest.mark.django_db
+def test_preview_log_attachment_missing_file_renders_admin_error_page() -> None:
+    case, user, attachment, _our_party, _opponent_party = _case_bundle()
+    user.is_staff = True
+    user.is_superuser = True
+    user.save(update_fields=["is_staff", "is_superuser"])
+    attachment.relative_file_path = "missing/material.pdf"
+    attachment.original_filename = "material.pdf"
+    attachment.save(update_fields=["relative_file_path", "original_filename"])
+
+    request = RequestFactory().get(f"/admin/cases/case/{case.id}/preview-log-attachment/{attachment.id}/")
+    request.user = user
+    response = CaseAdmin(Case, AdminSite()).preview_log_attachment_view(request, case.id, attachment.id)
+    content = response.content.decode("utf-8")
+
+    assert response.status_code == 404
+    assert response["Content-Type"].startswith("text/html")
+    assert "文件无法预览" in content
+    assert "重新上传/替换该材料" in content
 
 
 @pytest.mark.django_db
