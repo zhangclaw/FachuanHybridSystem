@@ -4,18 +4,17 @@
 
 ## 先看这里（30 秒选路径）
 
-- 只想最快跑起来（推荐）：直接看 **Docker 部署（推荐）**。
-- 需要本地开发：先看 **本地 PostgreSQL 安装与初始化**，再看对应系统的 **本地开发** 章节。
+- 只想最快跑起来（推荐）：直接看 **1. Docker 部署（推荐）**。
+- 需要本地开发：看对应系统的 **2. 本地开发（macOS）** 或 **3. 本地开发（Linux / Windows）**。
 
 ## 目录
 
-- Docker 部署（推荐）
-- 本地 PostgreSQL 安装与初始化
-- 本地开发（macOS）
-- 本地开发（Linux / Windows）
-- 环境变量
+1. Docker 部署（推荐）
+2. 本地开发（macOS）
+3. 本地开发（Linux / Windows）
+4. 环境变量
 
-## Docker 部署（推荐）
+## 1. Docker 部署（推荐）
 
 适合快速体验与服务器部署。只需安装 [Docker Desktop](https://www.docker.com/products/docker-desktop/)。
 
@@ -56,35 +55,18 @@ docker compose up -d --build    # 更新后重建
 - `docker compose down` 不会删除数据
 - 如需清空：`docker compose down -v`
 
-## 本地 PostgreSQL 安装与初始化
+## 2. 本地开发（macOS）
 
-如你使用本地开发（非 Docker 全家桶），且机器上尚未安装 PostgreSQL，可按以下方式安装。
+推荐使用 Make 命令管理流程。
 
-### macOS（Homebrew）
+### 2.1 安装 PostgreSQL
 
 ```bash
 brew install postgresql@16
 brew services start postgresql@16
 ```
 
-### Ubuntu / Debian
-
-```bash
-sudo apt update
-sudo apt install -y postgresql postgresql-contrib
-sudo systemctl enable --now postgresql
-```
-
-### Windows
-
-- 方案1（推荐）：从 PostgreSQL 官网下载安装器并完成初始化。
-- 方案2（Chocolatey）：
-
-```powershell
-choco install postgresql --yes
-```
-
-### 初始化数据库与用户（通用）
+### 2.2 初始化数据库与用户
 
 按 `backend/.env` 里的 `DB_NAME/DB_USER/DB_PASSWORD` 保持一致（默认示例：`fachuan_dev/postgres/postgres`）：
 
@@ -101,9 +83,7 @@ sudo -u postgres psql -c "CREATE DATABASE fachuan_dev OWNER postgres;"
 
 如果数据库已存在，第二条 `CREATE DATABASE` 报错可忽略。
 
-## 本地开发（macOS）
-
-推荐使用 Make 命令管理流程。
+### 2.3 安装项目依赖
 
 ```bash
 # 1) 克隆项目
@@ -127,26 +107,19 @@ make install
 # 6) 配置环境变量
 cp .env.example .env
 
-# 7) 确保本地 PostgreSQL 可用（两种方式二选一）
-# 方式A：已按上文安装本机 PostgreSQL，可跳过本步骤
-# 方式B：用 Docker 临时起 PostgreSQL：
-docker run -d --name fachuan-pg \
-  -e POSTGRES_DB=fachuan_dev \
-  -e POSTGRES_USER=postgres \
-  -e POSTGRES_PASSWORD=postgres \
-  -p 5432:5432 postgres:16
-
-# 8) 应用已提交的数据库迁移
+# 7) 应用已提交的数据库迁移
 make migrate
 
-# 9) 收集静态文件
+# 8) 收集静态文件
 make collectstatic
 
-# 10) 创建管理员
+# 9) 创建管理员
 make superuser
 ```
 
-启动服务（Web 与 qcluster 可按任意顺序启动；涉及异步任务时需保持 qcluster 运行）：
+### 2.4 启动服务
+
+Web 与 qcluster 可按任意顺序启动；涉及异步任务时需保持 qcluster 运行。
 
 ```bash
 # 终端1
@@ -160,7 +133,45 @@ make run-dev
 make run-port PORT=8080
 ```
 
-## 本地开发（Linux / Windows）
+## 3. 本地开发（Linux / Windows）
+
+### 3.1 安装 PostgreSQL
+
+#### Ubuntu / Debian
+
+```bash
+sudo apt update
+sudo apt install -y postgresql postgresql-contrib
+sudo systemctl enable --now postgresql
+```
+
+#### Windows
+
+- 方案1（推荐）：从 PostgreSQL 官网下载安装器并完成初始化。
+- 方案2（Chocolatey）：
+
+```powershell
+choco install postgresql --yes
+```
+
+### 3.2 初始化数据库与用户
+
+按 `backend/.env` 里的 `DB_NAME/DB_USER/DB_PASSWORD` 保持一致（默认示例：`fachuan_dev/postgres/postgres`）：
+
+```bash
+# 先通过本地 socket（peer 认证，无需密码）设置密码
+sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'postgres';"
+
+# 再创建数据库
+sudo -u postgres psql -c "CREATE DATABASE fachuan_dev OWNER postgres;"
+
+# 密码设好后，后续也可通过 TCP 连接（需输入密码）
+# psql -h 127.0.0.1 -U postgres -d postgres -c "..."
+```
+
+如果数据库已存在，第二条 `CREATE DATABASE` 报错可忽略。
+
+### 3.3 安装项目依赖
 
 ```bash
 # 1) 克隆项目
@@ -200,7 +211,9 @@ uv run python manage.py createsuperuser
 uv run python manage.py collectstatic --noinput
 ```
 
-启动服务（Web 与 qcluster 可按任意顺序启动；涉及异步任务时需保持 qcluster 运行）：
+### 3.4 启动服务
+
+Web 与 qcluster 可按任意顺序启动；涉及异步任务时需保持 qcluster 运行。
 
 ```bash
 # 终端1
@@ -210,7 +223,7 @@ uv run python manage.py qcluster
 uv run python manage.py runserver 0.0.0.0:8002
 ```
 
-## 环境变量
+## 4. 环境变量
 
 最小配置：
 
@@ -223,4 +236,3 @@ DB_PASSWORD=postgres
 DB_HOST=127.0.0.1
 DB_PORT=5432
 ```
-
