@@ -127,14 +127,15 @@ class CourtSMSDocumentReferenceService:
             normalized = self._normalize_existing_path(raw_path)
             if not normalized or normalized in seen_paths:
                 continue
-            file_name = Path(normalized).name
-            if file_name in seen_names:
+            original_name = getattr(attachment, "original_filename", "") or ""
+            display_name = original_name if original_name else Path(normalized).name
+            if display_name in seen_names:
                 continue
             seen_paths.add(normalized)
-            seen_names.add(file_name)
+            seen_names.add(display_name)
             refs.append(
                 CourtSMSDocumentReference(
-                    display_name=Path(normalized).name,
+                    display_name=display_name,
                     file_path=normalized,
                     source="case_log_attachment",
                 )
