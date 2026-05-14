@@ -129,6 +129,65 @@ class CaseFolderBindingService(FolderBindingCrudService):
         },
     ]
 
+    COURT_SMS_ROOT_SUBDIR: ClassVar = "4-法院送达材料"
+    COURT_SMS_ACCEPTANCE_SUBDIR: ClassVar = "4-法院送达材料/1-受理通知书"
+    COURT_SMS_FEE_SUBDIR: ClassVar = "4-法院送达材料/2-缴费通知书、发票"
+    COURT_SMS_OPPONENT_SUBDIR: ClassVar = "4-法院送达材料/3-对方当事人提交材料"
+    COURT_SMS_JUDGMENT_NOTICE_SUBDIR: ClassVar = "4-法院送达材料/4-裁定书、判决书、通知书"
+    COURT_SMS_OTHER_SUBDIR: ClassVar = "4-法院送达材料/5-其他材料"
+    COURT_SMS_ACCEPTANCE_KEYWORDS: ClassVar = [
+        "受理通知书",
+        "案件受理通知书",
+        "立案受理",
+        "受理案件通知",
+        "已受理",
+    ]
+    COURT_SMS_FEE_KEYWORDS: ClassVar = [
+        "缴费通知书",
+        "交费通知书",
+        "诉讼费",
+        "缴纳通知",
+        "缴费",
+        "交费",
+        "发票",
+        "票据",
+        "收费票据",
+    ]
+    COURT_SMS_OPPONENT_STRONG_KEYWORDS: ClassVar = [
+        "对方证据",
+        "补充证据",
+        "证据目录",
+        "证据清单",
+        "质证",
+        "质证意见",
+        "答辩状",
+        "答辩意见",
+        "对方提交材料",
+        "举证材料",
+        "举证通知材料",
+        "对方材料",
+    ]
+    COURT_SMS_JUDGMENT_NOTICE_KEYWORDS: ClassVar = [
+        "裁定书",
+        "判决书",
+        "调解书",
+        "决定书",
+        "通知书",
+        "传票",
+        "开庭通知",
+        "开庭传票",
+    ]
+    COURT_SMS_OPPONENT_WEAK_KEYWORDS: ClassVar = [
+        "证据",
+        "意见",
+        "书面意见",
+        "代理意见",
+        "补充材料",
+        "陈述意见",
+        "说明材料",
+        "提交材料",
+    ]
+
     binding_model = CaseFolderBinding
     owner_model = Case
     owner_rel_field: str = "case"
@@ -575,6 +634,7 @@ class CaseFolderBindingService(FolderBindingCrudService):
         *,
         source_subfolder: str = "",
         file_name: str = "",
+        source_scene: str = "manual_log_upload",
         user: Any | None = None,
         org_access: dict[str, Any] | None = None,
         perm_open_access: bool = False,
@@ -609,6 +669,14 @@ class CaseFolderBindingService(FolderBindingCrudService):
             root=Path(binding.resolved_folder_path).expanduser().resolve(),
         )
         existing_subdirs = self._collect_relative_subdirs(root)
+
+        if source_scene == "court_sms_attachment":
+            court_sms_match = self._recommend_court_sms_delivery_subdir(
+                existing_paths=existing_subdirs,
+                file_name=file_name,
+            )
+            if court_sms_match:
+                return court_sms_match
 
         file_name_match = self._recommend_subdir_by_file_name(
             existing_paths=existing_subdirs,
@@ -733,6 +801,88 @@ class CaseFolderBindingService(FolderBindingCrudService):
                 "reason": "file_name_generic_match",
             }
         return {}
+
+    def _recommend_court_sms_delivery_subdir(
+        self,
+        *,
+        existing_paths: list[str],
+        file_name: str,
+    ) -> dict[str, str]:
+        raw_file_name = str(file_name or "").strip()
+        normalized_name = self._normalize_match_text(Path(raw_file_name).stem)
+
+        if not normalized_name:
+            return self._build_court_sms_subdir_result(
+                existing_paths=existing_paths,
+                target_subdir=self.COURT_SMS_OTHER_SUBDIR,
+                reason="court_sms_other_fallback",
+            )
+
+        if self._contains_any_keyword(normalized_name, list(self.COURT_SMS_ACCEPTANCE_KEYWORDS)):
+            return self._build_court_sms_subdir_result(
+                existing_paths=existing_paths,
+                target_subdir=self.COURT_SMS_ACCEPTANCE_SUBDIR,
+                reason="court_sms_acceptance_match",
+            )
+
+        if self._contains_any_keyword(normalized_name, list(self.COURT_SMS_FEE_KEYWORDS)):
+            return self._build_court_sms_subdir_result(
+                existing_paths=existing_paths,
+                target_subdir=self.COURT_SMS_FEE_SUBDIR,
+                reason="court_sms_fee_invoice_match",
+            )
+
+        if self._contains_any_keyword(normalized_name, list(self.COURT_SMS_OPPONENT_STRONG_KEYWORDS)):
+            return self._build_court_sms_subdir_result(
+                existing_paths=existing_paths,
+                target_subdir=self.COURT_SMS_OPPONENT_SUBDIR,
+                reason="court_sms_opponent_material_match",
+            )
+
+        if self._contains_any_keyword(normalized_name, list(self.COURT_SMS_JUDGMENT_NOTICE_KEYWORDS)):
+            return self._build_court_sms_subdir_result(
+                existing_paths=existing_paths,
+                target_subdir=self.COURT_SMS_JUDGMENT_NOTICE_SUBDIR,
+                reason="court_sms_judgment_notice_match",
+            )
+
+        if self._contains_any_keyword(normalized_name, list(self.COURT_SMS_OPPONENT_WEAK_KEYWORDS)):
+            return self._build_court_sms_subdir_result(
+                existing_paths=existing_paths,
+                target_subdir=self.COURT_SMS_OPPONENT_SUBDIR,
+                reason="court_sms_opponent_material_weak_match",
+            )
+
+        return self._build_court_sms_subdir_result(
+            existing_paths=existing_paths,
+            target_subdir=self.COURT_SMS_OTHER_SUBDIR,
+            reason="court_sms_other_fallback",
+        )
+
+    def _contains_any_keyword(self, normalized_name: str, keywords: list[str]) -> bool:
+        for keyword in keywords:
+            normalized_keyword = self._normalize_match_text(str(keyword or "").strip())
+            if normalized_keyword and normalized_keyword in normalized_name:
+                return True
+        return False
+
+    def _build_court_sms_subdir_result(
+        self,
+        *,
+        existing_paths: list[str],
+        target_subdir: str,
+        reason: str,
+    ) -> dict[str, str]:
+        normalized_target = self._normalize_optional_relative_path(target_subdir)
+        matched_existing = self._match_preferred_existing_subdir(
+            existing_paths=existing_paths,
+            preferred_paths=[normalized_target],
+        )
+        return {
+            "recommended_subdir": matched_existing or normalized_target,
+            "matched_existing_subdir": matched_existing or "",
+            "reason": reason,
+        }
 
     def _extract_file_name_keywords(self, file_name: str) -> list[str]:
         stem = Path(str(file_name or "").strip()).stem

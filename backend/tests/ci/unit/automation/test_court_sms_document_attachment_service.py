@@ -30,4 +30,6 @@ def test_add_single_attachment_passes_original_file_path_to_case_service(tmp_pat
         case_log_id=88,
         file_path=str(source_file),
         file_name="source（测试案件）_20260514收.pdf",
+        source_scene="court_sms_attachment",
+        recommendation_file_name="source（测试案件）_20260514收.pdf",
     )

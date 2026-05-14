@@ -46,7 +46,14 @@ class CaseLogInternalService:
         )
         return case_log.id
 
-    def add_case_log_attachment_internal(self, case_log_id: int, file_path: str, file_name: str) -> bool:
+    def add_case_log_attachment_internal(
+        self,
+        case_log_id: int,
+        file_path: str,
+        file_name: str,
+        source_scene: str = "manual_log_upload",
+        recommendation_file_name: str = "",
+    ) -> bool:
         try:
             case_log = CaseLog.objects.get(id=case_log_id)
         except CaseLog.DoesNotExist:
@@ -70,6 +77,8 @@ class CaseLogInternalService:
                     log=case_log,
                     allowed_extensions=list(CASE_LOG_ALLOWED_EXTENSIONS),
                     max_size_bytes=int(CASE_LOG_MAX_FILE_SIZE),
+                    source_scene=source_scene,
+                    recommendation_file_name=recommendation_file_name or file_name,
                 )
                 attachment = CaseLogAttachment.objects.create(
                     log=case_log,

@@ -280,6 +280,8 @@ class DocumentAttachmentService:
                 case_log_id=sms.case_log.id,
                 file_path=file_path,
                 file_name=renamed_filename,
+                source_scene="court_sms_attachment",
+                recommendation_file_name=renamed_filename,
             )
             if not success:
                 logger.warning(f"添加案件日志附件失败: {renamed_filename}")
