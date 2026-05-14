@@ -59,12 +59,10 @@ def launch_browser(
 
         if effective_user_data_dir:
             Path(effective_user_data_dir).mkdir(parents=True, exist_ok=True)
-            browser = playwright.chromium.launch_persistent_context(
+            context = playwright.chromium.launch_persistent_context(
                 user_data_dir=effective_user_data_dir,
                 **launch_args,
             )
-            # persistent context 本身就是 context
-            context = browser  # type: ignore[assignment]
         else:
             browser = playwright.chromium.launch(**launch_args)
 

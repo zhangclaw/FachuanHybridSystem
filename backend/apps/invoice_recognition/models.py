@@ -4,9 +4,7 @@ from __future__ import annotations
 
 from datetime import date, datetime, time, timedelta
 from decimal import Decimal
-from typing import Any
-
-from typing import ClassVar
+from typing import Any, ClassVar
 
 from django.conf import settings
 from django.db import models

@@ -169,7 +169,8 @@ class ContractArchiveMixin:
 
     def preview_archive_material_view(self, request: HttpRequest, object_id: int, material_id: int) -> HttpResponse:
         """预览单个归档材料的 Admin view"""
-        from django.http import HttpResponse as DjangoHttpResponse, JsonResponse
+        from django.http import HttpResponse as DjangoHttpResponse
+        from django.http import JsonResponse
 
         if not self.has_view_permission(request):
             raise PermissionDenied

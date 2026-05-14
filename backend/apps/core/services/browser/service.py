@@ -14,7 +14,7 @@ from .profiles import BrowserProfile, get_profile
 if TYPE_CHECKING:
     from playwright.async_api import Browser as AsyncBrowser
     from playwright.async_api import BrowserContext as AsyncBrowserContext
-    from playwright.sync_api import Browser, BrowserContext
+    from playwright.sync_api import Browser, BrowserContext, Playwright
 
 logger = logging.getLogger("apps.core")
 
@@ -26,11 +26,12 @@ class BrowserService:
     """
 
     _instance: BrowserService | None = None
+    _browsers: dict[str, tuple[Any, Any]]
 
     def __new__(cls) -> BrowserService:
         if cls._instance is None:
             cls._instance = super().__new__(cls)
-            cls._instance._browsers: dict[str, Any] = {}  # profile_name -> (playwright, browser)
+            cls._instance._browsers = {}
         return cls._instance
 
     def get_context(
@@ -79,7 +80,7 @@ class BrowserService:
 
         return context
 
-    def _get_or_create_browser(self, profile: BrowserProfile) -> tuple[Any, Any]:
+    def _get_or_create_browser(self, profile: BrowserProfile) -> tuple[Playwright, Browser]:
         """获取或创建浏览器实例。"""
         if profile.name in self._browsers:
             return self._browsers[profile.name]

@@ -732,6 +732,7 @@ class ArchivePlaceholderService(BasePlaceholderService):
     def _get_file_page_count(material: Any) -> int:
         """读取归档材料文件的页数"""
         from pathlib import Path
+
         from django.conf import settings as django_settings
 
         file_path = Path(material.file_path)

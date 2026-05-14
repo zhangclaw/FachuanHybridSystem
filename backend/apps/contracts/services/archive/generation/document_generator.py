@@ -26,8 +26,8 @@ def preview_archive_template(contract_id: int, template_subtype: str) -> dict[st
     if not template_path:
         return {"success": False, "error": f"模板文件不存在: {template_subtype}"}
 
-    from apps.documents.services.generation.pipeline import DocxPreviewService, PipelineContextBuilder
     from apps.contracts.models.archive_override import ArchivePlaceholderOverride
+    from apps.documents.services.generation.pipeline import DocxPreviewService, PipelineContextBuilder
 
     case = (
         contract.cases.select_related("contract")

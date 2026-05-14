@@ -198,9 +198,9 @@ def _compile_final_archive_pdf(
     case_materials_pdf_exists: bool,
 ) -> dict[str, Any]:
     """将1-3号模板文书的docx转PDF，与4-案卷材料PDF按序号合并，生成"5-Final案卷材料.pdf"。"""
-    import fitz
-
     from datetime import date
+
+    import fitz
 
     from apps.documents.services.infrastructure.pdf_merge_utils import convert_docx_to_pdf
 

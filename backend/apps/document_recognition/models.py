@@ -3,9 +3,7 @@
 from __future__ import annotations
 
 from datetime import date, datetime, time, timedelta
-from typing import Any
-
-from typing import ClassVar
+from typing import Any, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _

@@ -8,11 +8,7 @@ from datetime import datetime
 from django.utils import timezone
 
 from ..models import Reminder, ReminderType
-from .calendar_providers import (
-    CalendarEvent,
-    get_available_providers,
-    get_provider,
-)
+from .calendar_providers import CalendarEvent, get_available_providers, get_provider
 
 logger = logging.getLogger(__name__)
 

@@ -4,8 +4,8 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import Mock, patch
 
-from apps.cases.models import Case
 from apps.cases.admin.caselog_admin import CaseLogAttachmentInlineForm
+from apps.cases.models import Case
 from apps.cases.services.log.case_log_attachment_storage_service import CaseLogAttachmentStorageService
 from apps.cases.services.template.folder_binding_service import CaseFolderBindingService
 
