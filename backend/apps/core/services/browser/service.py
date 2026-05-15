@@ -7,7 +7,7 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from .profiles import BrowserProfile, get_profile
 
@@ -78,7 +78,7 @@ class BrowserService:
 
             anti_detection.apply_stealth(context)
 
-        return context
+        return cast(BrowserContext, context)
 
     def _get_or_create_browser(self, profile: BrowserProfile) -> tuple[Any, Any]:
         """获取或创建浏览器实例。"""
