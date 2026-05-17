@@ -116,6 +116,7 @@ def _sync_llm_chat(
                 time.sleep(delay)
             else:
                 raise
+    raise last_error  # type: ignore[misc]
 
 
 # ─── 辅助函数 ────────────────────────────────────────────────────────────────
