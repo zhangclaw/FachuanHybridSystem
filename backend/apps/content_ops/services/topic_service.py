@@ -64,10 +64,16 @@ class TopicService:
 
         topics = []
         for t in raw_topics:
+            title = t.get("title", t.get("主题", t.get("选题标题", t.get("选题", t.get("topic", "")))))
+            description = t.get("description", t.get("描述", t.get("选题简介", t.get("简介", t.get("summary", "")))))
+            kw = t.get("suggested_keyword", t.get("建议的检索关键词", t.get("检索关键词", t.get("关键词", t.get("keyword", "")))))
+            # LLM may return keyword as a list
+            if isinstance(kw, list):
+                kw = "、".join(str(k) for k in kw)
             topics.append({
-                "title": t.get("title", t.get("选题标题", t.get("选题", ""))),
-                "description": t.get("description", t.get("选题简介", t.get("简介", ""))),
-                "suggested_keyword": t.get("suggested_keyword", t.get("建议的检索关键词", t.get("关键词", t.get("keyword", "")))),
+                "title": title,
+                "description": description,
+                "suggested_keyword": kw,
             })
 
         return TopicResult(
