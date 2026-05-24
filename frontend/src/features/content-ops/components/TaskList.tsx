@@ -99,9 +99,9 @@ export function TaskList({ selectedTaskId, onSelectTask }: TaskListProps) {
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 overflow-hidden w-full">
       {/* 搜索和筛选 */}
-      <div className="space-y-2">
+      <div className="space-y-2 overflow-hidden">
         <div className="relative">
           <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
           <Input
@@ -135,9 +135,9 @@ export function TaskList({ selectedTaskId, onSelectTask }: TaskListProps) {
           {tasks && tasks.length > 0 ? '没有匹配的任务' : '暂无任务记录'}
         </div>
       ) : (
-        <ScrollArea className="h-[calc(100vh-420px)]">
+        <ScrollArea className="h-[calc(100vh-420px)] w-full overflow-hidden">
           <motion.div
-            className="space-y-2 pr-3"
+            className="space-y-2 pr-3 w-full"
             initial="hidden"
             animate="visible"
             variants={{
@@ -180,7 +180,7 @@ function TaskCard({ task, isSelected, onClick }: {
   return (
     <Card
       className={cn(
-        'cursor-pointer transition-all hover:border-primary/30 overflow-hidden',
+        'w-full cursor-pointer transition-all hover:border-primary/30 overflow-hidden',
         isSelected && 'border-primary/50 bg-primary/5',
       )}
       onClick={onClick}
