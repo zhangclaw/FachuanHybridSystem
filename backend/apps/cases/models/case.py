@@ -67,6 +67,15 @@ class Case(models.Model):
     current_stage = models.CharField(
         max_length=64, choices=CaseStage.choices, blank=True, null=True, verbose_name=_("当前阶段")
     )
+    case_group = models.ForeignKey(
+        "cases.CaseGroup",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="cases",
+        verbose_name=_("案件组"),
+    )
+    group_sequence = models.PositiveIntegerField(default=0, verbose_name=_("组内顺序"))
 
     history = HistoricalRecords()
 

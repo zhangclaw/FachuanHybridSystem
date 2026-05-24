@@ -1,0 +1,27 @@
+{% load i18n %}
+{% if related_cases %}
+<div class="case-timeline">
+    <div class="case-timeline-label">{% trans "案件关联" %}：</div>
+    <div class="case-timeline-track">
+        {% for rc in related_cases %}
+        <div class="case-timeline-node {% if rc.pk == case.pk %}current{% endif %}">
+            <div class="case-timeline-dot"></div>
+            {% if rc.pk == case.pk %}
+            <div class="case-timeline-info">
+                <span class="case-timeline-stage">{{ rc.get_current_stage_display|default:"—" }}</span>
+                <span class="case-timeline-name">{{ rc.name }}</span>
+            </div>
+            {% else %}
+            <a href="{% url 'admin:cases_case_detail' rc.pk %}" class="case-timeline-info">
+                <span class="case-timeline-stage">{{ rc.get_current_stage_display|default:"—" }}</span>
+                <span class="case-timeline-name">{{ rc.name }}</span>
+            </a>
+            {% endif %}
+        </div>
+        {% if not forloop.last %}
+        <div class="case-timeline-connector"></div>
+        {% endif %}
+        {% endfor %}
+    </div>
+</div>
+{% endif %}

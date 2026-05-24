@@ -25,6 +25,7 @@ from apps.cases.admin.mixins import (
 from apps.cases.models import (
     Case,
     CaseAssignment,
+    CaseGroup,
     CaseLog,
     CaseLogAttachment,
     CaseNumber,
@@ -191,7 +192,7 @@ class CaseAdmin(
     BaseModelAdmin,
 ):
     form = CaseAdminForm
-    autocomplete_fields = ["contract"]
+    autocomplete_fields = ["contract", "case_group"]
     fieldsets = (
         (
             None,
@@ -214,6 +215,16 @@ class CaseAdmin(
                     "filing_number",
                     "effective_date",
                     "specified_date",
+                ),
+            },
+        ),
+        (
+            _("案件关联"),
+            {
+                "classes": ("collapse",),
+                "fields": (
+                    "case_group",
+                    "group_sequence",
                 ),
             },
         ),
@@ -302,3 +313,15 @@ class CaseAdmin(
     def get_file_paths(self, queryset: QuerySet[Case]) -> list[str]:
         service = self._get_case_admin_service()
         return service.collect_file_paths_for_export(queryset)
+
+
+@admin.register(CaseGroup)
+class CaseGroupAdmin(BaseModelAdmin):
+    list_display = ("name", "case_count", "created_at")
+    search_fields = ("name",)
+    ordering = ("-created_at",)
+
+    def case_count(self, obj: CaseGroup) -> int:
+        return obj.cases.count()
+
+    case_count.short_description = _("案件数")  # type: ignore[attr-defined]

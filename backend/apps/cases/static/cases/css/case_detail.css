@@ -1338,3 +1338,75 @@
     padding-top: 16px;
     border-top: 1px solid #e5e7eb;
 }
+
+/* 案件关联时间线 */
+.case-timeline {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    margin: 0 0 4px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    overflow-x: auto;
+}
+.case-timeline-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+    white-space: nowrap;
+}
+.case-timeline-track {
+    display: flex;
+    align-items: center;
+    gap: 0;
+}
+.case-timeline-node {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+.case-timeline-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #cbd5e1;
+    flex-shrink: 0;
+}
+.case-timeline-node.current .case-timeline-dot {
+    background: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+}
+.case-timeline-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    text-decoration: none;
+    color: inherit;
+}
+a.case-timeline-info:hover {
+    color: #3b82f6;
+}
+.case-timeline-stage {
+    font-size: 11px;
+    color: #64748b;
+    font-weight: 500;
+}
+.case-timeline-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: #1e293b;
+}
+.case-timeline-node.current .case-timeline-name {
+    color: #3b82f6;
+    font-weight: 600;
+}
+.case-timeline-connector {
+    width: 28px;
+    height: 2px;
+    background: #cbd5e1;
+    flex-shrink: 0;
+    margin: 0 4px;
+}

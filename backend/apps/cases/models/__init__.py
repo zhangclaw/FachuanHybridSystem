@@ -13,6 +13,9 @@ from apps.core.models.enums import CaseStage, CaseStatus, CaseType, LegalStatus,
 # case.py - 案件核心模型
 from .case import Case, CaseFilingNumberSequence, CaseNumber, SupervisingAuthority
 
+# case_group.py - 案件组
+from .case_group import CaseGroup
+
 # chat.py - 群聊相关模型
 from .chat import CaseChat, ChatAuditLog
 
@@ -50,6 +53,8 @@ __all__ = [
     "CaseFilingNumberSequence",
     "CaseNumber",
     "SupervisingAuthority",
+    # case_group.py
+    "CaseGroup",
     # party.py
     "CaseParty",
     "CaseAssignment",
