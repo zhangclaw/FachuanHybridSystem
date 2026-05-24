@@ -156,6 +156,42 @@ class ContentOpsTaskService:
         episode.save(update_fields=["review_status", "reviewer_notes", "reviewed_by", "reviewed_at", "updated_at"])
         return episode
 
+    def retry_task(self, *, task_id: int, user: Any | None = None) -> ContentTask:
+        """重试失败的任务。"""
+        task = self.get_task(task_id=task_id, user=user)
+        if task.status != ContentTaskStatus.FAILED:
+            raise ValidationException("只能重试失败的任务")
+        # 清除旧的文章和音频
+        GeneratedArticle.objects.filter(task=task).delete()
+        PodcastEpisode.objects.filter(task=task).delete()
+        # 重新提交
+        task.status = ContentTaskStatus.PENDING
+        task.progress = 0
+        task.message = "任务已重新提交"
+        task.error = ""
+        task.finished_at = None
+        task.save()
+        self.dispatch_task(task=task)
+        return task
+
+    def cancel_task(self, *, task_id: int, user: Any | None = None) -> ContentTask:
+        """取消运行中或排队中的任务。"""
+        task = self.get_task(task_id=task_id, user=user)
+        if task.status not in [ContentTaskStatus.PENDING, ContentTaskStatus.QUEUED, ContentTaskStatus.RUNNING]:
+            raise ValidationException("只能取消待执行或运行中的任务")
+        task.status = ContentTaskStatus.CANCELLED
+        task.message = "任务已取消"
+        task.finished_at = timezone.now()
+        task.save(update_fields=["status", "message", "finished_at", "updated_at"])
+        return task
+
+    def delete_task(self, *, task_id: int, user: Any | None = None) -> None:
+        """删除任务及其关联的文章和音频。"""
+        task = self.get_task(task_id=task_id, user=user)
+        if task.status in [ContentTaskStatus.RUNNING, ContentTaskStatus.QUEUED]:
+            raise ValidationException("不能删除正在执行的任务，请先取消")
+        task.delete()
+
     @staticmethod
     def _get_article(article_id: int) -> GeneratedArticle:
         article = GeneratedArticle.objects.filter(id=article_id).first()

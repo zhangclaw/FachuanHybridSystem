@@ -3,16 +3,24 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { contentOpsApi } from '../api'
 import type { CreateTaskInput, ReviewActionInput, TopicSuggestion } from '../types'
 
-// 选题建议（手动触发，使用 mutation）
+// 选题建议（手动触发，使用 mutation，带错误处理）
 export function useTopicSuggestions() {
   const [data, setData] = useState<TopicSuggestion[] | null>(null)
+  const [error, setError] = useState<string | null>(null)
   const mutation = useMutation({
     mutationFn: (model?: string) => contentOpsApi.suggestTopics(model),
-    onSuccess: (result) => setData(result),
+    onSuccess: (result) => {
+      setData(result)
+      setError(null)
+    },
+    onError: (err: Error) => {
+      setError(err.message || '获取选题建议失败')
+    },
   })
 
   return {
     data,
+    error,
     isFetching: mutation.isPending,
     refetch: (model?: string) => mutation.mutateAsync(model),
   }
@@ -105,6 +113,39 @@ export function useReviewEpisode() {
         ? contentOpsApi.approveEpisode(episodeId, data)
         : contentOpsApi.rejectEpisode(episodeId, data)
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['content-ops'] })
+    },
+  })
+}
+
+// 重试任务
+export function useRetryTask() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (taskId: number) => contentOpsApi.retryTask(taskId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['content-ops'] })
+    },
+  })
+}
+
+// 取消任务
+export function useCancelTask() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (taskId: number) => contentOpsApi.cancelTask(taskId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['content-ops'] })
+    },
+  })
+}
+
+// 删除任务
+export function useDeleteTask() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (taskId: number) => contentOpsApi.deleteTask(taskId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['content-ops'] })
     },

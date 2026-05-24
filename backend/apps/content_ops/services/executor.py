@@ -145,7 +145,7 @@ class ContentOpsExecutor:
         task.source_title = getattr(detail, "title", "") or ""
         task.source_court_text = getattr(detail, "court_text", "") or ""
         task.source_judgment_date = getattr(detail, "judgment_date", "") or ""
-        task.source_facts = getattr(detail, "facts", "") or ""
+        task.source_facts = getattr(detail, "content_text", "") or ""
         task.save(
             update_fields=[
                 "source_doc_id",

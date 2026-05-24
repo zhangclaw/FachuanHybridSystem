@@ -111,6 +111,27 @@ def get_task(request: HttpRequest, task_id: int) -> ContentTaskOut:
     return _task_to_out(task)
 
 
+@router.post("/tasks/{task_id}/retry", response=ContentTaskOut)
+def retry_task(request: HttpRequest, task_id: int) -> ContentTaskOut:
+    """重试失败的任务。"""
+    task = _task_service.retry_task(task_id=task_id, user=request.user)
+    return _task_to_out(task)
+
+
+@router.post("/tasks/{task_id}/cancel", response=ContentTaskOut)
+def cancel_task(request: HttpRequest, task_id: int) -> ContentTaskOut:
+    """取消运行中的任务。"""
+    task = _task_service.cancel_task(task_id=task_id, user=request.user)
+    return _task_to_out(task)
+
+
+@router.delete("/tasks/{task_id}")
+def delete_task(request: HttpRequest, task_id: int) -> dict[str, str]:
+    """删除任务。"""
+    _task_service.delete_task(task_id=task_id, user=request.user)
+    return {"message": "任务已删除"}
+
+
 @router.get("/tasks/{task_id}/articles", response=list[GeneratedArticleOut])
 def list_articles(request: HttpRequest, task_id: int) -> list[GeneratedArticleOut]:
     """列出任务关联的文章。"""

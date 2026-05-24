@@ -2,6 +2,12 @@ import { useState } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet'
 import { Plus, Sparkles, FileInput, LayoutList } from 'lucide-react'
 import { TopicInspiration } from './TopicInspiration'
 import { DirectInput } from './DirectInput'
@@ -96,28 +102,28 @@ export function ContentWorkbench() {
         defaultMode={dialogKeyword ? 'search' : 'direct'}
       />
 
-      {/* 任务详情对话框 */}
-      {selectedTaskId && detailOpen && (
-        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm">
-          <div className="fixed inset-y-0 right-0 z-50 w-full max-w-2xl border-l bg-background shadow-lg">
-            <div className="flex h-full flex-col">
-              <div className="flex items-center justify-between border-b px-6 py-4">
-                <h2 className="text-lg font-semibold">任务详情</h2>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setDetailOpen(false)}
-                >
-                  关闭
-                </Button>
-              </div>
-              <div className="flex-1 overflow-y-auto p-6">
-                <TaskDetail taskId={selectedTaskId} />
-              </div>
-            </div>
+      {/* 任务详情侧面板 */}
+      <Sheet open={detailOpen} onOpenChange={setDetailOpen}>
+        <SheetContent
+          side="right"
+          className="w-full sm:max-w-2xl p-0"
+          showCloseButton={false}
+        >
+          <SheetHeader className="border-b px-6 py-4 flex-row items-center justify-between space-y-0">
+            <SheetTitle className="text-lg font-semibold">任务详情</SheetTitle>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setDetailOpen(false)}
+            >
+              关闭
+            </Button>
+          </SheetHeader>
+          <div className="flex-1 overflow-y-auto p-6">
+            {selectedTaskId && <TaskDetail taskId={selectedTaskId} />}
           </div>
-        </div>
-      )}
+        </SheetContent>
+      </Sheet>
     </div>
   )
 }

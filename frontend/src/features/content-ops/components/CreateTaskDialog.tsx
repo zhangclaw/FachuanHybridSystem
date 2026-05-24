@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -18,8 +18,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Loader2, Search, FileText } from 'lucide-react'
+import { Loader2, Search, FileText, Volume2 } from 'lucide-react'
 import { useCreateTask } from '../hooks/use-content-ops'
+import { contentOpsApi } from '../api'
 import { VOICE_OPTIONS } from '../types'
 import type { TaskMode } from '../types'
 import { useCredentials } from '@/features/organization/hooks/use-credentials'
@@ -58,6 +59,42 @@ export function CreateTaskDialog({
 
   const createTask = useCreateTask()
   const { data: credentials = [] } = useCredentials()
+  const [previewPlaying, setPreviewPlaying] = useState(false)
+  const [previewLoading, setPreviewLoading] = useState(false)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
+
+  const handleVoicePreview = useCallback(async () => {
+    if (previewPlaying && audioRef.current) {
+      audioRef.current.pause()
+      audioRef.current = null
+      setPreviewPlaying(false)
+      return
+    }
+
+    setPreviewLoading(true)
+    try {
+      const blob = await contentOpsApi.testTts('你好，我是你的法律故事播客主持人。', voice)
+      const url = URL.createObjectURL(blob)
+      const audio = new Audio(url)
+      audioRef.current = audio
+      audio.onended = () => {
+        setPreviewPlaying(false)
+        URL.revokeObjectURL(url)
+      }
+      audio.onerror = () => {
+        setPreviewPlaying(false)
+        setPreviewLoading(false)
+        URL.revokeObjectURL(url)
+        toast.error('语音试听失败')
+      }
+      await audio.play()
+      setPreviewPlaying(true)
+    } catch {
+      toast.error('语音试听失败')
+    } finally {
+      setPreviewLoading(false)
+    }
+  }, [voice, previewPlaying])
 
   // 过滤威科先行相关凭证
   const weikeCredentials = credentials.filter((c) => {
@@ -209,18 +246,36 @@ export function CreateTaskDialog({
 
           <div className="space-y-2">
             <Label>语音音色</Label>
-            <Select value={voice} onValueChange={setVoice}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {VOICE_OPTIONS.map((v) => (
-                  <SelectItem key={v.value} value={v.value}>
-                    {v.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex gap-2">
+              <Select value={voice} onValueChange={setVoice}>
+                <SelectTrigger className="flex-1">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {VOICE_OPTIONS.map((v) => (
+                    <SelectItem key={v.value} value={v.value}>
+                      {v.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={handleVoicePreview}
+                disabled={previewLoading}
+                title={previewPlaying ? '停止试听' : '试听语音'}
+              >
+                {previewLoading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : previewPlaying ? (
+                  <span className="text-xs">停止</span>
+                ) : (
+                  <Volume2 className="w-4 h-4" />
+                )}
+              </Button>
+            </div>
           </div>
         </div>
 

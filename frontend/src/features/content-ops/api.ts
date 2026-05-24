@@ -28,6 +28,15 @@ export const contentOpsApi = {
   getTask: (taskId: number) =>
     api.get(`tasks/${taskId}`).json<ContentTask>(),
 
+  retryTask: (taskId: number) =>
+    api.post(`tasks/${taskId}/retry`).json<ContentTask>(),
+
+  cancelTask: (taskId: number) =>
+    api.post(`tasks/${taskId}/cancel`).json<ContentTask>(),
+
+  deleteTask: (taskId: number) =>
+    api.delete(`tasks/${taskId}`).json<{ message: string }>(),
+
   // 任务关联数据
   getTaskArticles: (taskId: number) =>
     api.get(`tasks/${taskId}/articles`).json<GeneratedArticle[]>(),

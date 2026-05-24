@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -14,9 +14,22 @@ import {
   Download,
   ThumbsUp,
   ThumbsDown,
+  Copy,
+  Check,
+  AlertCircle,
+  RotateCcw,
+  XCircle,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useTaskDetail, useTaskArticles, useTaskEpisodes, useReviewArticle, useReviewEpisode } from '../hooks/use-content-ops'
+import {
+  useTaskDetail,
+  useTaskArticles,
+  useTaskEpisodes,
+  useReviewArticle,
+  useReviewEpisode,
+  useRetryTask,
+  useCancelTask,
+} from '../hooks/use-content-ops'
 import { STATUS_LABEL, REVIEW_STATUS_LABEL } from '../types'
 import type { GeneratedArticle, PodcastEpisode, ReviewStatus } from '../types'
 import { contentOpsApi } from '../api'
@@ -30,6 +43,8 @@ export function TaskDetail({ taskId }: TaskDetailProps) {
   const { data: task, isLoading } = useTaskDetail(taskId)
   const { data: articles = [] } = useTaskArticles(taskId)
   const { data: episodes = [] } = useTaskEpisodes(taskId)
+  const retryTask = useRetryTask()
+  const cancelTask = useCancelTask()
 
   if (isLoading || !task) {
     return (
@@ -74,13 +89,38 @@ export function TaskDetail({ taskId }: TaskDetailProps) {
         </Card>
       )}
 
-      {/* 错误信息 */}
+      {/* 错误信息 + 重试 */}
       {task.status === 'failed' && task.error && (
         <Card className="border-destructive/50">
-          <CardContent className="pt-4">
-            <p className="text-sm text-destructive">{task.error}</p>
+          <CardContent className="pt-4 space-y-3">
+            <div className="flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 text-destructive mt-0.5 shrink-0" />
+              <p className="text-sm text-destructive">{task.error}</p>
+            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => retryTask.mutate(task.id)}
+              disabled={retryTask.isPending}
+            >
+              <RotateCcw className="w-3.5 h-3.5 mr-1" />
+              重试任务
+            </Button>
           </CardContent>
         </Card>
+      )}
+
+      {/* 取消按钮 */}
+      {isActive && (
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => cancelTask.mutate(task.id)}
+          disabled={cancelTask.isPending}
+        >
+          <XCircle className="w-3.5 h-3.5 mr-1" />
+          取消任务
+        </Button>
       )}
 
       {/* 文章和音频 Tab */}
@@ -117,6 +157,7 @@ export function TaskDetail({ taskId }: TaskDetailProps) {
 function ArticleCard({ article }: { article: GeneratedArticle }) {
   const [expanded, setExpanded] = useState(false)
   const [notes, setNotes] = useState('')
+  const [copied, setCopied] = useState(false)
   const reviewArticle = useReviewArticle()
 
   const handleReview = (action: 'approve' | 'reject') => {
@@ -131,6 +172,17 @@ function ArticleCard({ article }: { article: GeneratedArticle }) {
       },
     )
   }
+
+  const handleCopy = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(article.content)
+      setCopied(true)
+      toast.success('已复制到剪贴板')
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      toast.error('复制失败')
+    }
+  }, [article.content])
 
   const reviewBadge = (status: ReviewStatus) => {
     const variants = { draft: 'secondary' as const, approved: 'default' as const, rejected: 'destructive' as const }
@@ -161,11 +213,17 @@ function ArticleCard({ article }: { article: GeneratedArticle }) {
         <div className={cn('text-sm whitespace-pre-wrap', !expanded && 'line-clamp-6')}>
           {article.content}
         </div>
-        {article.content.length > 300 && (
-          <Button variant="ghost" size="sm" onClick={() => setExpanded(!expanded)}>
-            {expanded ? '收起' : '展开全文'}
+        <div className="flex items-center gap-2">
+          {article.content.length > 300 && (
+            <Button variant="ghost" size="sm" onClick={() => setExpanded(!expanded)}>
+              {expanded ? '收起' : '展开全文'}
+            </Button>
+          )}
+          <Button variant="outline" size="sm" onClick={handleCopy}>
+            {copied ? <Check className="w-3.5 h-3.5 mr-1" /> : <Copy className="w-3.5 h-3.5 mr-1" />}
+            {copied ? '已复制' : '复制全文'}
           </Button>
-        )}
+        </div>
 
         {/* 审核操作 */}
         {article.review_status === 'draft' && (
@@ -206,8 +264,10 @@ function ArticleCard({ article }: { article: GeneratedArticle }) {
 
 function EpisodeCard({ episode }: { episode: PodcastEpisode }) {
   const [playing, setPlaying] = useState(false)
+  const [audioError, setAudioError] = useState(false)
   const [notes, setNotes] = useState('')
   const reviewEpisode = useReviewEpisode()
+  const audioRef = useRef<HTMLAudioElement>(null)
   const audioUrl = contentOpsApi.getAudioUrl(episode.id)
 
   const handleReview = (action: 'approve' | 'reject') => {
@@ -223,17 +283,21 @@ function EpisodeCard({ episode }: { episode: PodcastEpisode }) {
     )
   }
 
-  const handlePlay = () => {
-    const audio = document.getElementById(`audio-${episode.id}`) as HTMLAudioElement
-    if (audio) {
-      if (playing) {
-        audio.pause()
-      } else {
-        audio.play()
-      }
-      setPlaying(!playing)
+  const handlePlay = useCallback(() => {
+    const audio = audioRef.current
+    if (!audio) return
+    if (playing) {
+      audio.pause()
+      setPlaying(false)
+    } else {
+      audio.play().catch(() => {
+        setAudioError(true)
+        setPlaying(false)
+        toast.error('音频播放失败')
+      })
+      setPlaying(true)
     }
-  }
+  }, [playing])
 
   const reviewBadge = (status: ReviewStatus) => {
     const variants = { draft: 'secondary' as const, approved: 'default' as const, rejected: 'destructive' as const }
@@ -245,14 +309,27 @@ function EpisodeCard({ episode }: { episode: PodcastEpisode }) {
       <CardContent className="p-4 space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Button size="icon" variant="outline" className="h-8 w-8" onClick={handlePlay}>
-              {playing ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+            <Button
+              size="icon"
+              variant="outline"
+              className="h-8 w-8"
+              onClick={handlePlay}
+              disabled={audioError}
+            >
+              {audioError ? (
+                <AlertCircle className="w-4 h-4 text-destructive" />
+              ) : playing ? (
+                <Pause className="w-4 h-4" />
+              ) : (
+                <Play className="w-4 h-4" />
+              )}
             </Button>
             <div>
               <p className="text-sm font-medium">音色: {episode.voice}</p>
               <p className="text-[10px] text-muted-foreground">
                 {episode.duration_seconds && `${Math.round(episode.duration_seconds)}秒`}
                 {episode.file_size_bytes && ` · ${(episode.file_size_bytes / 1024 / 1024).toFixed(1)}MB`}
+                {audioError && <span className="text-destructive ml-1">音频加载失败</span>}
               </p>
             </div>
           </div>
@@ -267,9 +344,13 @@ function EpisodeCard({ episode }: { episode: PodcastEpisode }) {
         </div>
 
         <audio
-          id={`audio-${episode.id}`}
+          ref={audioRef}
           src={audioUrl ?? undefined}
           onEnded={() => setPlaying(false)}
+          onError={() => {
+            setAudioError(true)
+            setPlaying(false)
+          }}
           className="hidden"
         />
 
