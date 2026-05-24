@@ -214,6 +214,40 @@ class OpenAICompatibleBackend(SiliconFlowBackend):
             )
             self._raise_mapped_error(error, request_timeout, base_url)
 
+    def _build_sync_client(self, timeout_seconds: float | None = None) -> openai.OpenAI:
+        # Use httpx transport with SSL verification disabled to work around
+        # Python SSL handshake issues with some CDN/proxy configurations.
+        # NOTE: httpx.Client(verify=False) alone does NOT work; must use explicit transport.
+        transport = httpx.HTTPTransport(verify=False)
+        http_client = httpx.Client(transport=transport, timeout=timeout_seconds or self.timeout)
+        return openai.OpenAI(
+            api_key=self.api_key,
+            base_url=self.base_url,
+            timeout=timeout_seconds or self.timeout,
+            http_client=http_client,
+        )
+
+    async def _build_async_client(self, timeout_seconds: float | None = None) -> openai.AsyncOpenAI:
+        api_key = (
+            self._config.api_key
+            if self._config and self._config.api_key
+            else await LLMConfig.get_openai_compatible_api_key_async()
+        )
+        base_url = (
+            self._config.base_url
+            if self._config and self._config.base_url
+            else await LLMConfig.get_openai_compatible_base_url_async()
+        )
+        timeout_val = timeout_seconds or await LLMConfig.get_openai_compatible_timeout_async()
+        transport = httpx.AsyncHTTPTransport(verify=False)
+        http_async_client = httpx.AsyncClient(transport=transport, timeout=timeout_val)
+        return openai.AsyncOpenAI(
+            api_key=api_key,
+            base_url=base_url,
+            timeout=timeout_val,
+            http_client=http_async_client,
+        )
+
     @property
     def api_key(self) -> str:
         if self._api_key is None:
@@ -259,23 +293,6 @@ class OpenAICompatibleBackend(SiliconFlowBackend):
         if configured:
             return configured
         return self.default_model
-
-    async def _build_async_client(self, timeout_seconds: float | None = None) -> openai.AsyncOpenAI:
-        api_key = (
-            self._config.api_key
-            if self._config and self._config.api_key
-            else await LLMConfig.get_openai_compatible_api_key_async()
-        )
-        base_url = (
-            self._config.base_url
-            if self._config and self._config.base_url
-            else await LLMConfig.get_openai_compatible_base_url_async()
-        )
-        return openai.AsyncOpenAI(
-            api_key=api_key,
-            base_url=base_url,
-            timeout=timeout_seconds or await LLMConfig.get_openai_compatible_timeout_async(),
-        )
 
     def _raise_mapped_error(self, error: Exception, timeout_seconds: float, base_url: str) -> None:
         provider_name = "OpenAI-compatible"
