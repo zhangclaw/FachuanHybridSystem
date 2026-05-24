@@ -108,6 +108,7 @@ class TTSService:
         """Synthesize multi-person discussion audio.
 
         Each turn uses its own VoiceDesign style_prompt for a distinct voice.
+        Turns are synthesized in parallel for better performance.
 
         Args:
             turns: List of {"text": "...", "style_prompt": "..."} dicts.
@@ -128,28 +129,48 @@ class TTSService:
         ])
         silence_gap = _SILENCE_FRAME * 3  # ~0.4s of silence
 
-        logger.info("Discussion TTS: %d turns", len(turns))
+        logger.info("Discussion TTS: %d turns (parallel)", len(turns))
 
-        audio_parts: list[bytes] = []
-        transport = httpx.HTTPTransport(verify=False)
-        with httpx.Client(transport=transport, timeout=120) as client:
-            for i, turn in enumerate(turns):
-                text = turn["text"]
-                style_prompt = turn.get("style_prompt") or self._default_style_prompt
-                speaker = turn.get("speaker", f"Speaker {i+1}")
+        def _synthesize_turn(idx: int, turn: dict) -> tuple[int, bytes]:
+            """Synthesize a single turn, returns (index, audio_bytes)."""
+            text = turn["text"]
+            style_prompt = turn.get("style_prompt") or self._default_style_prompt
+            speaker = turn.get("speaker", f"Speaker {idx+1}")
 
-                chunks = self._split_text(text)
-                logger.info(
-                    "Turn %d/%d [%s]: %d chars -> %d chunks",
-                    i + 1, len(turns), speaker, len(text), len(chunks),
-                )
+            chunks = self._split_text(text)
+            logger.info(
+                "Turn %d/%d [%s]: %d chars -> %d chunks",
+                idx + 1, len(turns), speaker, len(text), len(chunks),
+            )
 
-                if i > 0:
-                    audio_parts.append(silence_gap)
-
+            transport = httpx.HTTPTransport(verify=False)
+            with httpx.Client(transport=transport, timeout=120) as client:
+                parts = []
                 for chunk in chunks:
-                    part = self._call_api_voicedesign(chunk, style_prompt, audio_format, client)
-                    audio_parts.append(part)
+                    parts.append(self._call_api_voicedesign(chunk, style_prompt, audio_format, client))
+
+            return idx, b"".join(parts)
+
+        from concurrent.futures import ThreadPoolExecutor, as_completed
+
+        max_workers = min(8, len(turns))
+        results: dict[int, bytes] = {}
+
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            futures = {
+                executor.submit(_synthesize_turn, i, turn): i
+                for i, turn in enumerate(turns)
+            }
+            for future in as_completed(futures):
+                idx, audio = future.result()
+                results[idx] = audio
+
+        # Assemble in original order
+        audio_parts: list[bytes] = []
+        for i in range(len(turns)):
+            if i > 0:
+                audio_parts.append(silence_gap)
+            audio_parts.append(results[i])
 
         return b"".join(audio_parts)
 
