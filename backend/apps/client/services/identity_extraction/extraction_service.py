@@ -71,14 +71,19 @@ class IdentityExtractionService:
             # 2. 优先规则提取（身份证场景稳定且低延迟）
             extracted_data = self._extract_by_rules(raw_text, resolved_doc_type)
             if extracted_data is not None:
-                id_number_hit = bool(extracted_data.get("id_number"))
-                if id_number_hit or not model:
+                # 判断规则提取是否命中关键字段
+                key_field_hit = bool(
+                    extracted_data.get("id_number")
+                    or extracted_data.get("credit_code")
+                    or extracted_data.get("company_name")
+                )
+                if key_field_hit or not model:
                     logger.info(
-                        "证件识别使用规则提取: requested_doc_type=%s, resolved_doc_type=%s, model=%s, id_number_hit=%s",
+                        "证件识别使用规则提取: requested_doc_type=%s, resolved_doc_type=%s, model=%s, key_field_hit=%s",
                         doc_type,
                         resolved_doc_type,
                         model,
-                        id_number_hit,
+                        key_field_hit,
                     )
                     return ExtractionResult(
                         doc_type=resolved_doc_type,
@@ -89,7 +94,7 @@ class IdentityExtractionService:
                     )
 
                 logger.info(
-                    "规则提取未命中身份证号且指定了模型，回退 LLM 提取: requested_doc_type=%s, resolved_doc_type=%s, model=%s",
+                    "规则提取未命中关键字段且指定了模型，回退 LLM 提取: requested_doc_type=%s, resolved_doc_type=%s, model=%s",
                     doc_type,
                     resolved_doc_type,
                     model,
@@ -444,7 +449,9 @@ class IdentityExtractionService:
         return str(ClientIdentityDoc.ID_CARD)
 
     def _extract_by_rules(self, raw_text: str, doc_type: str) -> dict[str, Any] | None:
-        """规则提取：当前覆盖身份证与法代身份证。"""
+        """规则提取：覆盖身份证、法代身份证、营业执照。"""
+        if doc_type == "business_license":
+            return self._extract_business_license(raw_text)
         if doc_type not in {"id_card", "legal_rep_id_card"}:
             return None
 
@@ -469,6 +476,81 @@ class IdentityExtractionService:
             "ethnicity": ethnicity,
             "birth_date": birth_date,
         }
+
+        return extracted
+
+    def _extract_business_license(self, raw_text: str) -> dict[str, Any] | None:
+        """营业执照正则提取：企业名称、统一社会信用代码、法定代表人、地址、电话。"""
+        text = self._prepare_text_for_llm(raw_text)
+        lines = [line.strip() for line in text.split("\n") if line.strip()]
+
+        # 统一社会信用代码（18位字母数字）
+        credit_code_match = re.search(r"([0-9A-Z]{18})", text)
+        credit_code = credit_code_match.group(1) if credit_code_match else None
+
+        # 企业名称（原告/被告/名称/公司 后面的内容）
+        company_name = None
+        for line in lines:
+            m = re.search(r"(?:原告|被告|名称|公司名称|企业名称)[:：]\s*(.+)", line)
+            if m:
+                company_name = m.group(1).strip()
+                break
+        # 如果没匹配到前缀，尝试匹配"有限公司/股份公司"等模式
+        if not company_name:
+            m = re.search(r"([一-龥]+(?:有限公司|股份有限公司|集团|合伙企业))", text)
+            if m:
+                company_name = m.group(1)
+
+        # 法定代表人
+        legal_rep = None
+        for line in lines:
+            m = re.search(r"(?:法定代表人|负责人|经营者)[:：]\s*([一-龥·]{2,20})", line)
+            if m:
+                legal_rep = m.group(1).strip()
+                break
+
+        # 地址
+        address = None
+        for line in lines:
+            m = re.search(r"(?:地址|住所|经营场所|住址)[:：]\s*(.+)", line)
+            if m:
+                address = m.group(1).strip()
+                break
+
+        # 联系电话
+        phone = None
+        phone_match = re.search(r"(?:联系电话|电话|手机|联系方式)[:：]\s*([0-9\-\+\s]{7,20})", text)
+        if phone_match:
+            phone = phone_match.group(1).replace(" ", "").strip()
+
+        # 成立日期
+        registration_date = None
+        date_match = re.search(r"(?:成立日期|注册日期|营业期限)[:：]?\s*(\d{4})\D(\d{1,2})\D(\d{1,2})", text)
+        if date_match:
+            y, m, d = date_match.group(1), date_match.group(2), date_match.group(3)
+            registration_date = f"{y}-{int(m):02d}-{int(d):02d}"
+
+        # 经营范围
+        business_scope = None
+        for i, line in enumerate(lines):
+            m = re.search(r"(?:经营范围)[:：]\s*(.+)", line)
+            if m:
+                business_scope = m.group(1).strip()
+                break
+
+        extracted: dict[str, Any] = {
+            "company_name": company_name,
+            "credit_code": credit_code,
+            "legal_representative": legal_rep,
+            "address": address,
+            "business_scope": business_scope,
+            "registration_date": registration_date,
+            "phone": phone,
+        }
+
+        # 如果一个字段都没提取到，返回 None 让后续流程处理
+        if not any(extracted.values()):
+            return None
 
         return extracted
 
@@ -577,6 +659,34 @@ class IdentityExtractionService:
             return None
         return f"{y:04d}-{m:02d}-{d:02d}"
 
+    @staticmethod
+    def _parse_llm_json(content: str) -> dict[str, Any]:
+        """从 LLM 输出中提取 JSON 对象，支持多种格式。"""
+        # 1. 尝试从 ```json ... ``` 代码块中提取
+        if "```json" in content:
+            json_start = content.find("```json") + 7
+            json_end = content.find("```", json_start)
+            if json_end > json_start:
+                return json.loads(content[json_start:json_end].strip())
+        # 2. 尝试从 ``` ... ``` 代码块中提取
+        if "```" in content:
+            json_start = content.find("```") + 3
+            json_end = content.find("```", json_start)
+            if json_end > json_start:
+                return json.loads(content[json_start:json_end].strip())
+        # 3. 尝试直接解析整个内容
+        try:
+            return json.loads(content.strip())
+        except json.JSONDecodeError:
+            pass
+        # 4. 尝试从文本中提取第一个 JSON 对象
+        import re
+
+        match = re.search(r"\{[^{}]*\}", content, re.DOTALL)
+        if match:
+            return json.loads(match.group())
+        raise ValueError("无法从 LLM 输出中提取 JSON")
+
     def _llm_extract(self, raw_text: str, doc_type: str, model: str) -> dict[str, Any]:
         """
         使用 LLM 从文字中提取结构化信息
@@ -587,10 +697,12 @@ class IdentityExtractionService:
             logger.info("发送 LLM 前 OCR 清洗后文本内容:\n%s", llm_text)
 
             prompt = get_prompt_for_doc_type(doc_type, llm_text)
+            # 推理模型需要更多 token（reasoning + output），普通模型 512 足够
+            max_tokens = 2048
             logger.info(
                 "证件识别将调用 LLM: model=%s, max_tokens=%s",
                 model,
-                256,
+                max_tokens,
             )
 
             messages = [
@@ -602,10 +714,18 @@ class IdentityExtractionService:
             llm_resp = llm_service.chat(
                 messages=messages,
                 model=model,
-                max_tokens=256,
+                max_tokens=max_tokens,
                 timeout=60,
                 think=False,
                 fallback=True,
+            )
+            logger.info(
+                "LLM 响应详情: backend=%s, model=%s, content=%r, prompt_tokens=%s, completion_tokens=%s",
+                llm_resp.backend,
+                llm_resp.model,
+                llm_resp.content,
+                llm_resp.prompt_tokens,
+                llm_resp.completion_tokens,
             )
             content = llm_resp.content or ""
             if not content:
@@ -613,22 +733,11 @@ class IdentityExtractionService:
 
             # 解析 JSON
             try:
-                if "```json" in content:
-                    json_start = content.find("```json") + 7
-                    json_end = content.find("```", json_start)
-                    if json_end > json_start:
-                        content = content[json_start:json_end].strip()
-                elif "```" in content:
-                    json_start = content.find("```") + 3
-                    json_end = content.find("```", json_start)
-                    if json_end > json_start:
-                        content = content[json_start:json_end].strip()
-
-                extracted_data = json.loads(content)
+                extracted_data = self._parse_llm_json(content)
                 logger.info("LLM 提取成功,字段数量: %s", len(extracted_data))
                 return dict(extracted_data)
 
-            except json.JSONDecodeError as e:
+            except (json.JSONDecodeError, ValueError) as e:
                 logger.exception("LLM 返回的 JSON 格式错误: %s", e)
                 raise OllamaExtractionError(_("智能识别结果解析失败，请稍后重试")) from e
 
