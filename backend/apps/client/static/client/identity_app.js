@@ -291,17 +291,16 @@ function identityApp(config = {}) {
         async recognizeIdentity(file, docType) {
             const formData = new FormData();
             formData.append('file', file);
-            formData.append('doc_type', docType);
-            // 直接从 DOM 读取 select 值，避免 Alpine x-model 同步问题
+            let url = '/api/v1/client/identity-doc/recognize?doc_type=' + encodeURIComponent(docType);
             const sel = this.$el.querySelector('select[x-model="selectedModel"]');
             const domModel = sel ? sel.value : this.selectedModel;
             if (domModel) {
-                formData.append('model', domModel);
+                url += '&model=' + encodeURIComponent(domModel);
             }
 
             this.loadingText = '正在识别证件...';
 
-            const response = await fetch('/api/v1/client/identity-doc/recognize', {
+            const response = await fetch(url, {
                 method: 'POST',
                 body: formData,
                 headers: {

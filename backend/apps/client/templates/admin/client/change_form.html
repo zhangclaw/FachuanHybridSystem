@@ -496,15 +496,14 @@
                 const formData = new FormData();
                 formData.append('file', file);
                 const docType = 'auto';
-                formData.append('doc_type', docType);
+                let url = '/api/v1/client/identity-doc/recognize?doc_type=' + encodeURIComponent(docType);
                 if (this.selectedModel) {
-                    formData.append('model', this.selectedModel);
+                    url += '&model=' + encodeURIComponent(this.selectedModel);
                 }
-                console.log('[TextParserApp] handleOcrFile: selectedModel=%s', this.selectedModel);
 
                 try {
                     const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-                    const response = await fetch('/api/v1/client/identity-doc/recognize', {
+                    const response = await fetch(url, {
                         method: 'POST',
                         headers: { 'X-CSRFToken': csrfToken },
                         body: formData,
