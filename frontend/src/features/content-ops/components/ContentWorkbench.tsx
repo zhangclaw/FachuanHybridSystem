@@ -59,9 +59,25 @@ export function ContentWorkbench() {
         </div>
 
         {/* 主内容区 */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_minmax(280px,360px)] gap-6">
-          {/* 左侧：创作区 */}
-          <div className="space-y-6 min-w-0 overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(320px,1fr)_380px] gap-6">
+          {/* 左侧：任务列表（主区域） */}
+          <div className="min-w-0 overflow-hidden">
+            <Card className="border-0 shadow-none bg-muted/30 h-full">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <LayoutList className="w-4 h-4 text-muted-foreground" />
+                  <h3 className="text-sm font-medium">任务记录</h3>
+                </div>
+                <TaskList
+                  selectedTaskId={selectedTaskId}
+                  onSelectTask={handleSelectTask}
+                />
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* 右侧：创作工具（辅助区域） */}
+          <div className="lg:border-l lg:pl-6 min-w-0 overflow-hidden">
             <Tabs defaultValue="topics">
               <TabsList>
                 <TabsTrigger value="topics">
@@ -102,22 +118,6 @@ export function ContentWorkbench() {
                 </TabsContent>
               </AnimatePresence>
             </Tabs>
-          </div>
-
-          {/* 右侧：任务列表 */}
-          <div className="lg:border-l lg:pl-6 min-w-0 overflow-hidden">
-            <Card className="border-0 shadow-none bg-muted/30">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <LayoutList className="w-4 h-4 text-muted-foreground" />
-                  <h3 className="text-sm font-medium">任务记录</h3>
-                </div>
-                <TaskList
-                  selectedTaskId={selectedTaskId}
-                  onSelectTask={handleSelectTask}
-                />
-              </CardContent>
-            </Card>
           </div>
         </div>
 
