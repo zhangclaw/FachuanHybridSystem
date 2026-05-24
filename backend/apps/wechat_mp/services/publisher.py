@@ -172,10 +172,10 @@ class WeChatPublisher:
             raise PublishError(f"填写标题失败: {e}") from e
 
     async def _inject_content(self, page: Page, html_content: str) -> None:
-        """将内容注入到正文编辑器。
+        """将带格式的 HTML 内容粘贴到正文编辑器。
 
-        微信公众号编辑器正文区域是第二个 ProseMirror contenteditable div。
-        用 keyboard.type 逐字输入，避免 innerHTML 注入后事件未触发的问题。
+        通过剪贴板粘贴（ClipboardEvent）注入内联样式的 HTML，
+        保留标题、加粗、列表、引用等排版格式。
         """
         try:
             # 正文区域：页面上第二个 ProseMirror div
@@ -183,13 +183,44 @@ class WeChatPublisher:
             if len(editors) >= 2:
                 content_editor = editors[1]
                 await content_editor.click()
-                # 将 HTML 转为纯文本后逐字输入（微信编辑器不接受 innerHTML 直接注入）
+                await asyncio.sleep(0.3)
+
+                # 提取纯文本作为 fallback
                 import re
 
                 plain_text = re.sub(r"<[^>]+>", "", html_content).strip()
-                if plain_text:
-                    await page.keyboard.type(plain_text, delay=30)
-                logger.info("Content injected into editor (%d chars)", len(plain_text))
+
+                # 通过剪贴板粘贴 HTML，保留格式
+                await page.evaluate(
+                    """(args) => {
+                        const [html, plain] = args;
+                        const editorEl = document.querySelectorAll('.ProseMirror')[1];
+                        if (!editorEl) return;
+
+                        // 尝试通过 ProseMirror EditorView 的 pasteHTML
+                        try {
+                            const view = editorEl.pmViewDesc?.view;
+                            if (view && typeof view.pasteHTML === 'function') {
+                                view.pasteHTML(html);
+                                return;
+                            }
+                        } catch (e) {}
+
+                        // 降级：模拟剪贴板粘贴事件
+                        const dt = new DataTransfer();
+                        dt.setData('text/html', html);
+                        dt.setData('text/plain', plain);
+                        const evt = new ClipboardEvent('paste', {
+                            bubbles: true,
+                            cancelable: true,
+                            clipboardData: dt
+                        });
+                        editorEl.dispatchEvent(evt);
+                    }""",
+                    [html_content, plain_text],
+                )
+
+                logger.info("Content pasted into editor (HTML, %d chars)", len(html_content))
                 await asyncio.sleep(1)
                 return
 
