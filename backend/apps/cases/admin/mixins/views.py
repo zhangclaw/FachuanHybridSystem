@@ -282,7 +282,7 @@ class CaseAdminViewsMixin:
                 "has_delay_delivery_template": has_delay_delivery_template,
                 "is_our_party_all_defendant": is_our_party_all_defendant,
                 "folder_path_auto_repaired": folder_path_auto_repaired,
-                "contacts": list(case.contacts.select_related("authority").all()),
+                "contacts": list(case.contacts.all()),
                 "contact_role_choices": list(_get_contact_role_choices()),
                 "case_stage_choices": list(_get_case_stage_choices()),
                 "related_cases": (lambda chain: chain if len(chain) > 1 else [])(case.get_case_chain()),
