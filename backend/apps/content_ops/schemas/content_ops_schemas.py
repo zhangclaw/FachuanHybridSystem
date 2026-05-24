@@ -43,6 +43,12 @@ class BatchReviewIn(Schema):
     ids: list[int]
     notes: str = ""
 
+    @staticmethod
+    def validate_ids(ids: list[int]) -> list[int]:
+        if len(ids) > 100:
+            raise ValueError("单次批量操作最多 100 条")
+        return ids
+
 
 class GeneratedArticleOut(Schema):
     id: int

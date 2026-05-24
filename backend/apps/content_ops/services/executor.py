@@ -8,6 +8,7 @@ from __future__ import annotations
 import asyncio
 import logging
 from collections.abc import Callable
+from io import BytesIO
 from typing import Any
 
 from django.db import close_old_connections
@@ -43,8 +44,11 @@ class ContentOpsExecutor:
             else:
                 self._run_direct_mode(task)
 
+            self._check_cancelled(task)
             self._run_llm_generation(task)
+            self._check_cancelled(task)
             self._run_tts_synthesis(task)
+            self._check_cancelled(task)
             self._mark_completed(task)
             return {"task_id": str(task.pk), "status": "completed"}
 
@@ -88,6 +92,13 @@ class ContentOpsExecutor:
         task.message = "任务已完成"
         task.finished_at = timezone.now()
         task.save(update_fields=["status", "progress", "message", "finished_at", "updated_at"])
+
+    @staticmethod
+    def _check_cancelled(task: ContentTask) -> None:
+        """Check if task was cancelled, raise if so."""
+        task.refresh_from_db(fields=["status"])
+        if task.status == ContentTaskStatus.CANCELLED:
+            raise RuntimeError("任务已被取消")
 
     @staticmethod
     def _mark_failed(task: ContentTask, error_message: str) -> None:
@@ -140,6 +151,7 @@ class ContentOpsExecutor:
         task.source_doc_id = getattr(selected_item, "doc_id", "") or ""
 
         self._update_progress(task, 40, "正在获取文书详情...")
+        self._check_cancelled(task)
         detail = source_client.fetch_case_detail(session=session, item=selected_item)
 
         task.source_title = getattr(detail, "title", "") or ""
@@ -188,8 +200,10 @@ class ContentOpsExecutor:
         user_msg = f"检索关键词：{keyword}\n\n找到的案例：\n{cases_text}\n\n请选择最有传播价值的1个案例。"
 
         try:
+            from apps.content_ops.constants import CONTENT_LLM_MODEL
+
             llm_service = ServiceLocator.get_llm_service()
-            model_name = "mimo-v2.5-pro"
+            model_name = CONTENT_LLM_MODEL
             backend = LLMConfig.resolve_backend_for_model(model_name)
 
             response = llm_service.chat(
@@ -262,40 +276,11 @@ class ContentOpsExecutor:
             voice=task.voice,
             file_size_bytes=len(audio_bytes),
         )
-        episode.audio_file.save(f"episode_{task.pk}.mp3", _BytesIO(audio_bytes))  # type: ignore[arg-type]
+        episode.audio_file.save(f"episode_{task.pk}.mp3", BytesIO(audio_bytes))  # type: ignore[arg-type]
         episode.save()
 
         self._update_progress(task, 90, "音频合成完成")
         logger.info("Episode created: id=%s, task=%s, size=%d", episode.pk, task.pk, len(audio_bytes))
-
-
-class _BytesIO:
-    """Minimal file-like wrapper for bytes, used by FileField.save()."""
-
-    def __init__(self, data: bytes) -> None:
-        self._data = data
-        self._pos = 0
-
-    def read(self, size: int = -1) -> bytes:
-        if size == -1:
-            result = self._data[self._pos :]
-            self._pos = len(self._data)
-        else:
-            result = self._data[self._pos : self._pos + size]
-            self._pos += len(result)
-        return result
-
-    def seek(self, offset: int, whence: int = 0) -> int:
-        if whence == 0:
-            self._pos = offset
-        elif whence == 1:
-            self._pos += offset
-        elif whence == 2:
-            self._pos = len(self._data) + offset
-        return self._pos
-
-    def tell(self) -> int:
-        return self._pos
 
 
 def _run_orm_safely[T](operation: Callable[[], T]) -> T:

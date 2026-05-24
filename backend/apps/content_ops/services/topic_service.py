@@ -41,8 +41,9 @@ class TopicService:
     def suggest(self, model: str | None = None) -> TopicResult:
         llm_service = ServiceLocator.get_llm_service()
 
-        # 确定使用的模型和后端
-        model_name = model or "mimo-v2.5-pro"
+        from apps.content_ops.constants import CONTENT_LLM_MODEL
+
+        model_name = model or CONTENT_LLM_MODEL
         backend = LLMConfig.resolve_backend_for_model(model_name)
 
         messages = [

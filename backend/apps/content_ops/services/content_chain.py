@@ -51,7 +51,9 @@ class ContentGenerationChain:
     """将裁判文书事实改写为叙事风格的故事文章。"""
 
     def __init__(self, model: str | None = None) -> None:
-        self._model = model or "mimo-v2.5-pro"
+        from apps.content_ops.constants import CONTENT_LLM_MODEL
+
+        self._model = model or CONTENT_LLM_MODEL
 
     def run(self, *, facts: str, case_summary: str = "") -> ContentResult:
         llm_service = ServiceLocator.get_llm_service()

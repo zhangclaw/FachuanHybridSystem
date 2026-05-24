@@ -36,7 +36,7 @@ class PodcastEpisode(models.Model):
     review_status = models.CharField(
         max_length=16,
         choices=ReviewStatus,
-        default="draft",
+        default=ReviewStatus.DRAFT,
         verbose_name=_("审核状态"),
     )
     reviewer_notes = models.TextField(blank=True, verbose_name=_("审核备注"))

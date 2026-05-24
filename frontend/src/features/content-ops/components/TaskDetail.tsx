@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
@@ -8,6 +8,17 @@ import { Progress } from '@/components/ui/progress'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import { Input } from '@/components/ui/input'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 import {
   Loader2,
   FileText,
@@ -104,30 +115,56 @@ export function TaskDetail({ taskId }: TaskDetailProps) {
               <AlertCircle className="w-4 h-4 text-destructive mt-0.5 shrink-0" />
               <p className="text-sm text-destructive">{task.error}</p>
             </div>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => retryTask.mutate(task.id)}
-              disabled={retryTask.isPending}
-            >
-              <RotateCcw className="w-3.5 h-3.5 mr-1" />
-              重试任务
-            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button size="sm" variant="outline" disabled={retryTask.isPending}>
+                  <RotateCcw className="w-3.5 h-3.5 mr-1" />
+                  重试任务
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>确认重试任务？</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    重试将删除已生成的文章和音频，重新执行整个流程。此操作不可撤销。
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>取消</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => retryTask.mutate(task.id)}>
+                    确认重试
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </CardContent>
         </Card>
       )}
 
       {/* 取消按钮 */}
       {isActive && (
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() => cancelTask.mutate(task.id)}
-          disabled={cancelTask.isPending}
-        >
-          <XCircle className="w-3.5 h-3.5 mr-1" />
-          取消任务
-        </Button>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button size="sm" variant="outline" disabled={cancelTask.isPending}>
+              <XCircle className="w-3.5 h-3.5 mr-1" />
+              取消任务
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>确认取消任务？</AlertDialogTitle>
+              <AlertDialogDescription>
+                取消后任务将立即停止，已生成的部分内容会保留。
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>继续执行</AlertDialogCancel>
+              <AlertDialogAction onClick={() => cancelTask.mutate(task.id)}>
+                确认取消
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       )}
 
       {/* 文章和音频 Tab */}
@@ -266,6 +303,9 @@ function ArticleCard({ article }: { article: GeneratedArticle }) {
     })
   }, [article.id, regenerateArticle])
 
+  const wordCount = article.content.length
+  const readingTime = Math.max(1, Math.ceil(wordCount / 300))
+
   const reviewBadge = (status: ReviewStatus) => {
     const variants = { draft: 'secondary' as const, approved: 'default' as const, rejected: 'destructive' as const }
     return <Badge variant={variants[status]}>{REVIEW_STATUS_LABEL[status]}</Badge>
@@ -278,7 +318,8 @@ function ArticleCard({ article }: { article: GeneratedArticle }) {
           <div>
             <CardTitle className="text-sm">{article.title}</CardTitle>
             <CardDescription className="text-xs mt-0.5">
-              {article.llm_model && <span>模型: {article.llm_model}</span>}
+              <span>{wordCount} 字 · 约 {readingTime} 分钟</span>
+              {article.llm_model && <span className="ml-2">模型: {article.llm_model}</span>}
               {article.token_usage && (
                 <span className="ml-2">Token: {article.token_usage.total_tokens}</span>
               )}
@@ -400,6 +441,17 @@ function EpisodeCard({ episode }: { episode: PodcastEpisode }) {
   const reviewEpisode = useReviewEpisode()
   const audioRef = useRef<HTMLAudioElement>(null)
   const audioUrl = contentOpsApi.getAudioUrl(episode.id)
+
+  // Pause audio on unmount to prevent it from continuing to play
+  useEffect(() => {
+    return () => {
+      const audio = audioRef.current
+      if (audio && !audio.paused) {
+        audio.pause()
+        audio.currentTime = 0
+      }
+    }
+  }, [])
 
   const handleReview = (action: 'approve' | 'reject') => {
     reviewEpisode.mutate(
@@ -539,7 +591,10 @@ function BatchApproveButton({ articles, episodes }: {
         await contentOpsApi.batchApproveEpisodes(draftEpisodes.map((e) => e.id))
       }
       queryClient.invalidateQueries({ queryKey: ['content-ops'] })
-      toast.success(`已批量通过 ${draftArticles.length} 篇文章和 ${draftEpisodes.length} 个音频`)
+      const parts: string[] = []
+      if (draftArticles.length > 0) parts.push(`${draftArticles.length} 篇文章`)
+      if (draftEpisodes.length > 0) parts.push(`${draftEpisodes.length} 个音频`)
+      toast.success(`已批量通过 ${parts.join('和')}`)
     } catch {
       toast.error('批量操作失败')
     }

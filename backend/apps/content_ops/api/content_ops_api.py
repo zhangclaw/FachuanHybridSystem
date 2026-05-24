@@ -1,8 +1,7 @@
 from __future__ import annotations
 
 import logging
-import tempfile
-from pathlib import Path
+from io import BytesIO
 from typing import Any
 
 from django.http import FileResponse, HttpRequest, HttpResponse, HttpResponseBase
@@ -57,12 +56,6 @@ def tts_test(request: HttpRequest, payload: TTSTestIn) -> dict[str, str] | FileR
         logger.error("TTS test failed: %s", e)
         return {"error": str(e)}
 
-    suffix = f".{payload.audio_format}"
-    tmp = tempfile.NamedTemporaryFile(suffix=suffix, delete=False)
-    tmp.write(audio_bytes)
-    tmp.flush()
-    tmp.close()
-
     content_type = {
         "mp3": "audio/mpeg",
         "wav": "audio/wav",
@@ -70,11 +63,10 @@ def tts_test(request: HttpRequest, payload: TTSTestIn) -> dict[str, str] | FileR
         "pcm16": "audio/pcm",
     }.get(payload.audio_format, "audio/mpeg")
 
-    return FileResponse(
-        Path(tmp.name).open("rb"),
-        content_type=content_type,
-        filename=f"tts_test{suffix}",
-    )
+    suffix = f".{payload.audio_format}"
+    response = HttpResponse(audio_bytes, content_type=content_type)
+    response["Content-Disposition"] = f'attachment; filename="tts_test{suffix}"'
+    return response
 
 
 # --- 选题建议 ---
@@ -85,8 +77,12 @@ def topic_suggest(request: HttpRequest, payload: TopicSuggestIn) -> list[dict[st
     """获取选题建议。"""
     from apps.content_ops.services.topic_service import TopicService
 
-    result = TopicService().suggest(model=payload.model or None)
-    return result.topics
+    try:
+        result = TopicService().suggest(model=payload.model or None)
+        return result.topics
+    except Exception as e:
+        logger.error("Topic suggestion failed: %s", e)
+        return []
 
 
 # --- 任务管理 ---
@@ -227,9 +223,12 @@ def episode_audio(request: HttpRequest, episode_id: int) -> dict[str, str] | Fil
     """获取播客单集音频。"""
     from apps.content_ops.models import PodcastEpisode
 
-    episode = PodcastEpisode.objects.filter(id=episode_id).first()
+    episode = PodcastEpisode.objects.filter(id=episode_id).select_related("task").first()
     if not episode or not episode.audio_file:
         return {"error": "音频不存在"}
+
+    if episode.task.created_by_id and episode.task.created_by_id != request.user.pk:
+        return {"error": "无权访问此音频"}
 
     from apps.core.http.streaming import build_range_file_response
 
