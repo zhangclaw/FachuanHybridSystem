@@ -339,17 +339,10 @@
                             x-effect="if (models.length) { $nextTick(() => { const s = $refs.modelSelect; if (s) { const v = localStorage.getItem('client_recognize_last_model') || ''; if (v && models.some(m => m.id === v)) { selectedModel = v; s.value = v; } } }) }"
                             style="font-size:12px; padding:2px 4px; border:1px solid #ced4da; border-radius:4px; max-width:260px;">
                         <option value="">{% trans "不使用 LLM（仅 OCR + 规则）" %}</option>
-                        <template x-for="m in sortedModels" :key="m.id">
-                            <option :value="m.id" x-text="(isFav(m.id) ? '★ ' : '') + m.name + ' (' + m.id + ')'"></option>
+                        <template x-for="m in models" :key="m.id">
+                            <option :value="m.id" x-text="m.name + ' (' + m.id + ')'"></option>
                         </template>
                     </select>
-                    <button type="button"
-                            @click="toggleFav(selectedModel)"
-                            :disabled="!selectedModel"
-                            :title="isFav(selectedModel) ? '取消收藏' : '收藏此模型'"
-                            style="background:none; border:none; cursor:pointer; font-size:16px; line-height:1; padding:0;"
-                            x-text="isFav(selectedModel) ? '★' : '☆'">
-                    </button>
                 </div>
             </div>
             <div class="format-hint">💡 {% trans "支持粘贴/拖拽图片自动 OCR，或粘贴文本/JSON 解析" %}</div>
@@ -375,7 +368,6 @@
             autoParse: true,
             selectedModel: '',
             models: [],
-            favModels: [],
             isParsing: false,
             isDragOver: false,
             isExpanded: false,
@@ -387,8 +379,7 @@
             init() {
                 console.log('[TextParserApp] 初始化文本解析组件');
                 this.initClientTypeWatcher();
-                this.loadFavModels();
-                this.loadLastModel();
+                this.selectedModel = localStorage.getItem('client_recognize_last_model') || '';
                 this.fetchModels();
             },
 
@@ -401,43 +392,6 @@
                 } catch (e) {
                     console.warn('[TextParserApp] 加载模型列表失败:', e);
                 }
-            },
-
-            get sortedModels() {
-                const favs = this.favModels.filter(fid => this.models.some(m => m.id === fid));
-                const rest = this.models.filter(m => !this.favModels.includes(m.id));
-                return [...favs.map(fid => this.models.find(m => m.id === fid)), ...rest];
-            },
-
-            loadFavModels() {
-                try {
-                    this.favModels = JSON.parse(localStorage.getItem('client_recognize_fav_models') || '[]');
-                } catch { this.favModels = []; }
-            },
-
-            saveFavModels() {
-                localStorage.setItem('client_recognize_fav_models', JSON.stringify(this.favModels));
-            },
-
-            toggleFav(modelId) {
-                if (!modelId) return;
-                const idx = this.favModels.indexOf(modelId);
-                if (idx >= 0) {
-                    this.favModels.splice(idx, 1);
-                } else {
-                    this.favModels.push(modelId);
-                    this.selectedModel = modelId;
-                    this.saveLastModel();
-                }
-                this.saveFavModels();
-            },
-
-            isFav(modelId) {
-                return modelId && this.favModels.includes(modelId);
-            },
-
-            loadLastModel() {
-                this.selectedModel = localStorage.getItem('client_recognize_last_model') || '';
             },
 
             saveLastModel() {
@@ -855,24 +809,15 @@
                     {% if not original %}
                     <div class="form-group">
                         <label class="form-label">{% trans "LLM 模型（可选）" %}</label>
-                        <div style="display:flex; align-items:center; gap:6px;">
-                            <select x-model="selectedModel"
-                                    @change="saveLastModel()"
-                                    class="form-control"
-                                    style="max-width:320px;">
-                                <option value="">{% trans "不使用 LLM（仅 OCR + 规则）" %}</option>
-                                <template x-for="m in sortedModels" :key="m.id">
-                                    <option :value="m.id" x-text="(isFav(m.id) ? '★ ' : '') + m.name + ' (' + m.id + ')'"></option>
-                                </template>
-                            </select>
-                            <button type="button"
-                                    @click="toggleFav(selectedModel)"
-                                    :disabled="!selectedModel"
-                                    :title="isFav(selectedModel) ? '取消收藏' : '收藏此模型'"
-                                    style="background:none; border:none; cursor:pointer; font-size:18px; line-height:1; padding:0;"
-                                    x-text="isFav(selectedModel) ? '★' : '☆'">
-                            </button>
-                        </div>
+                        <select x-model="selectedModel"
+                                @change="saveLastModel()"
+                                class="form-control"
+                                style="max-width:320px;">
+                            <option value="">{% trans "不使用 LLM（仅 OCR + 规则）" %}</option>
+                            <template x-for="m in models" :key="m.id">
+                                <option :value="m.id" x-text="m.name + ' (' + m.id + ')'"></option>
+                            </template>
+                        </select>
                     </div>
                     {% endif %}
 

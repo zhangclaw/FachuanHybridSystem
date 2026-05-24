@@ -24,7 +24,6 @@ function identityApp(config = {}) {
         confidence: 0,              // 置信度
         selectedModel: '',          // 选中的 LLM 模型（空表示不使用 LLM）
         models: [],                 // 可用模型列表
-        favModels: [],              // 收藏的模型 ID 列表
         errorMessage: '',           // 错误信息
         showError: false,           // 是否显示错误状态
         showResult: false,          // 是否显示结果状态
@@ -68,8 +67,7 @@ function identityApp(config = {}) {
                 });
             }
 
-            this.loadFavModels();
-            this.loadLastModel();
+            this.selectedModel = localStorage.getItem('client_recognize_last_model') || '';
             this.fetchModels();
         },
 
@@ -83,7 +81,6 @@ function identityApp(config = {}) {
                 const saved = localStorage.getItem('client_recognize_last_model') || '';
                 if (saved && this.models.some(m => m.id === saved)) {
                     this.selectedModel = saved;
-                    // Alpine x-model 在 option 动态加载后可能不同步，手动设置 DOM
                     this.$nextTick(() => {
                         const sel = this.$el.querySelector('select');
                         if (sel && sel.value !== saved) sel.value = saved;
@@ -92,43 +89,6 @@ function identityApp(config = {}) {
             } catch (e) {
                 console.warn('加载模型列表失败:', e);
             }
-        },
-
-        get sortedModels() {
-            const favs = this.favModels.filter(fid => this.models.some(m => m.id === fid));
-            const rest = this.models.filter(m => !this.favModels.includes(m.id));
-            return [...favs.map(fid => this.models.find(m => m.id === fid)), ...rest];
-        },
-
-        loadFavModels() {
-            try {
-                this.favModels = JSON.parse(localStorage.getItem('client_recognize_fav_models') || '[]');
-            } catch { this.favModels = []; }
-        },
-
-        saveFavModels() {
-            localStorage.setItem('client_recognize_fav_models', JSON.stringify(this.favModels));
-        },
-
-        toggleFav(modelId) {
-            if (!modelId) return;
-            const idx = this.favModels.indexOf(modelId);
-            if (idx >= 0) {
-                this.favModels.splice(idx, 1);
-            } else {
-                this.favModels.push(modelId);
-                this.selectedModel = modelId;
-                this.saveLastModel();
-            }
-            this.saveFavModels();
-        },
-
-        isFav(modelId) {
-            return modelId && this.favModels.includes(modelId);
-        },
-
-        loadLastModel() {
-            this.selectedModel = localStorage.getItem('client_recognize_last_model') || '';
         },
 
         saveLastModel() {
