@@ -1341,139 +1341,41 @@
 
 /* 案件关联时间线 */
 .case-timeline {
-    background: #fff;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 16px 20px;
-    margin: 0 0 6px;
-    box-shadow: 0 1px 3px rgba(0,0,0,.06);
-}
-.case-timeline-header {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 6px;
-    margin-bottom: 14px;
-    font-size: 13px;
+    padding: 6px 14px;
+    margin: 0 0 8px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    font-size: 12px;
+    flex-wrap: wrap;
+}
+.case-timeline-label {
     font-weight: 600;
-    color: #334155;
+    color: #475569;
+    margin-right: 2px;
 }
-.case-timeline-icon { color: #6366f1; flex-shrink: 0; }
-.case-timeline-count {
-    margin-left: 6px;
-    font-size: 11px;
+.case-timeline-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 10px;
+    border-radius: 12px;
+    background: #e2e8f0;
+    color: #475569;
     font-weight: 500;
-    color: #6366f1;
-    background: #eef2ff;
-    padding: 1px 8px;
-    border-radius: 10px;
+    font-size: 12px;
+    text-decoration: none;
+    transition: background .15s;
 }
-.case-timeline-track {
-    display: flex;
-    align-items: flex-start;
-    gap: 0;
-    overflow-x: auto;
-    padding-bottom: 4px;
-}
-.case-timeline-step {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-width: 120px;
-    flex: 1;
-}
-/* 连接器：竖线 + 圆点 */
-.case-timeline-connector {
-    display: flex;
-    align-items: center;
-    width: 100%;
-}
-.case-timeline-connector .connector-line {
-    flex: 1;
-    height: 2px;
-    background: #e2e8f0;
-}
-.case-timeline-connector.first .connector-line:first-child {
-    background: transparent;
-}
-.case-timeline-step:last-child .connector-line:last-child {
-    background: transparent;
-}
-.case-timeline-connector .connector-dot {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: #e2e8f0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    border: 3px solid #fff;
-    box-shadow: 0 0 0 2px #e2e8f0;
-    transition: all .2s;
-}
-.case-timeline-connector .connector-dot .step-num {
-    font-size: 11px;
-    font-weight: 700;
-    color: #94a3b8;
-}
-/* 当前案件高亮 */
-.case-timeline-step.active .connector-dot {
+a.case-timeline-pill:hover { background: #cbd5e1; }
+.case-timeline-pill.current {
     background: #6366f1;
-    box-shadow: 0 0 0 2px #6366f1, 0 0 0 5px rgba(99,102,241,.18);
-}
-.case-timeline-step.active .connector-dot .step-num {
     color: #fff;
 }
-.case-timeline-step.active .connector-line {
-    background: #6366f1;
-}
-/* 已结案灰色 */
-.case-timeline-step.closed .connector-dot {
-    background: #94a3b8;
-    box-shadow: 0 0 0 2px #94a3b8;
-}
-.case-timeline-step.closed .connector-dot .step-num { color: #fff; }
-/* 卡片 */
-.case-timeline-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
-    margin-top: 8px;
-    padding: 6px 10px;
-    border-radius: 8px;
-    text-decoration: none;
-    color: inherit;
-    transition: background .15s;
-    text-align: center;
-}
-a.case-timeline-card:hover { background: #f1f5f9; }
-.case-timeline-card.current {
-    background: #eef2ff;
-}
-.case-timeline-card .card-stage {
-    font-size: 11px;
-    font-weight: 600;
-    color: #6366f1;
-    letter-spacing: .02em;
-}
-.case-timeline-card .card-name {
-    font-size: 12px;
-    font-weight: 500;
-    color: #1e293b;
-    max-width: 140px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-.case-timeline-card .card-date {
-    font-size: 11px;
+.case-timeline-arrow {
     color: #94a3b8;
-}
-.case-timeline-step.closed .card-stage { color: #94a3b8; }
-/* 响应式 */
-@media (max-width: 768px) {
-    .case-timeline { padding: 12px; }
-    .case-timeline-step { min-width: 90px; }
-    .case-timeline-card .card-name { max-width: 100px; }
+    font-size: 14px;
+    line-height: 1;
 }
