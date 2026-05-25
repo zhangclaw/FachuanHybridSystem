@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import logging
 import re
+import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from typing import Any
 
@@ -20,6 +21,20 @@ CACHE_TTL = 1800  # 30 minutes
 _HEADERS = {
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
 }
+
+# 法律科技关键词（中英文）
+LEGAL_TECH_KEYWORDS = [
+    # 中文
+    "法律", "律师", "法院", "法官", "司法", "诉讼", "仲裁", "调解",
+    "合同", "知识产权", "专利", "商标", "著作权", "合规", "风控",
+    "法务", "法治", "立法", "法规", "条例", "判决", "裁定",
+    "AI", "人工智能", "大模型", "GPT", "智能", "数字化", "区块链",
+    # 英文
+    "legal", "law", "lawyer", "attorney", "court", "judge", "litigation",
+    "arbitration", "compliance", "contract", "IP", "patent", "trademark",
+    "regulation", "statute", "verdict", "ruling",
+    "AI", "artificial intelligence", "LLM", "GPT", "blockchain", "smart contract",
+]
 
 
 @dataclass
@@ -178,6 +193,83 @@ def _fetch_thepaper(limit: int = 50) -> list[HotTopicItem]:
     return items
 
 
+def _is_legal_tech_related(title: str) -> bool:
+    """判断标题是否与法律科技相关。"""
+    title_lower = title.lower()
+    return any(kw.lower() in title_lower for kw in LEGAL_TECH_KEYWORDS)
+
+
+def _fetch_rss_feed(name: str, url: str, limit: int = 20) -> list[HotTopicItem]:
+    """从 RSS 源获取法律科技新闻。"""
+    client = get_sync_http_client()
+    resp = client.get(url, headers=_HEADERS, timeout=15)
+    resp.raise_for_status()
+
+    items: list[HotTopicItem] = []
+    try:
+        root = ET.fromstring(resp.text)
+        for i, entry in enumerate(root.findall(".//item")[:limit]):
+            title_el = entry.find("title")
+            link_el = entry.find("link")
+            title = title_el.text.strip() if title_el is not None and title_el.text else ""
+            link = link_el.text.strip() if link_el is not None and link_el.text else ""
+            if title:
+                items.append(
+                    HotTopicItem(
+                        rank=i + 1,
+                        title=title,
+                        heat=None,
+                        url=link,
+                        source=name,
+                    )
+                )
+    except ET.ParseError:
+        logger.warning("Failed to parse RSS feed from %s", name)
+    return items
+
+
+def _fetch_legaltech(limit: int = 50) -> list[HotTopicItem]:
+    """获取法律科技相关新闻。
+
+    来源：
+    1. 英文法律科技 RSS（LawSites、Artificial Lawyer）
+    2. 从现有中文热搜中过滤法律科技相关条目
+    """
+    items: list[HotTopicItem] = []
+    rank = 0
+
+    # 1. 英文法律科技 RSS
+    rss_sources = [
+        ("lawsites", "https://www.lawsitesblog.com/feed"),
+        ("artificial_lawyer", "https://www.artificiallawyer.com/feed/"),
+    ]
+    for source_name, url in rss_sources:
+        try:
+            rss_items = _fetch_rss_feed(source_name, url, limit=15)
+            for item in rss_items:
+                rank += 1
+                item.rank = rank
+                items.append(item)
+        except Exception:
+            logger.exception("Failed to fetch RSS from %s", source_name)
+
+    # 2. 从现有中文热搜中过滤法律科技相关
+    chinese_sources = ["toutiao", "baidu", "douyin", "36kr", "thepaper"]
+    for src in chinese_sources:
+        try:
+            all_topics = _SCRAPER_FN_MAP[src](limit=50)
+            for topic in all_topics:
+                if _is_legal_tech_related(topic.title):
+                    rank += 1
+                    topic.rank = rank
+                    topic.source = f"{src}_legaltech"
+                    items.append(topic)
+        except Exception:
+            logger.exception("Failed to filter legaltech from %s", src)
+
+    return items[:limit]
+
+
 # 采集器注册表（仅保留有公开 API 的来源）
 _SCRAPERS: dict[str, tuple[str, type[Exception]]] = {
     "toutiao": ("头条", Exception),
@@ -185,6 +277,7 @@ _SCRAPERS: dict[str, tuple[str, type[Exception]]] = {
     "douyin": ("抖音", Exception),
     "36kr": ("36氪", Exception),
     "thepaper": ("澎湃", Exception),
+    "legaltech": ("法律科技", Exception),
 }
 
 _SCRAPER_FN_MAP: dict[str, Any] = {
@@ -193,6 +286,7 @@ _SCRAPER_FN_MAP: dict[str, Any] = {
     "douyin": _fetch_douyin,
     "36kr": _fetch_36kr,
     "thepaper": _fetch_thepaper,
+    "legaltech": _fetch_legaltech,
 }
 
 
@@ -201,8 +295,6 @@ class HotTopicService:
 
     def get_hot_topics(self, source: str | None = None) -> list[HotTopicItem]:
         """获取热点话题列表。优先从缓存读取。"""
-        if source == "legaltech":
-            return self._get_all_sources()
         if source:
             return self._get_single_source(source)
 
@@ -211,8 +303,6 @@ class HotTopicService:
 
     def refresh(self, source: str | None = None) -> list[HotTopicItem]:
         """强制刷新（绕过缓存）。"""
-        if source == "legaltech":
-            return self._refresh_all()
         if source:
             return self._fetch_and_cache(source)
 
