@@ -23,15 +23,16 @@ async def fetch_wechat_mp_credentials() -> tuple[str, str] | None:
 
     from apps.organization.models import AccountCredential
 
-    def _query():
+    def _query() -> tuple[str, str] | None:
         cred = AccountCredential.objects.filter(
             site_name="微信公众号后台",
         ).first()
         if cred:
-            return cred.account, cred.password
+            return str(cred.account), str(cred.password)
         return None
 
-    return await sync_to_async(_query)()
+    result = await sync_to_async(_query)()
+    return result
 
 
 async def check_login_status(page: Page) -> bool:

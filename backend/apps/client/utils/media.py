@@ -23,7 +23,7 @@ def _get_media_root() -> tuple[Path, str, str]:
         _cached_media_root = Path(settings.MEDIA_ROOT)
         _cached_media_root_str = str(_cached_media_root)
         _cached_media_url = settings.MEDIA_URL
-    return _cached_media_root, _cached_media_root_str, _cached_media_url
+    return _cached_media_root, _cached_media_root_str or "", _cached_media_url or ""
 
 
 @lru_cache(maxsize=1024)
