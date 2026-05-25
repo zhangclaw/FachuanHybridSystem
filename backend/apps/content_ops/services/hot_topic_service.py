@@ -92,15 +92,171 @@ def _fetch_baidu(limit: int = 50) -> list[HotTopicItem]:
     return items
 
 
+def _fetch_weibo(limit: int = 50) -> list[HotTopicItem]:
+    """从微博获取热搜榜。"""
+    url = "https://weibo.com/ajax/side/hotSearch"
+    client = get_sync_http_client()
+    resp = client.get(url, headers=_HEADERS, timeout=15)
+    resp.raise_for_status()
+    data = resp.json()
+
+    items: list[HotTopicItem] = []
+    for i, entry in enumerate(data.get("data", {}).get("realtime", [])[:limit]):
+        title = entry.get("word", "")
+        if not title:
+            continue
+        heat_raw = entry.get("raw_hot") or entry.get("num")
+        heat = int(heat_raw) if heat_raw and str(heat_raw).isdigit() else None
+        word_scheme = entry.get("word_scheme", "")
+        url_str = f"https://s.weibo.com/weibo?q=%23{word_scheme}%23" if word_scheme else ""
+        items.append(
+            HotTopicItem(
+                rank=i + 1,
+                title=title,
+                heat=heat,
+                url=url_str,
+                source="weibo",
+            )
+        )
+    return items
+
+
+def _fetch_zhihu(limit: int = 50) -> list[HotTopicItem]:
+    """从知乎获取热榜。"""
+    url = "https://www.zhihu.com/api/v3/feed/topstory/hot-lists/total?limit=50"
+    client = get_sync_http_client()
+    headers = {**_HEADERS, "Referer": "https://www.zhihu.com/hot"}
+    resp = client.get(url, headers=headers, timeout=15)
+    resp.raise_for_status()
+    data = resp.json()
+
+    items: list[HotTopicItem] = []
+    for i, entry in enumerate(data.get("data", [])[:limit]):
+        target = entry.get("target", {})
+        title = target.get("title", "")
+        if not title:
+            continue
+        heat_text = entry.get("detail_text", "")
+        heat_match = re.search(r"(\d+)", heat_text.replace(",", ""))
+        heat = int(heat_match.group(1)) if heat_match else None
+        url_str = target.get("url", "").replace("api.zhihu.com/questions", "www.zhihu.com/question")
+        items.append(
+            HotTopicItem(
+                rank=i + 1,
+                title=title,
+                heat=heat,
+                url=url_str,
+                source="zhihu",
+            )
+        )
+    return items
+
+
+def _fetch_douyin(limit: int = 50) -> list[HotTopicItem]:
+    """从抖音获取热搜榜。"""
+    url = "https://www.douyin.com/aweme/v1/web/hot/search/list/"
+    client = get_sync_http_client()
+    headers = {**_HEADERS, "Referer": "https://www.douyin.com/hot"}
+    resp = client.get(url, headers=headers, timeout=15)
+    resp.raise_for_status()
+    data = resp.json()
+
+    items: list[HotTopicItem] = []
+    for i, entry in enumerate(data.get("data", {}).get("word_list", [])[:limit]):
+        title = entry.get("word", "")
+        if not title:
+            continue
+        heat_raw = entry.get("hot_value")
+        heat = int(heat_raw) if heat_raw and str(heat_raw).isdigit() else None
+        items.append(
+            HotTopicItem(
+                rank=i + 1,
+                title=title,
+                heat=heat,
+                url="",
+                source="douyin",
+            )
+        )
+    return items
+
+
+def _fetch_36kr(limit: int = 50) -> list[HotTopicItem]:
+    """从36氪获取热榜。"""
+    url = "https://gateway.36kr.com/api/mis/nav/home/nav/rank/hot"
+    client = get_sync_http_client()
+    resp = client.post(
+        url,
+        headers={**_HEADERS, "Content-Type": "application/json"},
+        json={"partner_id": "wap", "param": {"siteId": 1, "platformId": 2}},
+        timeout=15,
+    )
+    resp.raise_for_status()
+    data = resp.json()
+
+    items: list[HotTopicItem] = []
+    for i, entry in enumerate(data.get("data", {}).get("hotRankList", [])[:limit]):
+        title = entry.get("templateMaterial", {}).get("widgetTitle", "")
+        if not title:
+            continue
+        item_id = entry.get("itemId", 0)
+        heat = entry.get("templateMaterial", {}).get("statRead")
+        items.append(
+            HotTopicItem(
+                rank=i + 1,
+                title=title,
+                heat=int(heat) if heat and str(heat).isdigit() else None,
+                url=f"https://36kr.com/p/{item_id}" if item_id else "",
+                source="36kr",
+            )
+        )
+    return items
+
+
+def _fetch_thepaper(limit: int = 50) -> list[HotTopicItem]:
+    """从澎湃新闻获取热榜。"""
+    url = "https://cache.thepaper.cn/contentapi/wwwIndex/rightSidebar"
+    client = get_sync_http_client()
+    resp = client.get(url, headers=_HEADERS, timeout=15)
+    resp.raise_for_status()
+    data = resp.json()
+
+    items: list[HotTopicItem] = []
+    for i, entry in enumerate(data.get("data", {}).get("hotNews", [])[:limit]):
+        title = entry.get("name", "")
+        if not title:
+            continue
+        cont_id = entry.get("contId", "")
+        items.append(
+            HotTopicItem(
+                rank=i + 1,
+                title=title,
+                heat=None,
+                url=f"https://www.thepaper.cn/newsDetail_forward_{cont_id}" if cont_id else "",
+                source="thepaper",
+            )
+        )
+    return items
+
+
 # 采集器注册表
 _SCRAPERS: dict[str, tuple[str, type[Exception]]] = {
     "toutiao": ("头条", Exception),
     "baidu": ("百度", Exception),
+    "weibo": ("微博", Exception),
+    "zhihu": ("知乎", Exception),
+    "douyin": ("抖音", Exception),
+    "36kr": ("36氪", Exception),
+    "thepaper": ("澎湃", Exception),
 }
 
 _SCRAPER_FN_MAP: dict[str, Any] = {
     "toutiao": _fetch_toutiao,
     "baidu": _fetch_baidu,
+    "weibo": _fetch_weibo,
+    "zhihu": _fetch_zhihu,
+    "douyin": _fetch_douyin,
+    "36kr": _fetch_36kr,
+    "thepaper": _fetch_thepaper,
 }
 
 
@@ -109,20 +265,32 @@ class HotTopicService:
 
     def get_hot_topics(self, source: str | None = None) -> list[HotTopicItem]:
         """获取热点话题列表。优先从缓存读取。"""
+        if source == "legaltech":
+            return self._get_all_sources()
         if source:
             return self._get_single_source(source)
 
         # 获取所有源
+        return self._get_all_sources()
+
+    def refresh(self, source: str | None = None) -> list[HotTopicItem]:
+        """强制刷新（绕过缓存）。"""
+        if source == "legaltech":
+            return self._refresh_all()
+        if source:
+            return self._fetch_and_cache(source)
+
+        return self._refresh_all()
+
+    def _get_all_sources(self) -> list[HotTopicItem]:
+        """获取所有源的数据。"""
         all_items: list[HotTopicItem] = []
         for src in _SCRAPERS:
             all_items.extend(self._get_single_source(src))
         return all_items
 
-    def refresh(self, source: str | None = None) -> list[HotTopicItem]:
-        """强制刷新（绕过缓存）。"""
-        if source:
-            return self._fetch_and_cache(source)
-
+    def _refresh_all(self) -> list[HotTopicItem]:
+        """强制刷新所有源。"""
         all_items: list[HotTopicItem] = []
         for src in _SCRAPERS:
             all_items.extend(self._fetch_and_cache(src))

@@ -26,6 +26,9 @@ export const HOT_TOPIC_SOURCE_LABEL: Record<string, string> = {
   weibo: '微博',
   zhihu: '知乎',
   douyin: '抖音',
+  '36kr': '36氪',
+  thepaper: '澎湃',
+  legaltech: '法律科技',
 }
 
 export interface DiscussionSpeaker {
