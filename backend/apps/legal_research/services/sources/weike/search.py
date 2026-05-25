@@ -468,7 +468,7 @@ class WeikeSearchMixin:
                 response_summary={"returned_count": len(items), "max_pages": max_pages},
             )
             return items
-        except Exception as exc:
+        except (TypeError, ValueError) as exc:
             self._record_search_event(
                 session=session,
                 source="dom",

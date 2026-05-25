@@ -402,7 +402,7 @@ class ContractAdmin(
                     "session_id": int(session.id),
                 }
             )
-        except Exception as exc:
+        except (TypeError, ValueError) as exc:
             logger.exception("contract_oa_sync_start_failed")
             return JsonResponse({"success": False, "message": str(exc)}, status=400)
 

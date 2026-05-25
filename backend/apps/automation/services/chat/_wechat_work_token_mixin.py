@@ -62,7 +62,7 @@ class WeChatWorkTokenMixin:
             logger.debug(f"最终企业微信配置: {list(filtered_config.keys())}")
             return filtered_config
 
-        except Exception as e:
+        except (TypeError, ValueError) as e:
             logger.error(f"加载企业微信配置失败: {e!s}")
             raise ConfigurationException(
                 message=f"无法加载企业微信配置: {e!s}", platform="wechat_work", errors={"original_error": str(e)}

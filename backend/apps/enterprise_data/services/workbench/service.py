@@ -288,7 +288,7 @@ class McpWorkbenchService:
             return default
         try:
             value = int(getter() or default)
-        except Exception:
+        except (TypeError, ValueError):
             return default
         return value if value > 0 else default
 
@@ -298,7 +298,7 @@ class McpWorkbenchService:
             return default
         try:
             value = float(getter() or default)
-        except Exception:
+        except (TypeError, ValueError):
             return default
         return value
 

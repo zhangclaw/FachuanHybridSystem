@@ -206,7 +206,7 @@ class ExecutorQueryMixin:
 
         try:
             llm = ServiceLocator.get_llm_service()
-        except Exception:
+        except (TypeError, ValueError):
             return []
 
         prompt = (
