@@ -15,7 +15,7 @@
 - **多人播客讨论**：新增 `discussion_chain.py`，支持多角色 VoiceDesign 讨论稿生成，TTS 并行合成（83s → 12s，6.7x 提速）
 - **内容运营任务管理增强**：任务状态机完善、讨论稿 speakers 字段、Episode 增强、API 扩展
 - **选题灵感功能改造**：新增 `HotTopicService`，从头条/百度获取实时热搜数据（httpx + Django cache 30 分钟缓存）；`TopicService` 新增 `suggest_from_trends()` 方法，用 LLM 从热点中筛选法律相关选题；新增 3 个 API 端点（`GET /topics/hot`、`POST /topics/hot/refresh`、`POST /topics/inspiration`）
-- **法律检索字段级查询**：威科先行搜索支持按法院层级、地域、案由等字段精确筛选，新增自动案由识别与匹配
+- **法律检索字段级查询**：WKXX搜索支持按法院层级、地域、案由等字段精确筛选，新增自动案由识别与匹配
 
 #### 性能优化
 
@@ -106,7 +106,7 @@
 
 #### 新功能
 
-- **内容运营模块 (content_ops)**：新增完整的内容运营应用，包含数据模型（ContentTask、GeneratedArticle、PodcastEpisode）、API 接口、任务执行器、TTS 服务、RSS 生成、LLM 选题建议等。支持检索模式和直投模式，自动调用威科先行检索案例并生成叙事文章和播客音频
+- **内容运营模块 (content_ops)**：新增完整的内容运营应用，包含数据模型（ContentTask、GeneratedArticle、PodcastEpisode）、API 接口、任务执行器、TTS 服务、RSS 生成、LLM 选题建议等。支持检索模式和直投模式，自动调用WKXX检索案例并生成叙事文章和播客音频
 
 - **VoiceDesign 模式**：TTS 服务支持自然语言描述音色风格，通过 `tts_style_prompt` 字段自定义语音特征
 
@@ -116,7 +116,7 @@
 
 - **LLM 服务调用和选题解析**：修复 openai_compatible 后端 SSL 握手问题、MiMo 模型调用配置、content_chain 字段校验
 
-- **credential 字段改名**：content_ops 的 credential 字段改名为「法律检索网站账号」并添加筛选逻辑，只显示威科先行相关账号
+- **credential 字段改名**：content_ops 的 credential 字段改名为「法律检索网站账号」并添加筛选逻辑，只显示WKXX相关账号
 
 - **内容运营收纳到其他工具菜单**：将 content_ops 模块从 Django admin 侧边栏移除，收纳到「其他工具」聚合页中
 
