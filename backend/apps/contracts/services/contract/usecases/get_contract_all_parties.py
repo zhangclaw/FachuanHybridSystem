@@ -6,6 +6,7 @@ from typing import Any
 
 from apps.core.exceptions import NotFoundError
 
+
 class GetContractAllPartiesUseCase:
     def __init__(self, contract_query_service: Any) -> None:
         self.contract_query_service = contract_query_service

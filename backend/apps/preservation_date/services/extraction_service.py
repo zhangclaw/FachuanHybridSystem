@@ -31,6 +31,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("apps.preservation_date")
 
+
 class PreservationDateExtractionService:
     """
     财产保全日期识别服务

@@ -18,6 +18,7 @@ from apps.document_recognition.services.data_classes import (
 
 logger = logging.getLogger("apps.document_recognition")
 
+
 @dataclass(frozen=True)
 class RecognizeCourtDocumentUsecase:
     text_extraction: Any

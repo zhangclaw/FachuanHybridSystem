@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Protocol, runtime_checkable
 
+
 @dataclass
 class CalendarEvent:
     """Unified representation of a calendar event from any source."""
@@ -21,6 +22,7 @@ class CalendarEvent:
     is_all_day: bool = False
     raw: dict = field(default_factory=dict)
 
+
 @runtime_checkable
 class CalendarEventProvider(Protocol):
     """Protocol for calendar event providers."""
@@ -28,6 +30,7 @@ class CalendarEventProvider(Protocol):
     def fetch_events(self, **kwargs: object) -> list[CalendarEvent]:
         """Fetch calendar events from the provider."""
         ...
+
 
 def provider_available(name: str) -> bool:
     """Check whether a platform-specific provider is available."""

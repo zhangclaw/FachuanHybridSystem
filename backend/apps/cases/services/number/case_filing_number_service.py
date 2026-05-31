@@ -14,6 +14,7 @@ from apps.core.models.enums import SimpleCaseType
 
 logger = logging.getLogger("apps.cases")
 
+
 class CaseFilingNumberService:
     def generate_case_filing_number_internal(self, case_id: int, case_type: str, created_year: int) -> str:
         try:
@@ -21,7 +22,7 @@ class CaseFilingNumberService:
                 raise ValidationException(
                     message="案件类型不能为空",
                     code="INVALID_CASE_TYPE",
-                    errors={"case_type": str("案件类型不能为空")},
+                    errors={"case_type": "案件类型不能为空"},
                 )
 
             if not (1900 <= created_year <= 2100):

@@ -6,6 +6,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Any, Protocol, cast
 
+
 class TaskScheduler(Protocol):
     def schedule_interval(
         self,
@@ -19,6 +20,7 @@ class TaskScheduler(Protocol):
     ) -> str: ...
 
     def delete_schedules(self, *, name: str | None = None, func: str | None = None) -> int: ...
+
 
 @dataclass(frozen=True)
 class DjangoQTaskScheduler:

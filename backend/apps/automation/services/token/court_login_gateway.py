@@ -7,8 +7,10 @@ from typing import Any, Protocol
 
 from apps.core.dto import AccountCredentialDTO
 
+
 class CourtLoginGateway(Protocol):
     def login(self, *, credential: AccountCredentialDTO, browser_context) -> str: ...  # type: ignore
+
 
 @dataclass(frozen=True)
 class CourtZxfwLoginGateway:

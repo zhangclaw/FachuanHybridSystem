@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Protocol
 
+
 class IPreservationQuoteService(Protocol):
     """财产保全询价服务接口"""
 
@@ -24,6 +25,7 @@ class IPreservationQuoteService(Protocol):
 
     def list_quotes(self, status: str | None = None, limit: int = 20, offset: int = 0) -> dict[str, Any]: ...
 
+
 class IDocumentProcessingService(Protocol):
     """文档处理服务接口"""
 
@@ -39,6 +41,7 @@ class IDocumentProcessingService(Protocol):
         self, uploaded_file: Any, limit: int | None = None, preview_page: int | None = None
     ) -> dict[str, Any]: ...
 
+
 class IAutoNamerService(Protocol):
     """自动命名服务接口"""
 
@@ -52,6 +55,7 @@ class IAutoNamerService(Protocol):
         limit: int | None = None,
         preview_page: int | None = None,
     ) -> dict[str, Any]: ...
+
 
 class IPerformanceMonitorService(Protocol):
     """性能监控服务接口"""

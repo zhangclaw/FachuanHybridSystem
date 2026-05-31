@@ -26,6 +26,7 @@ from .sales_dispute_api_factories import (
 
 router = Router()
 
+
 @router.post("/assess", response=AssessmentResponse)
 def assess_case(
     request: HttpRequest,
@@ -127,6 +128,7 @@ def assess_case(
         remarks=result.remarks,
     )
 
+
 @router.get("/assess/{case_id}", response=AssessmentResponse)
 def get_assessment(
     request: HttpRequest,
@@ -183,6 +185,7 @@ def get_assessment(
         remarks=result.remarks,
     )
 
+
 @router.post("/analyze-jurisdiction", response=JurisdictionResponseSchema)
 def analyze_jurisdiction(
     request: HttpRequest,
@@ -215,6 +218,7 @@ def analyze_jurisdiction(
         alternative_court=result.alternative_court,
         legal_basis=result.legal_basis,
     )
+
 
 @router.post("/recommend-strategy", response=StrategyResponseSchema)
 def recommend_strategy(

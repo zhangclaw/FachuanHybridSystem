@@ -26,6 +26,7 @@ from .outputs import ComplaintOutput, DefenseOutput
 
 logger = logging.getLogger("apps.documents.generation")
 
+
 class LitigationGenerationService:
     """
     诉讼文书生成服务

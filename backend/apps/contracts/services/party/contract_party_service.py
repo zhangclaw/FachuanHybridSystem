@@ -7,6 +7,7 @@ from typing import Any
 from apps.contracts.models import Contract, ContractParty
 from apps.core.exceptions import NotFoundError
 
+
 class ContractPartyService:
     def add_party(self, contract_id: int, client_id: int) -> ContractParty:
         if not Contract.objects.filter(id=contract_id).exists():

@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from apps.cases.models import Case, CaseParty, CaseTemplateBinding
 
+
 @dataclass
 class CaseDTO:
     id: int
@@ -39,6 +40,7 @@ class CaseDTO:
             effective_date=str(case.effective_date) if case.effective_date else None,
         )
 
+
 @dataclass
 class CaseSearchResultDTO:
     id: int
@@ -46,6 +48,7 @@ class CaseSearchResultDTO:
     case_numbers: list[str] = field(default_factory=list)
     parties: list[str] = field(default_factory=list)
     created_at: str | None = None
+
 
 @dataclass
 class CaseTemplateBindingDTO:
@@ -68,6 +71,7 @@ class CaseTemplateBindingDTO:
             binding_source=binding.binding_source,
             created_at=str(binding.created_at) if binding.created_at else None,
         )
+
 
 @dataclass
 class CasePartyDTO:

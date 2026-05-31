@@ -7,6 +7,7 @@ from typing import Any
 
 from mcp_server.client import client
 
+
 def create_pdf_split_job(
     file_base64: str,
     filename: str,

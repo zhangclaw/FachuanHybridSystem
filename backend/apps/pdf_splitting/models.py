@@ -9,6 +9,7 @@ from django.db import models
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
 
+
 class PdfSplitJobStatus(models.TextChoices):
     PENDING = "pending", "待处理"
     PROCESSING = "processing", "处理中"
@@ -18,19 +19,23 @@ class PdfSplitJobStatus(models.TextChoices):
     FAILED = "failed", "失败"
     CANCELLED = "cancelled", "已取消"
 
+
 class PdfSplitSourceType(models.TextChoices):
     UPLOAD = "upload", "上传文件"
     LOCAL_PATH = "local_path", "本地路径"
+
 
 class PdfSplitMode(models.TextChoices):
     CONTENT_ANALYSIS = "content_analysis", "内容识别拆分"
     PAGE_SPLIT = "page_split", "按页拆分"
     MANUAL_SPLIT = "manual_split", "手动拆分"
 
+
 class PdfSplitOcrProfile(models.TextChoices):
     FAST = "fast", "快速"
     BALANCED = "balanced", "均衡"
     ACCURATE = "accurate", "高精度"
+
 
 class PdfSplitSegmentType(models.TextChoices):
     COMPLAINT = "complaint", "起诉状"
@@ -42,11 +47,13 @@ class PdfSplitSegmentType(models.TextChoices):
     REFUND_ACCOUNT_CONFIRMATION = "refund_account_confirmation", "诉讼费用退费账户确认书"
     UNRECOGNIZED = "unrecognized", "未识别材料"
 
+
 class PdfSplitReviewFlag(models.TextChoices):
     NORMAL = "normal", "正常"
     LOW_CONFIDENCE = "low_confidence", "低置信度"
     UNRECOGNIZED = "unrecognized", "未识别"
     OCR_FAILED = "ocr_failed", "OCR失败"
+
 
 class PdfSplittingTool(models.Model):
     name: str = models.CharField(max_length=64, default="Pdf Splitting")
@@ -55,6 +62,7 @@ class PdfSplittingTool(models.Model):
         managed = False
         verbose_name = "PDF 拆解"
         verbose_name_plural = "PDF 拆解"
+
 
 class PdfSplitJob(models.Model):
     id: UUID = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -120,6 +128,7 @@ class PdfSplitJob(models.Model):
     def __str__(self) -> str:
         return f"{self.source_original_name} ({self.get_status_display()})"
 
+
 class PdfSplitSegment(models.Model):
     job: Any = models.ForeignKey(
         PdfSplitJob,
@@ -158,6 +167,7 @@ class PdfSplitSegment(models.Model):
 
     def __str__(self) -> str:
         return f"{self.job_id}:{self.page_start}-{self.page_end} {self.segment_type}"
+
 
 @receiver(post_delete, sender=PdfSplitJob)
 def delete_job_files(sender: type, instance: PdfSplitJob, **kwargs: object) -> None:

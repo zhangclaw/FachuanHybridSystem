@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from apps.client.models import Client, ClientIdentityDoc, PropertyClue
 
+
 class ClientInternalQueryService:
     def get_client(self, *, client_id: int) -> Client | None:
         return Client.objects.prefetch_related("identity_docs").filter(id=client_id).first()

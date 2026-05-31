@@ -14,6 +14,7 @@ from apps.documents.utils.formatters import format_date_chinese
 
 logger = logging.getLogger(__name__)
 
+
 @PlaceholderRegistry.register
 class SupplementaryAgreementSignatureService(BasePlaceholderService):
     """补充协议签名盖章信息服务"""

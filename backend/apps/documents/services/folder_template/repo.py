@@ -5,6 +5,7 @@ from typing import Any
 
 from apps.documents.models import FolderTemplate
 
+
 class FolderTemplateRepo:
     def create(self, **kwargs: Any) -> FolderTemplate:
         return FolderTemplate.objects.create(**kwargs)

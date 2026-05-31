@@ -18,6 +18,7 @@ from ..core.access_policy import ensure_can_access_project
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass(frozen=True)
 class RecordingExtractParams:
     interval_seconds: float = 1.0
@@ -25,6 +26,7 @@ class RecordingExtractParams:
     dedup_threshold: int | None = None
     ocr_similarity_threshold: float | None = None
     ocr_min_new_chars: int | None = None
+
 
 class RecordingExtractFacade:
     def __init__(self, *, task_submission_service: TaskSubmissionService) -> None:

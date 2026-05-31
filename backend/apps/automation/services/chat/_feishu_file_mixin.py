@@ -14,6 +14,7 @@ from .base import ChatResult
 
 logger = logging.getLogger(__name__)
 
+
 class FeishuFileMixin:
     """负责飞书文件上传和文件消息发送"""
 

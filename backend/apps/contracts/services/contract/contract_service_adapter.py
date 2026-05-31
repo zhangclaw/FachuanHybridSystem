@@ -18,6 +18,7 @@ from .contract_service import ContractService
 
 logger = logging.getLogger("apps.contracts")
 
+
 class ContractServiceAdapter:
     def __init__(
         self,

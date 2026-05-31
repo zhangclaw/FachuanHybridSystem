@@ -9,6 +9,7 @@ import pytest
 
 from apps.workbench.services.doc_extractor import DocTextExtractor
 
+
 @pytest.fixture
 def extractor() -> DocTextExtractor:
     return DocTextExtractor()

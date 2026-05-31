@@ -13,6 +13,7 @@ from apps.image_rotation.services.transform import apply_rotation_for_pdf
 
 logger = logging.getLogger("apps.image_rotation")
 
+
 def generate_pdf(*, processed_images: list[tuple[bytes, int]], output_dir: Path) -> str:
     pdf_filename = storage.build_pdf_filename()
     pdf_path = output_dir / pdf_filename
@@ -34,6 +35,7 @@ def generate_pdf(*, processed_images: list[tuple[bytes, int]], output_dir: Path)
         if pdf_path.exists():
             pdf_path.unlink()
         raise
+
 
 def _create_pdf_from_images(images: list[tuple[bytes, int]]) -> Any:
     pdf_doc = fitz.open()

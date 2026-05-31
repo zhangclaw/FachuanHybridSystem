@@ -14,6 +14,7 @@ _ZERO = Decimal("0.00")
 
 # ── 输出 dataclass ──
 
+
 @dataclass(frozen=True)
 class SummaryOutput:
     """核心指标输出"""
@@ -26,6 +27,7 @@ class SummaryOutput:
     query_start: date
     query_end: date
 
+
 @dataclass(frozen=True)
 class TrendItem:
     """趋势分组项"""
@@ -34,6 +36,7 @@ class TrendItem:
     amount: Decimal
     count: int
     recovery_rate: Decimal
+
 
 @dataclass(frozen=True)
 class BreakdownItem:
@@ -44,6 +47,7 @@ class BreakdownItem:
     case_count: int
     recovery_rate: Decimal
 
+
 @dataclass(frozen=True)
 class FactorItem:
     """影响因素分析项"""
@@ -52,6 +56,7 @@ class FactorItem:
     case_count: int
     total_recovery: Decimal
     recovery_rate: Decimal
+
 
 @dataclass(frozen=True)
 class LawyerPerformanceItem:
@@ -65,6 +70,7 @@ class LawyerPerformanceItem:
     avg_recovery_cycle: int
     closed_rate: Decimal
 
+
 @dataclass(frozen=True)
 class CaseStatsOutput:
     """案件统计输出"""
@@ -77,6 +83,7 @@ class CaseStatsOutput:
     stage_conversion_rates: list[FactorItem]
     query_start: date
     query_end: date
+
 
 # ── 常量 ──
 
@@ -95,11 +102,13 @@ DEBT_AGE_RANGES: list[tuple[str, int | None, int | None]] = [
 
 # ── 工具函数 ──
 
+
 def _safe_rate(numerator: Decimal, denominator: Decimal) -> Decimal:
     """除零保护的百分比计算"""
     if denominator == 0:
         return _ZERO
     return (numerator / denominator * 100).quantize(Decimal("0.01"))
+
 
 def _amount_range_q(
     field: str,
@@ -114,11 +123,14 @@ def _amount_range_q(
         q &= Q(**{f"{field}__lt": high})
     return q
 
+
 def _get_case_model() -> type[Any]:
     return django_apps.get_model("cases", "Case")
 
+
 def _get_case_assignment_model() -> type[Any]:
     return django_apps.get_model("cases", "CaseAssignment")
+
 
 def _lawyer_display_name(lawyer: object | None) -> str:
     if lawyer is None:

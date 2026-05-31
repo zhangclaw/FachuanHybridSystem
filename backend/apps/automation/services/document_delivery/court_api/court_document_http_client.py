@@ -12,6 +12,7 @@ from .court_document_api_exceptions import ApiResponseError, CourtApiError, Toke
 
 logger = logging.getLogger("apps.automation")
 
+
 class CourtDocumentHttpClient:
     def __init__(self, *, timeout_seconds: float) -> None:
         self.timeout_seconds = timeout_seconds
@@ -23,7 +24,7 @@ class CourtDocumentHttpClient:
                 response = client.post(url, headers=headers, json=json_data)
 
             if response.status_code == 401:
-                raise TokenExpiredError(message=str("Token 已过期或无效"), errors={"status_code": 401})
+                raise TokenExpiredError(message="Token 已过期或无效", errors={"status_code": 401})
 
             if response.status_code >= 400:
                 raise ApiResponseError(

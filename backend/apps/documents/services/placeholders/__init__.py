@@ -11,6 +11,7 @@ from .base import BasePlaceholderService
 from .context_builder import EnhancedContextBuilder
 from .registry import PlaceholderRegistry
 
+
 def _auto_import_all_services() -> None:
     package_name = __name__
     for module_info in pkgutil.walk_packages(__path__, package_name + "."):
@@ -22,6 +23,7 @@ def _auto_import_all_services() -> None:
         ):
             continue
         importlib.import_module(module_name)
+
 
 _auto_import_all_services()
 

@@ -17,6 +17,7 @@ from .wiring import get_client_service
 
 logger = logging.getLogger("apps.contracts")
 
+
 class SupplementaryAgreementService:
     """
     补充协议服务

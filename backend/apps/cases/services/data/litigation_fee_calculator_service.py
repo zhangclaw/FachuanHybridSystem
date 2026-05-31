@@ -74,6 +74,7 @@ PERSONALITY_RIGHTS_DAMAGE_TIERS: list[tuple[int | None, Decimal, Decimal]] = [
     (None, Decimal("0.005"), Decimal("500")),  # >10万: 0.5%
 ]
 
+
 class DiscountType:
     """费用减免类型"""
 
@@ -81,6 +82,7 @@ class DiscountType:
     WITHDRAWAL = "withdrawal"  # 撤诉
     SIMPLE_PROCEDURE = "simple"  # 简易程序
     COUNTERCLAIM = "counterclaim"  # 反诉合并审理
+
 
 class LitigationFeeCalculatorService:
     """

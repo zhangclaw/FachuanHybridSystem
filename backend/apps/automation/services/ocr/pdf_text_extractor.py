@@ -6,6 +6,7 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
+
 class PDFTextExtractor:
     """使用 pdfplumber 从电子发票 PDF 中提取文本层内容"""
 

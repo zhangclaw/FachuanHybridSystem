@@ -6,6 +6,7 @@ from typing import ClassVar
 
 from django.db import models
 
+
 class HearingNote(models.Model):
     """庭审笔记，可关联证据项"""
 

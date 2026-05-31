@@ -10,6 +10,7 @@ from apps.core.exceptions import NotFoundError, ValidationException
 from apps.workbench.models import BatchJob, BatchJobItem, BatchJobStatus
 from apps.workbench.services.batch_service import BatchAnalysisService
 
+
 @pytest.fixture
 def svc() -> BatchAnalysisService:
     return BatchAnalysisService()

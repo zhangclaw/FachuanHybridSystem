@@ -6,6 +6,7 @@ from typing import Any
 
 from mcp_server.client import client
 
+
 def list_cases(
     case_type: str | None = None,
     status: str | None = None,

@@ -6,6 +6,7 @@ from apps.client.models import Client
 from apps.client.services.client_internal_query_service import ClientInternalQueryService
 from apps.core.exceptions import NotFoundError
 
+
 class ClientGetQueryService:
     def __init__(self, internal_query_service: ClientInternalQueryService | None = None) -> None:
         self._internal_query_service = internal_query_service

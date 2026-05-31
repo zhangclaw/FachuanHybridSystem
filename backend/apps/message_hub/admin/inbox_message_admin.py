@@ -16,6 +16,7 @@ from apps.message_hub.models import InboxMessage
 
 logger = logging.getLogger("apps.message_hub")
 
+
 @admin.register(InboxMessage)
 class InboxMessageAdmin(admin.ModelAdmin):
     class Media:

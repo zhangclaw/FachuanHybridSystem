@@ -15,6 +15,7 @@ from ..models import WorkbenchMessage, WorkbenchSession
 
 logger = logging.getLogger(__name__)
 
+
 def _calc_message_bytes(
     content: str = "",
     tool_input: dict | None = None,
@@ -27,6 +28,7 @@ def _calc_message_bytes(
     total += len(str(tool_output or {}).encode("utf-8"))
     total += len(str(metadata or {}).encode("utf-8"))
     return total
+
 
 class WorkbenchSessionService(PermissionMixin):
     """工作台会话管理服务"""

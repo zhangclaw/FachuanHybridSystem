@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from html import escape
 
+
 class AnimationHtmlComposerService:
     def compose(
         self,

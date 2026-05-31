@@ -19,6 +19,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("apps.contracts")
 
+
 class LawyerAssignmentService:
     """
     律师指派服务

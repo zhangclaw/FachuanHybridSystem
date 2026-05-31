@@ -2,6 +2,7 @@
 
 from typing import Any
 
+
 def get_email_configs() -> list[dict[str, Any]]:
     """获取邮件服务配置项"""
     return [

@@ -16,6 +16,7 @@ from .case_number_internal_service import CaseNumberInternalService
 from .case_party_internal_query_service import CasePartyInternalQueryService
 from .case_template_binding_query_service import CaseTemplateBindingQueryService
 
+
 class CaseServiceAdapter:
     def __init__(
         self,

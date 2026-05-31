@@ -23,6 +23,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class CalculationPeriod:
     """最小计算单元.
@@ -61,6 +62,7 @@ class CalculationPeriod:
         rate_decimal = self.rate / Decimal("100")
         self.interest = self.principal * rate_decimal * Decimal(self.days) / Decimal(self.year_days)
         return self.interest.quantize(Decimal("0.01"))
+
 
 @dataclass
 class InterestCalculationResult:
@@ -103,6 +105,7 @@ class InterestCalculationResult:
                 for p in self.periods
             ],
         }
+
 
 class InterestCalculator:
     """LPR利息计算器.

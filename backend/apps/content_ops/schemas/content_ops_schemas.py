@@ -5,6 +5,7 @@ from typing import Any
 
 from ninja import Schema
 
+
 class TTSTestIn(Schema):
     """Request body for TTS test endpoint."""
 
@@ -12,6 +13,7 @@ class TTSTestIn(Schema):
     voice: str = "冰糖"
     audio_format: str = "mp3"
     style_prompt: str = ""
+
 
 class ContentTaskCreateIn(Schema):
     mode: str = "search"
@@ -24,17 +26,21 @@ class ContentTaskCreateIn(Schema):
     output_mode: str = "narration"
     discussion_speakers: list[dict[str, Any]] = []
 
+
 class TopicSuggestIn(Schema):
     """选题建议请求参数。"""
 
     model: str = ""
 
+
 class ReviewActionIn(Schema):
     notes: str = ""
+
 
 class ArticleUpdateIn(Schema):
     title: str | None = None
     content: str | None = None
+
 
 class BatchReviewIn(Schema):
     ids: list[int]
@@ -46,9 +52,11 @@ class BatchReviewIn(Schema):
             raise ValueError("单次批量操作最多 100 条")
         return ids
 
+
 class DiscussionTurnUpdateIn(Schema):
     text: str | None = None
     speaker_style_prompt: str | None = None
+
 
 class GeneratedArticleOut(Schema):
     id: int
@@ -61,6 +69,7 @@ class GeneratedArticleOut(Schema):
     token_usage: dict
     created_at: datetime
     updated_at: datetime
+
 
 class PodcastEpisodeOut(Schema):
     id: int
@@ -76,12 +85,14 @@ class PodcastEpisodeOut(Schema):
     created_at: datetime
     updated_at: datetime
 
+
 class DiscussionTurnOut(Schema):
     id: int
     speaker_name: str
     speaker_style_prompt: str
     text: str
     order: int
+
 
 class DiscussionScriptOut(Schema):
     id: int
@@ -94,6 +105,7 @@ class DiscussionScriptOut(Schema):
     token_usage: dict
     created_at: datetime
     updated_at: datetime
+
 
 class ContentTaskOut(Schema):
     id: int
@@ -114,10 +126,12 @@ class ContentTaskOut(Schema):
     created_at: datetime
     updated_at: datetime
 
+
 class TopicSuggestionOut(Schema):
     title: str
     description: str
     suggested_keyword: str
+
 
 class HotTopicOut(Schema):
     """热点话题输出。"""
@@ -128,10 +142,12 @@ class HotTopicOut(Schema):
     url: str = ""
     source: str
 
+
 class HotTopicRefreshIn(Schema):
     """刷新热点话题请求参数。"""
 
     source: str = ""
+
 
 class TopicInspirationIn(Schema):
     """基于热点的选题灵感请求参数。"""

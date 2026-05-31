@@ -20,6 +20,7 @@ from apps.core.security import DjangoPermsMixin
 
 logger = logging.getLogger("apps.contracts")
 
+
 class ContractPaymentService(DjangoPermsMixin):
     """
     合同收款服务

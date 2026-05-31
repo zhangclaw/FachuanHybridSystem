@@ -22,6 +22,7 @@ __all__: list[str] = [
     "UnauthorizedError",
 ]
 
+
 class ValidationException(BusinessException):
     """
     验证异常
@@ -39,6 +40,7 @@ class ValidationException(BusinessException):
     ) -> None:
         super().__init__(message=message, code=code or "VALIDATION_ERROR", errors=errors)
 
+
 class PermissionDenied(BusinessException):
     """
     权限拒绝异常
@@ -55,6 +57,7 @@ class PermissionDenied(BusinessException):
     ) -> None:
         super().__init__(message=message, code=code or "PERMISSION_DENIED", errors=errors)
 
+
 class NotFoundError(BusinessException):
     """
     资源不存在异常
@@ -70,6 +73,7 @@ class NotFoundError(BusinessException):
         self, message: str | Promise = "资源不存在", code: str | None = None, errors: dict[str, Any] | None = None
     ) -> None:
         super().__init__(message=message, code=code or "NOT_FOUND", errors=errors)
+
 
 class ConflictError(BusinessException):
     """
@@ -88,6 +92,7 @@ class ConflictError(BusinessException):
     ) -> None:
         super().__init__(message=message, code=code or "CONFLICT", errors=errors)
 
+
 class AuthenticationError(BusinessException):
     """
     认证失败异常
@@ -105,6 +110,7 @@ class AuthenticationError(BusinessException):
     ) -> None:
         super().__init__(message=message, code=code or "AUTHENTICATION_ERROR", errors=errors)
 
+
 class RateLimitError(BusinessException):
     """
     频率限制异常
@@ -121,6 +127,7 @@ class RateLimitError(BusinessException):
     ) -> None:
         super().__init__(message=message, code=code or "RATE_LIMIT_ERROR", errors=errors)
 
+
 # 向后兼容的别名
 class ForbiddenError(PermissionDenied):
     """无权限访问(向后兼容)"""
@@ -128,6 +135,7 @@ class ForbiddenError(PermissionDenied):
     def __init__(self, message: str | Promise = "无权限访问") -> None:
         super().__init__(message)
         self.status = 403
+
 
 class UnauthorizedError(AuthenticationError):
     """未认证(向后兼容)"""

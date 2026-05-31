@@ -16,6 +16,7 @@ from apps.core.security import DjangoPermsMixin
 
 logger = logging.getLogger("apps.cases")
 
+
 class CaseAssignmentService(DjangoPermsMixin):
     """
     案件指派服务

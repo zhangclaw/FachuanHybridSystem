@@ -6,6 +6,7 @@ from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from typing import Any, TypeVar, cast
 
+
 @dataclass(frozen=True)
 class CodePlaceholderDefinition:
     key: str
@@ -14,6 +15,7 @@ class CodePlaceholderDefinition:
     display_name: str = ""
     description: str = ""
     example_value: str = ""
+
 
 class CodePlaceholderRegistry:
     _instance: CodePlaceholderRegistry | None = None
@@ -39,7 +41,9 @@ class CodePlaceholderRegistry:
     def clear(self) -> None:
         self._definitions.clear()
 
+
 T = TypeVar("T")
+
 
 def expose_placeholders(
     *,

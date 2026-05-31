@@ -6,6 +6,7 @@ from collections.abc import Iterable
 
 from apps.contracts.models import Contract, ContractAssignment
 
+
 class ContractAccessRepo:
     def has_assignment_access(self, *, contract_id: int, lawyer_ids: Iterable[int]) -> bool:
         lawyer_ids_list = list(lawyer_ids)

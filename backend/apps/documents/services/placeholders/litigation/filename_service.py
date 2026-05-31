@@ -14,6 +14,7 @@ from apps.documents.services.infrastructure.wiring import get_case_service
 
 logger = logging.getLogger(__name__)
 
+
 class FilenameService:
     """文件名生成服务"""
 

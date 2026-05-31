@@ -22,6 +22,7 @@ DEFAULT_TIMELINE: dict[str, int] = {
     "litigation": 42,
 }
 
+
 @dataclass(frozen=True)
 class CollectionRecordOutput:
     """催收记录输出"""
@@ -35,6 +36,7 @@ class CollectionRecordOutput:
     days_elapsed: int
     is_overdue: bool
     remarks: str
+
 
 class CollectionWorkflowService:
     """催收工作流服务：启动催收、推进阶段"""
@@ -86,7 +88,7 @@ class CollectionWorkflowService:
             record=record,
             action_type=CollectionStage.PHONE_COLLECTION,
             action_date=actual_start,
-            description=str("启动催收流程，进入电话催款阶段"),
+            description="启动催收流程，进入电话催款阶段",
         )
 
         logger.info("案件 %s 启动催收流程", case_id)

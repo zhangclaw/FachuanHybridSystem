@@ -7,6 +7,7 @@ from typing import ClassVar
 from django.conf import settings
 from django.db import models
 
+
 class InvoiceCategory(models.TextChoices):
     """发票类目"""
 
@@ -21,6 +22,7 @@ class InvoiceCategory(models.TextChoices):
     TOLL_RECEIPT = "toll_receipt", "过路费发票"
     OTHER = "other", "其他"
 
+
 class InvoiceRecognitionTaskStatus(models.TextChoices):
     """发票识别任务状态"""
 
@@ -29,12 +31,14 @@ class InvoiceRecognitionTaskStatus(models.TextChoices):
     COMPLETED = "completed", "已完成"
     FAILED = "failed", "失败"
 
+
 class InvoiceRecordStatus(models.TextChoices):
     """发票记录识别状态"""
 
     PENDING = "pending", "待识别"
     SUCCESS = "success", "识别成功"
     FAILED = "failed", "识别失败"
+
 
 class InvoiceRecognitionTask(models.Model):
     """发票识别任务"""
@@ -71,6 +75,7 @@ class InvoiceRecognitionTask(models.Model):
     def __str__(self) -> str:
         return f"{self.name} ({self.get_status_display()})"
 
+
 class InvoiceRecord(models.Model):
     """发票记录"""
 
@@ -86,13 +91,9 @@ class InvoiceRecord(models.Model):
     invoice_code = models.CharField(max_length=50, blank=True, default="", verbose_name="发票代码")
     invoice_number = models.CharField(max_length=50, blank=True, default="", verbose_name="发票号码")
     invoice_date = models.DateField(null=True, blank=True, verbose_name="开票日期")
-    amount = models.DecimalField(
-        max_digits=12, decimal_places=2, null=True, blank=True, verbose_name="金额（不含税）"
-    )
+    amount = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True, verbose_name="金额（不含税）")
     tax_amount = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True, verbose_name="税额")
-    total_amount = models.DecimalField(
-        max_digits=12, decimal_places=2, null=True, blank=True, verbose_name="价税合计"
-    )
+    total_amount = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True, verbose_name="价税合计")
     buyer_name = models.CharField(max_length=255, blank=True, default="", verbose_name="购买方名称")
     seller_name = models.CharField(max_length=255, blank=True, default="", verbose_name="销售方名称")
     project_name = models.CharField(max_length=255, blank=True, default="", verbose_name="项目名称")

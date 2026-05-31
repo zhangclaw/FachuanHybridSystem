@@ -11,7 +11,6 @@ from typing import TYPE_CHECKING, Any, ClassVar
 
 from django.core.exceptions import ValidationError
 from django.db import models
-
 from django_lifecycle import AFTER_CREATE, AFTER_UPDATE, BEFORE_CREATE, BEFORE_UPDATE, LifecycleModel, hook
 
 from apps.core.utils.path import Path
@@ -34,6 +33,7 @@ if TYPE_CHECKING:
     from django.db.models.fields.related_descriptors import RelatedManager
 
     from .evidence import EvidenceList
+
 
 class DocumentTemplate(LifecycleModel):
     """
@@ -246,6 +246,7 @@ class DocumentTemplate(LifecycleModel):
             _invalidate_template_matching_cache(self.__class__)
         except Exception:
             logger.exception("更新审计日志失败: %s", self)
+
 
 class DocumentTemplateFolderBinding(LifecycleModel):
     """

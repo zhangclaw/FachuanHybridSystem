@@ -17,6 +17,7 @@ from .download_response_factory import build_download_response
 logger = logging.getLogger("apps.documents.api")
 router = Router(auth=JWTOrSessionAuth())
 
+
 def _get_preservation_materials_service() -> Any:
     """工厂函数:获取财产保全材料生成服务"""
     from apps.documents.services.generation.preservation_materials_generation_service import (
@@ -25,10 +26,12 @@ def _get_preservation_materials_service() -> Any:
 
     return PreservationMaterialsGenerationService()
 
+
 def _get_folder_binding_service() -> Any:
     from apps.core.interfaces import ServiceLocator
 
     return ServiceLocator.get_contract_folder_binding_service()
+
 
 def _require_case_contract(request: Any, case_id: int) -> Any:
     """获取案件绑定的合同 ID，无合同则返回 None。"""
@@ -38,6 +41,7 @@ def _require_case_contract(request: Any, case_id: int) -> Any:
     if not case:
         return None
     return case
+
 
 def _save_or_download(
     contract_id: int | None,
@@ -72,6 +76,7 @@ def _save_or_download(
 
     return build_download_response(content=content, filename=filename, content_type=content_type)
 
+
 @router.post("/cases/{case_id}/preservation/application/download")
 @rate_limit_from_settings("EXPORT", by_user=True)
 def download_preservation_application(request: Any, case_id: int) -> Any:
@@ -98,6 +103,7 @@ def download_preservation_application(request: Any, case_id: int) -> Any:
         subdir_key="contract_documents",
     )
 
+
 @router.post("/cases/{case_id}/preservation/delay-delivery/download")
 @rate_limit_from_settings("EXPORT", by_user=True)
 def download_delay_delivery_application(request: Any, case_id: int) -> Any:
@@ -123,6 +129,7 @@ def download_delay_delivery_application(request: Any, case_id: int) -> Any:
         content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         subdir_key="contract_documents",
     )
+
 
 @router.post("/cases/{case_id}/preservation/package/download")
 @rate_limit_from_settings("EXPORT", by_user=True)

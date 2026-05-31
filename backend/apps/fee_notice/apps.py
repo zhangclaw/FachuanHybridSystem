@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from django.apps import AppConfig
 
+
 class FeeNoticeConfig(AppConfig):
     """Fee notice app configuration."""
 

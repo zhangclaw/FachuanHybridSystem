@@ -8,6 +8,7 @@ from apps.core.protocols import IOcrService
 
 from .ocr_service import OCRService
 
+
 class OCRServiceAdapter(IOcrService):
     def __init__(self, service: OCRService | None = None) -> None:
         self._service = service

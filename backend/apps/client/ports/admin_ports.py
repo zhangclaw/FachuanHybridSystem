@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from typing import Any, Protocol
 
+
 class GsxtReportPort(Protocol):
     """企业信用报告服务端口。
 
@@ -71,6 +72,7 @@ class GsxtReportPort(Protocol):
             状态选项列表
         """
         ...
+
 
 class CredentialPort(Protocol):
     """账号凭证服务端口。

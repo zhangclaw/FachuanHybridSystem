@@ -13,6 +13,7 @@ from apps.contracts.models import ArchiveClassificationRule
 
 logger = logging.getLogger(__name__)
 
+
 @admin.register(ArchiveClassificationRule)
 class ArchiveClassificationRuleAdmin(admin.ModelAdmin):
     list_display = ("archive_category", "filename_keyword", "archive_item_code", "hit_count", "source", "updated_at")

@@ -8,6 +8,7 @@ from typing import Any
 
 from playwright.sync_api import Page
 
+
 class FormUtilsMixin:
     """表单操作工具 Mixin，需要子类提供 self.page。"""
 

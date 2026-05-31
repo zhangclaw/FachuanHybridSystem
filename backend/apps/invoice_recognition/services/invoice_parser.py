@@ -8,6 +8,7 @@ from decimal import Decimal, InvalidOperation
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass(frozen=True)
 class ParsedInvoice:
     invoice_code: str = field(default="")
@@ -20,6 +21,7 @@ class ParsedInvoice:
     seller_name: str = field(default="")
     project_name: str = field(default="")
     category: str = field(default="other")
+
 
 class InvoiceParser:
     """通过正则表达式和关键词匹配从 OCR/PDF 文本中提取结构化发票字段"""

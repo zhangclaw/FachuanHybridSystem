@@ -5,6 +5,7 @@ from uuid import uuid4
 
 from django.db import models
 
+
 class LegalResearchTaskStatus(models.TextChoices):
     PENDING = "pending", "待执行"
     QUEUED = "queued", "排队中"
@@ -13,9 +14,11 @@ class LegalResearchTaskStatus(models.TextChoices):
     FAILED = "failed", "失败"
     CANCELLED = "cancelled", "已取消"
 
+
 class LegalResearchSearchMode(models.TextChoices):
     EXPANDED = "expanded", "扩展检索"
     SINGLE = "single", "单检索"
+
 
 class LegalResearchTask(models.Model):
     legacy_uuid = models.UUIDField(default=uuid4, editable=False, db_index=True, verbose_name="历史UUID")

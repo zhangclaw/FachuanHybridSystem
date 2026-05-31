@@ -6,6 +6,7 @@ from django.urls import URLPattern, path
 
 from apps.cases.models import CaseParty
 
+
 @admin.register(CaseParty)
 class CasePartyAdmin(admin.ModelAdmin):
     list_display = ("id", "case", "client", "is_our_client", "legal_status")

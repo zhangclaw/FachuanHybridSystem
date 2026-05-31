@@ -36,6 +36,7 @@ from .base import ChatProvider, ChatResult, MessageContent
 
 logger = logging.getLogger(__name__)
 
+
 class DingtalkProvider(DingtalkTokenMixin, DingtalkFileMixin, ChatProvider):
     """钉钉群聊提供者
 
@@ -152,7 +153,7 @@ class DingtalkProvider(DingtalkTokenMixin, DingtalkFileMixin, ChatProvider):
             self._send_initial_message(chat_id, chat_name)
 
             result = ChatResult(
-                success=True, chat_id=chat_id, chat_name=chat_name, message=str("群聊创建成功"), raw_response=data
+                success=True, chat_id=chat_id, chat_name=chat_name, message="群聊创建成功", raw_response=data
             )
             if result.raw_response:
                 result.raw_response["owner_info"] = {
@@ -241,7 +242,7 @@ class DingtalkProvider(DingtalkTokenMixin, DingtalkFileMixin, ChatProvider):
 
             logger.info(f"成功发送钉钉消息到群聊: {chat_id}")
 
-            return ChatResult(success=True, chat_id=chat_id, message=str("消息发送成功"), raw_response=data)
+            return ChatResult(success=True, chat_id=chat_id, message="消息发送成功", raw_response=data)
 
         except MessageSendException:
             raise
@@ -309,7 +310,7 @@ class DingtalkProvider(DingtalkTokenMixin, DingtalkFileMixin, ChatProvider):
                 success=True,
                 chat_id=chat_id,
                 chat_name=chat_name,
-                message=str("获取群聊信息成功"),
+                message="获取群聊信息成功",
                 raw_response=data,
             )
 

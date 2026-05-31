@@ -12,6 +12,7 @@ from django.utils.html import format_html
 
 from apps.chat_records.models import ChatRecordExportTask, ChatRecordProject, ChatRecordRecording, ChatRecordScreenshot
 
+
 @admin.register(ChatRecordProject)
 class ChatRecordProjectAdmin(admin.ModelAdmin):
     list_display = ("id", "name", "created_by", "created_at", "workbench_link")
@@ -45,12 +46,14 @@ class ChatRecordProjectAdmin(admin.ModelAdmin):
         }
         return TemplateResponse(request, "admin/chat_records/workbench.html", context)
 
+
 @admin.register(ChatRecordScreenshot)
 class ChatRecordScreenshotAdmin(admin.ModelAdmin):
     list_display = ("id", "project", "ordering", "title", "created_at")
     search_fields = ("title", "note", "sha256")
     list_filter = ("project",)
     readonly_fields = ("created_at", "sha256")
+
 
 @admin.register(ChatRecordExportTask)
 class ChatRecordExportTaskAdmin(admin.ModelAdmin):
@@ -82,6 +85,7 @@ class ChatRecordExportTaskAdmin(admin.ModelAdmin):
         if not obj.output_file:
             return "-"
         return format_html('<a href="/api/v1/chat-records/exports/{}/download">下载</a>', obj.id)
+
 
 @admin.register(ChatRecordRecording)
 class ChatRecordRecordingAdmin(admin.ModelAdmin):

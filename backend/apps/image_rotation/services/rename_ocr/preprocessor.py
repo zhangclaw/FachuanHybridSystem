@@ -16,6 +16,7 @@ from PIL import Image, ImageEnhance, ImageFilter
 
 logger = logging.getLogger("apps.image_rotation")
 
+
 @dataclass
 class PreprocessConfig:
     """预处理配置参数"""
@@ -29,10 +30,12 @@ class PreprocessConfig:
     target_width: int = 1500
     enable_binarize: bool = False
 
+
 ENHANCED_CONFIG = PreprocessConfig(
     contrast_factor=2.0,
     enable_binarize=True,
 )
+
 
 class ImagePreprocessor:
     """图片预处理器 - OCR 前的图片增强"""

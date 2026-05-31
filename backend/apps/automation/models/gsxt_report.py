@@ -8,6 +8,7 @@ from django.db import models
 
 from apps.core.filesystem.upload_paths import DatedUUIDPath
 
+
 class GsxtReportStatus(models.TextChoices):
     """任务状态。"""
 
@@ -16,6 +17,7 @@ class GsxtReportStatus(models.TextChoices):
     WAITING_EMAIL = "waiting_email", "等待邮件"
     SUCCESS = "success", "成功"
     FAILED = "failed", "失败"
+
 
 class GsxtReportTask(models.Model):
     """国家企业信用信息公示系统报告下载任务。"""

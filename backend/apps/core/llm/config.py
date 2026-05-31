@@ -22,6 +22,7 @@ if TYPE_CHECKING:
     from apps.core.llm.backends.base import BackendConfig
     from apps.core.services.system_config_service import SystemConfigService
 
+
 class LLMConfig:
     """
     LLM 配置管理器

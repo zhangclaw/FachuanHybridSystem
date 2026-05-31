@@ -7,6 +7,7 @@ from typing import Any
 
 from mcp_server.client import client
 
+
 def trigger_case_import(file_base64: str, filename: str) -> dict[str, Any]:
     """上传 Excel 文件触发 OA 案件导入预览。file_base64 为 Excel 文件的 base64 编码。返回 session_id 用于查询进度。"""
     file_bytes = base64.b64decode(file_base64)

@@ -28,6 +28,7 @@ _SOURCE_NAME_WIDGET = forms.TextInput(
     }
 )
 
+
 class ExternalTemplateAddForm(forms.ModelForm[ExternalTemplate]):
     """新增外部模板表单"""
 
@@ -44,6 +45,7 @@ class ExternalTemplateAddForm(forms.ModelForm[ExternalTemplate]):
             "source_name": _SOURCE_NAME_WIDGET,
         }
 
+
 class ExternalTemplateChangeForm(forms.ModelForm[ExternalTemplate]):
     """编辑外部模板表单"""
 
@@ -54,17 +56,20 @@ class ExternalTemplateChangeForm(forms.ModelForm[ExternalTemplate]):
             "source_name": _SOURCE_NAME_WIDGET,
         }
 
+
 def _get_analysis_service() -> Any:
     """工厂函数获取分析服务"""
     from apps.documents.services.infrastructure.wiring import get_analysis_service
 
     return get_analysis_service()
 
+
 def _get_filling_service() -> Any:
     """工厂函数获取填充服务"""
     from apps.documents.services.infrastructure.wiring import get_filling_service
 
     return get_filling_service()
+
 
 class ExternalTemplateFieldMappingInline(admin.TabularInline):
     """字段映射 Inline（只读展示，由 LLM 分析自动生成）"""
@@ -82,6 +87,7 @@ class ExternalTemplateFieldMappingInline(admin.TabularInline):
         "semantic_label",
         "fill_type",
     )
+
 
 @admin.register(ExternalTemplate)
 class ExternalTemplateAdmin(admin.ModelAdmin):

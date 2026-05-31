@@ -8,6 +8,7 @@ from django.utils import timezone
 from apps.batch_printing.admin.batch_printing_admin import PrintKeywordRuleAdmin
 from apps.batch_printing.models import PrintKeywordRule, PrintPresetSnapshot
 
+
 @pytest.mark.django_db
 def test_print_keyword_rule_admin_form_hides_manual_printer_field() -> None:
     admin = PrintKeywordRuleAdmin(PrintKeywordRule, AdminSite())

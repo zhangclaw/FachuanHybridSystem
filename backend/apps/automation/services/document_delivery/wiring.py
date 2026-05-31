@@ -17,6 +17,7 @@ if TYPE_CHECKING:
     from .repo.document_history_repo import DocumentHistoryRepo
     from .token.document_delivery_token_service import DocumentDeliveryTokenService
 
+
 def build_document_delivery_coordinator(
     *,
     case_matcher: CaseMatcher | None = None,

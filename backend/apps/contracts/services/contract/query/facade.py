@@ -13,6 +13,7 @@ from ..assemblers.contract_list_assembler import ContractListAssembler
 from ..domain import ContractAccessPolicy
 from .service import ContractQueryService
 
+
 class ContractQueryFacade:
     def __init__(
         self,

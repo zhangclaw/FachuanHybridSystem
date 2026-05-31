@@ -17,6 +17,7 @@ from .repo import CasePartyCommandRepo
 
 logger = logging.getLogger("apps.cases")
 
+
 class CasePartyMutationService:
     def __init__(
         self,
@@ -50,7 +51,7 @@ class CasePartyMutationService:
             raise ValidationException(
                 message="当事人必须属于绑定合同的当事人范围",
                 code="PARTY_NOT_IN_CONTRACT_SCOPE",
-                errors={"client_id": str("当事人必须属于绑定合同的当事人范围")},
+                errors={"client_id": "当事人必须属于绑定合同的当事人范围"},
             )
         return True
 
@@ -74,7 +75,7 @@ class CasePartyMutationService:
                 message="诉讼地位 %(status)s 不适用于当前案件" % {"status": legal_status},
                 code="INCOMPATIBLE_LEGAL_STATUS",
                 errors={
-                    "legal_status": str("诉讼地位与现有当事人不兼容"),
+                    "legal_status": "诉讼地位与现有当事人不兼容",
                     "attempted_status": legal_status,
                 },
             )
@@ -129,7 +130,7 @@ class CasePartyMutationService:
                     message=conflict_msg,
                     code="OUR_PARTY_LEGAL_STATUS_CONFLICT",
                     errors={
-                        "legal_status": str("我方当事人不能同时处于对立诉讼地位"),
+                        "legal_status": "我方当事人不能同时处于对立诉讼地位",
                         "conflicting_party": client_name,
                         "conflicting_status": existing_status,
                     },

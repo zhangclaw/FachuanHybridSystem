@@ -8,6 +8,7 @@ from typing import Any
 
 from apps.core.utils.path import Path
 
+
 class DocxPreviewService:
     """从 docx 模板提取占位符，与上下文匹配后返回键值对预览"""
 

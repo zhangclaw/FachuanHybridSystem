@@ -1,5 +1,6 @@
 from typing import Any
 
+
 def __getattr__(name: str) -> Any:
     """延迟导入避免循环依赖"""
     if name == "EvidenceFileService":
@@ -39,6 +40,7 @@ def __getattr__(name: str) -> Any:
 
         return evidence_file_storage
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
 
 __all__ = [
     "EvidenceFileService",

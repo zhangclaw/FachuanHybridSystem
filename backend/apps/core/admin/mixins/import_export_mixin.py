@@ -20,6 +20,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("apps.core")
 
+
 class AdminImportExportMixin:
     """
     为 ModelAdmin 提供 ZIP 格式导入导出功能。
@@ -110,9 +111,7 @@ class AdminImportExportMixin:
                     raise ValueError("第 %(i)d 条记录格式错误" % {"i": i})
                 missing = [f for f in required if not item.get(f)]
                 if missing:
-                    raise ValueError(
-                        "第 %(i)d 条记录缺少必填字段: %(fields)s" % {"i": i, "fields": ", ".join(missing)}
-                    )
+                    raise ValueError("第 %(i)d 条记录缺少必填字段: %(fields)s" % {"i": i, "fields": ", ".join(missing)})
             self._extract_files(zf)
             return self.handle_json_import(data_list, user, zf)  # type: ignore[attr-defined,no-any-return]
 

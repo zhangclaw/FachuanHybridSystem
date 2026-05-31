@@ -9,6 +9,7 @@ from django.db import transaction
 from apps.cases.services.case.repo.case_full_create_repo import CaseFullCreateRepo
 from apps.core.exceptions import ConflictError, ValidationException
 
+
 class CaseFullCreateWorkflow:
     def __init__(self, case_service: Any, repo: CaseFullCreateRepo | None = None) -> None:
         self.case_service = case_service
@@ -38,7 +39,7 @@ class CaseFullCreateWorkflow:
             raise ValidationException(
                 message="操作人不能为空",
                 code="MISSING_ACTOR",
-                errors={"actor_id": str("创建日志时必须提供有效的操作人")},
+                errors={"actor_id": "创建日志时必须提供有效的操作人"},
             )
 
         case = self.case_service.create_case(case_data, user=user)

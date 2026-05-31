@@ -16,6 +16,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+
 class EvidenceService:
     SUPPORTED_FORMATS = EvidenceFileService.SUPPORTED_FORMATS
     MAX_FILE_SIZE = EvidenceFileService.MAX_FILE_SIZE

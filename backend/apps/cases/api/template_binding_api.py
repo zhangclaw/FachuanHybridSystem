@@ -25,11 +25,13 @@ router = Router()
 
 # ==================== Factory Function ====================
 
+
 def _get_binding_service() -> Any:
     """工厂函数:获取案件模板绑定服务"""
     from apps.cases.services.template.wiring import get_case_template_binding_service
 
     return get_case_template_binding_service()
+
 
 def _get_generation_service() -> Any:
     """工厂函数:获取案件模板生成服务"""
@@ -37,13 +39,16 @@ def _get_generation_service() -> Any:
 
     return CaseTemplateGenerationService()
 
+
 def _get_unified_template_generation_service() -> Any:
     """工厂函数:获取统一模板生成服务"""
     from apps.cases.services import UnifiedTemplateGenerationService
 
     return UnifiedTemplateGenerationService()
 
+
 # ==================== API Endpoints ====================
+
 
 @router.get("/{case_id}/template-bindings", response=BindingsResponseSchema)
 def get_case_template_bindings(request: HttpRequest, case_id: int) -> Any:
@@ -55,6 +60,7 @@ def get_case_template_bindings(request: HttpRequest, case_id: int) -> Any:
     service = _get_binding_service()
     return service.get_bindings_for_case(case_id)
 
+
 @router.post("/{case_id}/template-bindings", response=TemplateBindingSchema)
 def bind_template_to_case(request: HttpRequest, case_id: int, payload: BindTemplateRequestSchema) -> Any:
     """
@@ -64,6 +70,7 @@ def bind_template_to_case(request: HttpRequest, case_id: int, payload: BindTempl
     """
     service = _get_binding_service()
     return service.bind_template(case_id, payload.template_id)
+
 
 @router.delete("/{case_id}/template-bindings/{binding_id}", response=SuccessResponseSchema)
 def unbind_template_from_case(request: HttpRequest, case_id: int, binding_id: int) -> dict[str, bool]:
@@ -76,6 +83,7 @@ def unbind_template_from_case(request: HttpRequest, case_id: int, binding_id: in
     service.unbind_template(case_id, binding_id)
     return {"success": True}
 
+
 @router.get("/{case_id}/available-templates", response=list[AvailableTemplateSchema])
 def get_available_templates(request: HttpRequest, case_id: int) -> Any:
     """
@@ -85,6 +93,7 @@ def get_available_templates(request: HttpRequest, case_id: int) -> Any:
     """
     service = _get_binding_service()
     return service.get_available_templates(case_id)
+
 
 @router.post("/{case_id}/generate-template")
 def generate_template_document(
@@ -119,7 +128,9 @@ def generate_template_document(
     response["Content-Disposition"] = f"attachment; filename*=UTF-8''{filename}"
     return response
 
+
 # ==================== Helper Functions ====================
+
 
 def _build_file_response(content: bytes, filename: str) -> HttpResponse:
     """
@@ -138,7 +149,9 @@ def _build_file_response(content: bytes, filename: str) -> HttpResponse:
     response["Content-Disposition"] = f"attachment; filename*=UTF-8''{encoded_filename}"
     return response
 
+
 # ==================== Unified Template Generation API ====================
+
 
 @router.post("/{case_id}/unified-generate")
 def unified_generate_template(request: HttpRequest, case_id: int, payload: UnifiedGenerateRequest) -> HttpResponse:

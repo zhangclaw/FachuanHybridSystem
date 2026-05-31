@@ -23,6 +23,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("apps.chat_records")
 
+
 class ScreenshotService:
     MAX_IMAGE_SIZE_BYTES = 20 * 1024 * 1024
 

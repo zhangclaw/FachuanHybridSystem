@@ -10,6 +10,7 @@
 
 from django.db import models
 
+
 class CaseType(models.TextChoices):
     """案件类型"""
 
@@ -20,6 +21,7 @@ class CaseType(models.TextChoices):
     INTL = "intl", "商事仲裁"
     SPECIAL = "special", "专项服务"
     ADVISOR = "advisor", "常法顾问"
+
 
 class LegalStatus(models.TextChoices):
     """诉讼地位"""
@@ -37,11 +39,13 @@ class LegalStatus(models.TextChoices):
     ORIGINAL_DEFENDANT = "orig_defendant", "原审被告"
     ORIGINAL_THIRD = "orig_third", "原审第三人"
 
+
 class CaseStatus(models.TextChoices):
     """案件状态"""
 
     ACTIVE = "active", "在办"
     CLOSED = "closed", "已结案"
+
 
 class CaseStage(models.TextChoices):
     """案件阶段"""
@@ -65,6 +69,7 @@ class CaseStage(models.TextChoices):
     APPLY_PROTEST = "apply_protest", "申请抗诉"
     PETITION_PROTEST = "petition_protest", "申诉抗诉"
 
+
 class AuthorityType(models.TextChoices):
     """主管机关性质"""
 
@@ -72,6 +77,7 @@ class AuthorityType(models.TextChoices):
     PROSECUTION = "prosecution", "审查起诉机关"
     TRIAL = "trial", "审理机构"
     DETENTION = "detention", "当前关押地点"
+
 
 class ContactRole(models.TextChoices):
     """工作人员角色"""
@@ -86,6 +92,7 @@ class ContactRole(models.TextChoices):
     MEDIATOR = "mediator", "调解员"
     OTHER = "other", "其他"
 
+
 class SimpleCaseType(models.TextChoices):
     """案件类型（简化版）"""
 
@@ -94,6 +101,7 @@ class SimpleCaseType(models.TextChoices):
     CRIMINAL = "criminal", "刑事"
     EXECUTION = "execution", "申请执行"
     BANKRUPTCY = "bankruptcy", "破产"
+
 
 class CaseLogReminderType(models.TextChoices):
     """案件日志提醒类型"""
@@ -104,6 +112,7 @@ class CaseLogReminderType(models.TextChoices):
     STATUTE_LIMITATIONS = "statute_limitations", "时效"
     APPEAL_PERIOD = "appeal_period", "上诉期"
     OTHER = "other", "其他"
+
 
 class ChatPlatform(models.TextChoices):
     """群聊平台枚举"""

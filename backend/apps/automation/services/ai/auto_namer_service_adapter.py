@@ -13,6 +13,7 @@ from apps.core.interfaces import IAutoNamerService, IDocumentProcessingService
 
 logger = logging.getLogger("apps.automation")
 
+
 class AutoNamerServiceAdapter(IAutoNamerService):
     """
     自动命名服务适配器

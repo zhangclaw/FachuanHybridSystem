@@ -2,6 +2,7 @@
 
 from apps.litigation_ai.placeholders.spec import LitigationPlaceholderKeys
 
+
 class LitigationPlaceholderContextService:
     def build_fixed_blocks(self, case_id: int, document_type: str) -> dict[str, str]:
         from apps.documents.services.placeholders.litigation import (

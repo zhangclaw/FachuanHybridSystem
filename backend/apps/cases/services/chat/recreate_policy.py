@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
+
 class ChatRecreatePolicy:
     def should_recreate(self, *, result: Any) -> bool:
         if not result.error_code:

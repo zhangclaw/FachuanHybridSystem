@@ -17,6 +17,7 @@ from apps.documents.models import Placeholder
 
 logger = logging.getLogger(__name__)
 
+
 class PlaceholderService:
     """
     占位符服务

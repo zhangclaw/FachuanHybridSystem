@@ -9,6 +9,7 @@ from typing import Any, ClassVar
 from django.conf import settings
 from django.db import models
 
+
 class InvoiceCategory(models.TextChoices):
     """发票类目"""
 
@@ -23,6 +24,7 @@ class InvoiceCategory(models.TextChoices):
     TOLL_RECEIPT = "toll_receipt", "过路费发票"
     OTHER = "other", "其他"
 
+
 class InvoiceRecognitionTaskStatus(models.TextChoices):
     """发票识别任务状态"""
 
@@ -31,12 +33,14 @@ class InvoiceRecognitionTaskStatus(models.TextChoices):
     COMPLETED = "completed", "已完成"
     FAILED = "failed", "失败"
 
+
 class InvoiceRecordStatus(models.TextChoices):
     """发票记录识别状态"""
 
     PENDING = "pending", "待识别"
     SUCCESS = "success", "识别成功"
     FAILED = "failed", "识别失败"
+
 
 class InvoiceRecognitionTask(models.Model):
     """发票识别任务。"""
@@ -70,6 +74,7 @@ class InvoiceRecognitionTask(models.Model):
 
     def __str__(self) -> str:
         return f"{self.name} ({self.get_status_display()})"
+
 
 class InvoiceRecord(models.Model):
     """发票记录。"""

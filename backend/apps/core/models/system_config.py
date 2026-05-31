@@ -10,6 +10,7 @@ from typing import ClassVar
 
 from django.db import models
 
+
 class SystemConfig(models.Model):
     """系统配置模型
 

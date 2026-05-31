@@ -7,7 +7,6 @@ from typing import TYPE_CHECKING, ClassVar
 
 from django.conf import settings
 from django.db import models
-
 from django_lifecycle import AFTER_CREATE, LifecycleModel, hook
 
 if TYPE_CHECKING:
@@ -16,6 +15,7 @@ if TYPE_CHECKING:
     from apps.cases.models import Case
 
 logger = logging.getLogger("apps.automation")
+
 
 class QuoteStatus(models.TextChoices):
     """询价任务状态"""
@@ -26,11 +26,13 @@ class QuoteStatus(models.TextChoices):
     PARTIAL_SUCCESS = "partial_success", "部分成功"
     FAILED = "failed", "失败"
 
+
 class QuoteItemStatus(models.TextChoices):
     """单个报价状态"""
 
     SUCCESS = "success", "成功"
     FAILED = "failed", "失败"
+
 
 class PreservationQuote(LifecycleModel):
     """财产保全询价任务"""
@@ -41,9 +43,7 @@ class PreservationQuote(LifecycleModel):
     preserve_amount = models.DecimalField(
         max_digits=15, decimal_places=2, verbose_name="保全金额", help_text="需要保全的财产金额"
     )
-    corp_id = models.CharField(
-        max_length=32, default="2550", verbose_name="法院ID", help_text="法院系统中的法院标识"
-    )
+    corp_id = models.CharField(max_length=32, default="2550", verbose_name="法院ID", help_text="法院系统中的法院标识")
     category_id = models.CharField(
         max_length=32, default="127000", verbose_name="分类ID", help_text="保全分类ID (cPid)"
     )
@@ -111,6 +111,7 @@ class PreservationQuote(LifecycleModel):
                 exc_info=True,
             )
 
+
 class InsuranceQuote(models.Model):
     """保险公司报价记录"""
 
@@ -155,9 +156,7 @@ class InsuranceQuote(models.Model):
     )
     status = models.CharField(max_length=32, choices=QuoteItemStatus.choices, verbose_name="查询状态")
     error_message = models.TextField(null=True, blank=True, verbose_name="错误信息")
-    response_data = models.JSONField(
-        null=True, blank=True, verbose_name="完整响应", help_text="API 返回的完整响应数据"
-    )
+    response_data = models.JSONField(null=True, blank=True, verbose_name="完整响应", help_text="API 返回的完整响应数据")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
 
     class Meta:
@@ -175,6 +174,7 @@ class InsuranceQuote(models.Model):
         if self.min_amount:
             return f"{self.company_name} - ¥{self.min_amount}"
         return f"{self.company_name} - {self.get_status_display()}"
+
 
 class CasePreservationQuoteBinding(models.Model):
     """案件与财产保全询价绑定关系。"""

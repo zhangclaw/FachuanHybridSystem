@@ -7,9 +7,11 @@ from typing import ClassVar
 
 from django.db import models
 
+
 class SessionStatus(models.TextChoices):
     ACTIVE = "active", "活跃"
     ARCHIVED = "archived", "已归档"
+
 
 class WorkbenchSession(models.Model):
     """工作台会话"""

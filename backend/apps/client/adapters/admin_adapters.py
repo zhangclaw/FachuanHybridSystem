@@ -14,15 +14,19 @@ from django.core.files.base import ContentFile
 
 logger = logging.getLogger(__name__)
 
+
 def _get_gsxt_report_task_model() -> Any:
     return django_apps.get_model("automation", "GsxtReportTask")
+
 
 def _get_gsxt_report_status_enum() -> Any:
     module = import_module("apps.automation.models.gsxt_report")
     return module.GsxtReportStatus
 
+
 def _get_account_credential_model() -> Any:
     return django_apps.get_model("organization", "AccountCredential")
+
 
 class GsxtReportAdapter:
     """企业信用报告适配器。"""
@@ -86,6 +90,7 @@ class GsxtReportAdapter:
         gsxt_report_status = _get_gsxt_report_status_enum()
 
         return gsxt_report_status.choices  # type: ignore[no-any-return]
+
 
 class CredentialAdapter:
     """账号凭证适配器。"""

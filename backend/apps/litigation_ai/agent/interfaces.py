@@ -10,6 +10,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Callable
 from typing import Any
 
+
 class ILitigationAgentService(ABC):
     """
     诉讼 Agent 服务接口
@@ -75,6 +76,7 @@ class ILitigationAgentService(ABC):
         """
         pass
 
+
 class IAgentFactory(ABC):
     """
     Agent 工厂接口
@@ -101,6 +103,7 @@ class IAgentFactory(ABC):
             配置好的 Agent 实例
         """
         pass
+
 
 class IMemoryMiddleware(ABC):
     """

@@ -10,6 +10,7 @@ from ninja import ModelSchema, Schema
 from apps.contacts.models import CaseContact
 from apps.core.api.schemas import SchemaMixin
 
+
 class CaseContactIn(Schema):
     case_id: int
     authority_id: int | None = None
@@ -19,6 +20,7 @@ class CaseContactIn(Schema):
     address: str | None = None
     stage: str | None = None
     note: str | None = None
+
 
 class CaseContactOut(ModelSchema, SchemaMixin):
     role_display: str | None
@@ -69,6 +71,7 @@ class CaseContactOut(ModelSchema, SchemaMixin):
     def resolve_updated_at(obj: CaseContact) -> datetime | None:
         return SchemaMixin._resolve_datetime(getattr(obj, "updated_at", None))
 
+
 class CaseContactUpdate(Schema):
     authority_id: int | None = None
     name: str | None = None
@@ -77,6 +80,7 @@ class CaseContactUpdate(Schema):
     address: str | None = None
     stage: str | None = None
     note: str | None = None
+
 
 class CaseContactSearchResult(Schema):
     authority_name: str | None = None
@@ -87,6 +91,7 @@ class CaseContactSearchResult(Schema):
     address: str | None = None
     occurrence_count: int = 1
     case_ids: list[int] = []
+
 
 __all__: list[str] = [
     "CaseContactIn",

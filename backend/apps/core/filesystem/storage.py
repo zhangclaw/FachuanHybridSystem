@@ -6,6 +6,7 @@
 
 from django.core.files.storage import FileSystemStorage
 
+
 class KeepOriginalNameStorage(FileSystemStorage):
     """
     自定义存储类,保持原文件名(包括括号等特殊字符)

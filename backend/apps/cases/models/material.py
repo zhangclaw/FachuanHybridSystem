@@ -11,13 +11,16 @@ from .case import Case, SupervisingAuthority
 from .log import CaseLogAttachment
 from .party import CaseParty
 
+
 class CaseMaterialCategory(models.TextChoices):
     PARTY = "party", "当事人材料"
     NON_PARTY = "non_party", "非当事人材料"
 
+
 class CaseMaterialSide(models.TextChoices):
     OUR = "our", "我方当事人材料"
     OPPONENT = "opponent", "对方当事人材料"
+
 
 class CaseMaterialType(models.Model):
     id: int
@@ -50,6 +53,7 @@ class CaseMaterialType(models.Model):
         scope = self.law_firm.name if self.law_firm_id and self.law_firm else "全局"
         category_display = self.get_category_display()
         return f"{scope}-{category_display}-{self.name}"
+
 
 class CaseMaterial(models.Model):
     id: int
@@ -104,11 +108,10 @@ class CaseMaterial(models.Model):
         category_display = self.get_category_display()
         return f"{self.case_id}-{category_display}-{self.type_name}"
 
+
 class CaseMaterialGroupOrder(models.Model):
     id: int
-    case = models.ForeignKey(
-        Case, on_delete=models.CASCADE, related_name="material_group_orders", verbose_name="案件"
-    )
+    case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name="material_group_orders", verbose_name="案件")
     category = models.CharField(max_length=32, choices=CaseMaterialCategory.choices, verbose_name="材料大类")
     side = models.CharField(
         max_length=32,
@@ -147,14 +150,13 @@ class CaseMaterialGroupOrder(models.Model):
     def __str__(self) -> str:
         return f"{self.case_id}-{self.category}-{self.sort_index}"
 
+
 class CaseFolderBinding(models.Model):
     """案件文件夹绑定"""
 
     id: int
     case = models.OneToOneField(Case, on_delete=models.CASCADE, related_name="folder_binding", verbose_name="案件")
-    folder_path = models.CharField(
-        max_length=1000, verbose_name="文件夹路径", help_text="绑定的本地或网络文件夹路径"
-    )
+    folder_path = models.CharField(max_length=1000, verbose_name="文件夹路径", help_text="绑定的本地或网络文件夹路径")
     relative_path = models.CharField(
         max_length=500,
         blank=True,

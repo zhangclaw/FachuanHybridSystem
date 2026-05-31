@@ -14,6 +14,7 @@ from apps.documents.services.placeholders.fallback import build_docx_render_cont
 
 logger = logging.getLogger("apps.cases.services")
 
+
 class DocxRenderer:
     def render(self, *, template_path: Path, context: dict[str, Any]) -> bytes:
         try:

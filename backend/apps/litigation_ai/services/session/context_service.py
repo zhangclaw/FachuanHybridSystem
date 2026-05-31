@@ -13,6 +13,7 @@ from apps.core.exceptions import NotFoundError
 
 logger = logging.getLogger("apps.litigation_ai")
 
+
 class LitigationContextService:
     """
     诉讼文书生成上下文服务

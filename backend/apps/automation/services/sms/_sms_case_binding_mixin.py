@@ -11,6 +11,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("apps.automation")
 
+
 class SMSCaseBindingMixin:
     """负责案件绑定、案号写入逻辑"""
 

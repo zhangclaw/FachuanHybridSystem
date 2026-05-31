@@ -6,5 +6,6 @@ from typing import Any
 
 from apps.core.interfaces import ServiceLocator
 
+
 def get_case_filing_number_service() -> Any:
     return ServiceLocator.get_case_filing_number_service()

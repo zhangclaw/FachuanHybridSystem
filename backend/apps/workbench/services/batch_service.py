@@ -23,12 +23,14 @@ logger = logging.getLogger(__name__)
 
 _EXCEL_EXTS = {".xls", ".xlsx"}
 
+
 def _is_excel(filename: str) -> bool:
     """判断文件是否为 Excel 格式"""
     if not filename or "." not in filename:
         return False
     ext = "." + filename.rsplit(".", 1)[-1].lower()
     return ext in _EXCEL_EXTS
+
 
 def _split_excel_rows(uploaded_file: Any) -> list[tuple[str, str]]:
     """将 Excel 文件拆分为多行文本
@@ -93,6 +95,7 @@ def _split_excel_rows(uploaded_file: Any) -> list[tuple[str, str]]:
 
     logger.info("Excel 拆分完成: %s → %d 行", uploaded_file.name, len(results))
     return results
+
 
 class BatchAnalysisService(PermissionMixin):
     """批量分析任务服务"""

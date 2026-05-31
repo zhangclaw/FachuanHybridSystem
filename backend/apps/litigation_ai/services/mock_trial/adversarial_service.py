@@ -35,6 +35,7 @@ from .types import AdversarialConfig, MockTrialContext, MockTrialStep, TrialLeve
 
 logger = logging.getLogger("apps.litigation_ai")
 
+
 class AdversarialTrialService:
     """多 Agent 对抗模拟庭审引擎 — 严格按照民事诉讼法庭审程序."""
 

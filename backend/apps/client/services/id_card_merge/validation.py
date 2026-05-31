@@ -5,8 +5,8 @@ from typing import Any
 
 import numpy as np
 from django.core.files.uploadedfile import UploadedFile
-
 from numpy.typing import NDArray
+
 
 def validate_image_format(
     image: UploadedFile,
@@ -33,6 +33,7 @@ def validate_image_format(
             }
     return None
 
+
 def validate_image_size(image: NDArray[np.uint8], name: str, *, min_image_size: int) -> dict[str, Any] | None:
     height, width = image.shape[:2]
     if width < min_image_size or height < min_image_size:
@@ -43,6 +44,7 @@ def validate_image_size(image: NDArray[np.uint8], name: str, *, min_image_size: 
             % {"name": name, "w": width, "h": height},
         }
     return None
+
 
 def order_corners(corners: NDArray[np.float32]) -> NDArray[np.float32]:
     corners = corners.astype(np.float32)
@@ -55,6 +57,7 @@ def order_corners(corners: NDArray[np.float32]) -> NDArray[np.float32]:
     ordered[1] = corners[np.argmax(diff_coords)]
     ordered[3] = corners[np.argmin(diff_coords)]
     return ordered
+
 
 def validate_corners(corners: list[list[int]]) -> str | None:
     if not corners or len(corners) != 4:
@@ -78,6 +81,7 @@ def validate_corners(corners: list[list[int]]) -> str | None:
         return "四角坐标不构成凸四边形"
 
     return None
+
 
 def is_convex_quadrilateral(corners: NDArray[np.float32]) -> bool:
     n = len(corners)

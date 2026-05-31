@@ -3,6 +3,7 @@
 from dataclasses import dataclass, field
 from typing import Any
 
+
 @dataclass
 class DocumentTemplateDTO:
     id: int
@@ -20,6 +21,7 @@ class DocumentTemplateDTO:
     case_type: str | None = None
     is_active: bool = True
 
+
 @dataclass
 class GenerationTaskDTO:
     id: int
@@ -28,6 +30,7 @@ class GenerationTaskDTO:
     created_by_id: int | None = None
     document_name: str | None = None
     document_url: str | None = None
+
 
 @dataclass
 class EvidenceItemDigestDTO:

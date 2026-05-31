@@ -9,6 +9,7 @@ from typing import Any, cast
 
 logger = logging.getLogger(__name__)
 
+
 class BusinessConfigService:
     """业务配置服务
 

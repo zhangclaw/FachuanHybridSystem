@@ -27,6 +27,7 @@ HIGH_RISK_TOOLS: frozenset[str] = frozenset(
     }
 )
 
+
 class ApprovalManager:
     """管理高风险工具的审批流程"""
 
@@ -74,8 +75,10 @@ class ApprovalManager:
             self._results.pop(approval_id, None)
             self._user_ids.pop(approval_id, None)
 
+
 # 模块级单例
 approval_manager = ApprovalManager()
+
 
 async def process_tool_call_with_approval(
     ctx: Any,

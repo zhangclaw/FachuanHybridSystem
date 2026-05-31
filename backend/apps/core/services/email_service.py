@@ -16,6 +16,7 @@ from .email_config_service import EmailConfigService
 
 logger = logging.getLogger(__name__)
 
+
 class EmailService:
     """邮件发送服务"""
 

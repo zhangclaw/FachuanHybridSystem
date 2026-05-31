@@ -6,7 +6,6 @@ from io import BytesIO
 from typing import Any
 
 from django.http import FileResponse, Http404, HttpResponse
-
 from ninja import Router
 
 from apps.core.infrastructure.throttling import rate_limit_from_settings
@@ -25,14 +24,18 @@ from apps.legal_research.services.task.service import LegalResearchTaskService
 
 router = Router(tags=["案例检索"], auth=JWTOrSessionAuth())
 
+
 def _get_service() -> LegalResearchTaskService:
     return LegalResearchTaskService()
+
 
 def _get_capability_service() -> LegalResearchCapabilityService:
     return LegalResearchCapabilityService()
 
+
 def _get_capability_mcp_wrapper() -> LegalResearchCapabilityMcpWrapper:
     return LegalResearchCapabilityMcpWrapper()
+
 
 def _serialize_task(task: Any) -> LegalResearchTaskOut:
     return LegalResearchTaskOut(
@@ -62,6 +65,7 @@ def _serialize_task(task: Any) -> LegalResearchTaskOut:
         updated_at=task.updated_at,
     )
 
+
 def _serialize_result(result: Any) -> LegalResearchResultOut:
     return LegalResearchResultOut(
         id=result.id,
@@ -80,10 +84,12 @@ def _serialize_result(result: Any) -> LegalResearchResultOut:
         created_at=result.created_at,
     )
 
+
 @router.post("/tasks", response=LegalResearchCreateOut)
 def create_task(request: Any, payload: LegalResearchTaskCreateIn) -> LegalResearchCreateOut:
     task = _get_service().create_task(payload=payload, user=getattr(request, "user", None))
     return LegalResearchCreateOut(task_id=task.id, status=task.status)
+
 
 @router.post("/capability/search", response=AgentSearchResponseV1)
 def capability_search(request: Any, payload: AgentSearchRequestV1) -> AgentSearchResponseV1:
@@ -95,6 +101,7 @@ def capability_search(request: Any, payload: AgentSearchRequestV1) -> AgentSearc
         idempotency_key=idempotency_key,
     )
 
+
 @router.post("/capability/search/mcp", response=dict[str, Any])
 def capability_search_mcp(request: Any, payload: AgentSearchRequestV1) -> dict[str, Any]:
     headers = getattr(request, "headers", {}) or {}
@@ -105,15 +112,18 @@ def capability_search_mcp(request: Any, payload: AgentSearchRequestV1) -> dict[s
         idempotency_key=idempotency_key,
     )
 
+
 @router.get("/tasks/{task_id}", response=LegalResearchTaskOut)
 def get_task(request: Any, task_id: int) -> LegalResearchTaskOut:
     task = _get_service().get_task(task_id=task_id, user=getattr(request, "user", None))
     return _serialize_task(task)
 
+
 @router.get("/tasks/{task_id}/results", response=list[LegalResearchResultOut])
 def list_results(request: Any, task_id: int) -> list[LegalResearchResultOut]:
     results = _get_service().list_results(task_id=task_id, user=getattr(request, "user", None))
     return [_serialize_result(x) for x in results]
+
 
 @router.get("/tasks/{task_id}/results/{result_id}/download")
 @rate_limit_from_settings("EXPORT", by_user=True)
@@ -124,6 +134,7 @@ def download_single_result(request: Any, task_id: int, result_id: int) -> FileRe
 
     filename = (result.pdf_file.name or "").split("/")[-1]
     return FileResponse(result.pdf_file.open("rb"), as_attachment=True, filename=filename)
+
 
 @router.get("/tasks/{task_id}/results/download")
 @rate_limit_from_settings("EXPORT", by_user=True)

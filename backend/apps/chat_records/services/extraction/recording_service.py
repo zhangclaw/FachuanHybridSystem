@@ -22,6 +22,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+
 class RecordingService:
     DEFAULT_MAX_VIDEO_SIZE_BYTES = 2 * 1024 * 1024 * 1024
 

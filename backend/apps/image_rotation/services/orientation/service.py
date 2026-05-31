@@ -9,6 +9,7 @@ from PIL import Image
 
 logger = logging.getLogger("apps.image_rotation")
 
+
 class OrientationDetectionService:
     """
     图片方向检测服务

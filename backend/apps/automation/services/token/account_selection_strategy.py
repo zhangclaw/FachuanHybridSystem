@@ -17,6 +17,7 @@ from .cache_manager import cache_manager
 
 logger = logging.getLogger(__name__)
 
+
 class AccountSelectionStrategy:
     """
     账号选择策略实现

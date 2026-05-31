@@ -17,6 +17,7 @@ logger = logging.getLogger("apps.documents.generation")
 
 TOutput = TypeVar("TOutput", bound=BaseModel)
 
+
 class LitigationLLMGenerator:
     def __init__(self, llm_service: object | None = None) -> None:
         self._llm_service = llm_service

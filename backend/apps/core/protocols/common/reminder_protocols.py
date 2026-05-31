@@ -5,6 +5,7 @@ from typing import Any, Protocol
 
 from apps.core.dto import ReminderDTO, ReminderTypeDTO
 
+
 class IReminderService(Protocol):
     def create_case_log_reminder_internal(
         self,

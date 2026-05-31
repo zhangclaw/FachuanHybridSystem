@@ -9,6 +9,7 @@ from .models import DocConverterItem, DocConverterJob
 
 logger = logging.getLogger("apps.doc_converter")
 
+
 @receiver(post_delete, sender=DocConverterJob)
 def _cleanup_job_files(sender: type, instance: DocConverterJob, **kwargs: object) -> None:
     from apps.doc_converter.services.storage import DocConverterStorage
@@ -21,6 +22,7 @@ def _cleanup_job_files(sender: type, instance: DocConverterJob, **kwargs: object
 
     storage = DocConverterStorage(instance.id)
     storage.cleanup()
+
 
 @receiver(post_delete, sender=DocConverterItem)
 def _cleanup_item_files(sender: type, instance: DocConverterItem, **kwargs: object) -> None:

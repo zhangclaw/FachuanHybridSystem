@@ -14,6 +14,7 @@ from apps.documents.services.infrastructure.wiring import get_case_service
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class MergeProgressReporter:
     list_id: int
@@ -38,6 +39,7 @@ class MergeProgressReporter:
         )
         self._last_progress = progress
         self._last_update_ts = now_ts
+
 
 class EvidenceMergeUseCase:
     def merge(self, *, list_id: int, reporter: MergeProgressReporter | None = None) -> dict[str, Any]:

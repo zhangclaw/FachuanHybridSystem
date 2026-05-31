@@ -15,6 +15,7 @@ from .repo import CaseChatRepository
 
 logger = logging.getLogger(__name__)
 
+
 class SendNotificationUsecase:
     def __init__(
         self,

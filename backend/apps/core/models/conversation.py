@@ -8,6 +8,7 @@ from typing import ClassVar
 
 from django.db import models
 
+
 class ConversationHistory(models.Model):
     """对话历史模型
 

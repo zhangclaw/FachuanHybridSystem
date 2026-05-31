@@ -7,7 +7,6 @@ from typing import TYPE_CHECKING, Any, ClassVar
 
 from django.db import models
 from django.utils import timezone
-
 from simple_history.models import HistoricalRecords
 
 from apps.core.models.enums import CaseType
@@ -25,16 +24,19 @@ if TYPE_CHECKING:
     from .payment import ContractPayment
     from .supplementary import SupplementaryAgreement
 
+
 class ContractStatus(models.TextChoices):
     UNSIGNED = "unsigned", "未签约"
     ACTIVE = "active", "在办"
     ARCHIVED = "archived", "已归档"
+
 
 class FeeMode(models.TextChoices):
     FIXED = "FIXED", "固定收费"
     SEMI_RISK = "SEMI_RISK", "半风险收费"
     FULL_RISK = "FULL_RISK", "全风险收费"
     CUSTOM = "CUSTOM", "自定义"
+
 
 class Contract(models.Model):
     id: int

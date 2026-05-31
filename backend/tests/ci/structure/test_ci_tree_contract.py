@@ -5,6 +5,7 @@ from __future__ import annotations
 from importlib import import_module
 from pathlib import Path
 
+
 def test_ci_tree_has_required_layers() -> None:
     root = Path(__file__).resolve().parents[1]
     assert (root / "structure").is_dir()

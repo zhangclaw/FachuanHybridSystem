@@ -12,6 +12,7 @@ from apps.documents.services.placeholders.litigation.execution_request_service i
 from apps.finance.models.lpr_rate import LPRRate
 from apps.litigation_ai.placeholders.spec import LitigationPlaceholderKeys
 
+
 @pytest.fixture
 def service() -> ExecutionRequestService:
     return ExecutionRequestService()

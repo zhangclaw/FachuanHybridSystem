@@ -18,6 +18,7 @@ from ..core.project_service import ProjectService
 
 logger = logging.getLogger(__name__)
 
+
 class ExportTaskService:
     def __init__(self, *, task_submission_service: TaskSubmissionService, project_service: ProjectService) -> None:
         self._task_submission_service = task_submission_service
@@ -47,7 +48,7 @@ class ExportTaskService:
             progress=0,
             current=0,
             total=0,
-            message=str("准备导出"),
+            message="准备导出",
         )
         return task
 
@@ -67,7 +68,7 @@ class ExportTaskService:
             started_at=timezone.now(),
             finished_at=None,
             error="",
-            message=str("任务已提交"),
+            message="任务已提交",
             progress=0,
             current=0,
             total=0,

@@ -2,6 +2,7 @@
 
 from django.db import models
 
+
 class LawFirm(models.Model):
     """律所模型，代表一个律师事务所实体。"""
 

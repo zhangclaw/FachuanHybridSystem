@@ -17,6 +17,7 @@ from .base import BaseSMSStage
 
 logger = logging.getLogger("apps.automation")
 
+
 class SMSDownloadingStage(BaseSMSStage):
     """
     SMS 下载阶段处理器
@@ -136,6 +137,7 @@ class SMSDownloadingStage(BaseSMSStage):
         except Exception as e:
             logger.error(f"创建下载任务失败: SMS ID={sms.id}, 错误: {e!s}")
             return None
+
 
 def create_sms_downloading_stage() -> SMSDownloadingStage:
     """工厂函数：创建 SMS 下载阶段处理器"""

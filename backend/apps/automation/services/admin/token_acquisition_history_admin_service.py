@@ -16,6 +16,7 @@ from django.utils import timezone
 from apps.automation.models import TokenAcquisitionHistory, TokenAcquisitionStatus
 from apps.core.exceptions import BusinessException, ValidationException
 
+
 class TokenAcquisitionHistoryAdminService:
     """
     Token获取历史记录管理服务

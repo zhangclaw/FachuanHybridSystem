@@ -20,6 +20,7 @@ from apps.core.exceptions import PermissionDenied
 
 logger = logging.getLogger("apps.core.auth")
 
+
 class SessionAuth(APIKeyHeader):
     """
     Django Session 认证
@@ -36,6 +37,7 @@ class SessionAuth(APIKeyHeader):
         if request.user and request.user.is_authenticated:
             return request.user
         return None
+
 
 class JWTOrSessionAuth(HttpBearer):
     """

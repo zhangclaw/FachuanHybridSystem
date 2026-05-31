@@ -28,6 +28,7 @@ llm_router = Router(tags=["LLM 服务"], auth=JWTOrSessionAuth())
 # 请求/响应 Schema
 # ============================================================
 
+
 class ChatRequest(Schema):
     """对话请求"""
 
@@ -36,11 +37,13 @@ class ChatRequest(Schema):
     user_id: str | None = None
     system_prompt: str | None = None
 
+
 class ChatResponse(Schema):
     """对话响应"""
 
     response: str
     session_id: str
+
 
 class ConversationMessage(Schema):
     """对话消息"""
@@ -50,16 +53,19 @@ class ConversationMessage(Schema):
     created_at: str
     metadata: ClassVar[dict[str, Any]] = {}
 
+
 class ConversationHistoryResponse(Schema):
     """对话历史响应"""
 
     session_id: str
     messages: list[ConversationMessage]
 
+
 class PromptTemplateSyncResponse(Schema):
     """Prompt 模板同步响应"""
 
     synced_count: int
+
 
 class ModelInfo(Schema):
     """模型信息"""
@@ -69,10 +75,12 @@ class ModelInfo(Schema):
     backend: str
     context_window: int = 0
 
+
 class ModelListResponse(Schema):
     """模型列表响应"""
 
     models: list[ModelInfo]
+
 
 def sync_prompt_templates_impl(*, overwrite: bool = True) -> dict[str, int]:
     """将代码内置 Prompt 模板同步到数据库。"""
@@ -80,9 +88,11 @@ def sync_prompt_templates_impl(*, overwrite: bool = True) -> dict[str, int]:
 
     return sync_prompt_templates(overwrite=overwrite)
 
+
 # ============================================================
 # API 端点
 # ============================================================
+
 
 @llm_router.post("/chat", response=ChatResponse)
 @rate_limit_from_settings("LLM", by_user=True)
@@ -112,6 +122,7 @@ async def chat_with_context(request: Any, payload: ChatRequest) -> Any:
         session_id=result["session_id"],
     )
 
+
 @llm_router.post("/chat/stream")
 @rate_limit_from_settings("LLM", by_user=True)
 async def chat_with_context_stream(request: Any, payload: ChatRequest) -> Any:
@@ -137,6 +148,7 @@ async def chat_with_context_stream(request: Any, payload: ChatRequest) -> Any:
     resp = StreamingHttpResponse(stream, content_type="text/event-stream")
     resp["Cache-Control"] = "no-cache"
     return resp
+
 
 @llm_router.get("/conversation/{session_id}/history", response=ConversationHistoryResponse)
 @rate_limit_from_settings("LLM_HISTORY", by_user=True)
@@ -167,6 +179,7 @@ def get_conversation_history(request: Any, session_id: str) -> Any:
 
     return ConversationHistoryResponse(session_id=session_id, messages=messages)
 
+
 @llm_router.post("/templates/sync", response=PromptTemplateSyncResponse)
 @rate_limit_from_settings("LLM", by_user=True)
 def sync_prompt_templates(request: Any) -> Any:
@@ -182,6 +195,7 @@ def sync_prompt_templates(request: Any) -> Any:
 
     result = sync_prompt_templates_impl(overwrite=True)
     return PromptTemplateSyncResponse(synced_count=int(result.get("synced_count", 0)))
+
 
 @llm_router.get("/models", response=ModelListResponse)
 def list_available_models(request: Any) -> Any:

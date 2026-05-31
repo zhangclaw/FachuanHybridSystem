@@ -19,6 +19,7 @@ from .models import PreservationMeasure
 
 logger = logging.getLogger("apps.preservation_date")
 
+
 @dataclass
 class RuleMatch:
     """规则匹配结果."""
@@ -30,6 +31,7 @@ class RuleMatch:
     end_date: str | None = None
     duration: str | None = None
     is_pending: bool = False
+
 
 # ---- 正则规则定义 ----
 
@@ -90,6 +92,7 @@ PROPERTY_KEYWORDS: list[str] = [
     "债权",
     "应收账款",
 ]
+
 
 class PreservationRuleEngine:
     """财产保全规则提取引擎.
@@ -456,6 +459,7 @@ class PreservationRuleEngine:
                 result.append(m)
 
         return result
+
 
 def extract_with_rules(text: str) -> list[PreservationMeasure]:
     """便捷函数: 使用规则引擎提取保全措施.

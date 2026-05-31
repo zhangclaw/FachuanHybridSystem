@@ -4,6 +4,7 @@ from typing import Any
 
 __all__ = ["get_feishu_configs", "get_dingtalk_configs", "get_wechat_work_configs", "get_telegram_configs"]
 
+
 def get_feishu_configs() -> list[dict[str, Any]]:
     """获取飞书配置项"""
     return [
@@ -41,6 +42,7 @@ def get_feishu_configs() -> list[dict[str, Any]]:
         },
     ]
 
+
 def get_dingtalk_configs() -> list[dict[str, Any]]:
     """获取钉钉配置项
 
@@ -62,6 +64,7 @@ def get_dingtalk_configs() -> list[dict[str, Any]]:
             "is_secret": False,
         },
     ]
+
 
 def get_wechat_work_configs() -> list[dict[str, Any]]:
     """获取企业微信配置项
@@ -96,6 +99,7 @@ def get_wechat_work_configs() -> list[dict[str, Any]]:
             "is_secret": False,
         },
     ]
+
 
 def get_telegram_configs() -> list[dict[str, Any]]:
     """获取 Telegram 配置项

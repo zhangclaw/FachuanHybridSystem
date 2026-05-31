@@ -6,10 +6,12 @@ from typing import ClassVar
 from django.conf import settings
 from django.db import models
 
+
 class StoryVizType(models.TextChoices):
     TIMELINE = "timeline", "时间线"
     RELATIONSHIP = "relationship", "人物关系图"
     CLAIM_JUDGMENT = "claim_judgment", "诉求 vs 判决"
+
 
 class StoryAnimationStatus(models.TextChoices):
     PENDING = "pending", "待处理"
@@ -17,6 +19,7 @@ class StoryAnimationStatus(models.TextChoices):
     COMPLETED = "completed", "已完成"
     FAILED = "failed", "失败"
     CANCELLED = "cancelled", "已取消"
+
 
 class StoryAnimationStage(models.TextChoices):
     QUEUED = "queued", "已入队"
@@ -28,6 +31,7 @@ class StoryAnimationStage(models.TextChoices):
     COMPLETED = "completed", "已完成"
     FAILED = "failed", "失败"
     CANCELLED = "cancelled", "已取消"
+
 
 class StoryAnimation(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

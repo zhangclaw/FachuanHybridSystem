@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
+
 class GuaranteeDialogPlaywrightFillMixin:
     """gTwo 对话框中基于 Playwright 的增强填充方法。"""
 

@@ -19,6 +19,7 @@ from apps.core.models.enums import CaseType
 
 logger = logging.getLogger(__name__)
 
+
 class ContractBatchFolderBindingService:
     """批量绑定合同文件夹（目标固定为根目录的一级子文件夹）。"""
 
@@ -200,7 +201,7 @@ class ContractBatchFolderBindingService:
         item["contract_count"] = len(contracts)
 
         if not root_path:
-            item["error"] = str("请先填写根目录")
+            item["error"] = "请先填写根目录"
             return item
 
         try:
@@ -273,15 +274,15 @@ class ContractBatchFolderBindingService:
     ) -> dict[str, Any]:
         targets: list[tuple[str, str, float]] = []
         if contract_name:
-            targets.append((contract_name, str("合同名称"), 1.0))
+            targets.append((contract_name, "合同名称", 1.0))
         for name in case_names:
-            targets.append((name, str("案件名称"), 1.0))
+            targets.append((name, "案件名称", 1.0))
         if contract_filing_number:
-            targets.append((contract_filing_number, str("合同建档编号"), 0.95))
+            targets.append((contract_filing_number, "合同建档编号", 0.95))
         if oa_case_number:
-            targets.append((oa_case_number, str("律所OA案件编号"), 1.0))
+            targets.append((oa_case_number, "律所OA案件编号", 1.0))
         for number in case_filing_numbers:
-            targets.append((number, str("案件建档编号"), 0.95))
+            targets.append((number, "案件建档编号", 0.95))
 
         scored_candidates: list[dict[str, Any]] = []
         for candidate in candidates:
@@ -304,7 +305,7 @@ class ContractBatchFolderBindingService:
                 "recommended_folder_path": "",
                 "recommended_folder_name": "",
                 "confidence": 0.0,
-                "reason": str("未找到一级子文件夹"),
+                "reason": "未找到一级子文件夹",
                 "auto_selected": False,
                 "candidates": [],
             }

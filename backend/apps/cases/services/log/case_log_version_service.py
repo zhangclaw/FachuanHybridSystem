@@ -8,6 +8,7 @@ from apps.cases.models import CaseLogVersion
 
 from .case_log_query_service import CaseLogQueryService
 
+
 class CaseLogVersionService:
     def __init__(self, query_service: CaseLogQueryService | None = None) -> None:
         self.query_service = query_service or CaseLogQueryService()

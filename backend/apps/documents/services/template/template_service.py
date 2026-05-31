@@ -19,6 +19,7 @@ from apps.documents.services.document_template.workflow import DocumentTemplateW
 
 logger = logging.getLogger(__name__)
 
+
 class DocumentTemplateService:
     """
     文书模板服务

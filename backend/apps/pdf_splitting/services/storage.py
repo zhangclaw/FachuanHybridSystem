@@ -7,6 +7,7 @@ from uuid import UUID
 
 from django.conf import settings
 
+
 class PdfSplitStorage:
     def __init__(self, job_id: UUID | str) -> None:
         self._job_id = str(job_id)

@@ -7,9 +7,11 @@ from django.db import models
 
 from apps.core.filesystem.upload_paths import EntityIdPath
 
+
 def _result_pdf_upload_to(instance: Any, filename: str) -> str:
     """Deprecated: 保留用于旧 migration 兼容，新代码请使用 EntityIdPath。"""
     return f"legal_research/{instance.task_id}/{instance.id}/{filename}"
+
 
 class LegalResearchResult(models.Model):
     legacy_uuid = models.UUIDField(default=uuid4, editable=False, db_index=True, verbose_name="历史UUID")

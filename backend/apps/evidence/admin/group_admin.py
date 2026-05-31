@@ -7,6 +7,7 @@ from django.db.models import Count, QuerySet
 
 from apps.evidence.models import EvidenceGroup
 
+
 @admin.register(EvidenceGroup)
 class EvidenceGroupAdmin(admin.ModelAdmin):
     list_display: ClassVar = ("name", "case", "item_count", "sort_order", "created_at")  # type: ignore[misc]

@@ -8,16 +8,19 @@ from typing import Any
 
 from apps.litigation_ai.services.wiring import get_llm_service
 
+
 @dataclass
 class AgentLLMResponse:
     content: str
     tool_calls: list[dict[str, Any]] = field(default_factory=list)
     type: str = "assistant"
 
+
 @dataclass
 class AgentLLMStreamChunk:
     content: str
     tool_calls: list[dict[str, Any]] = field(default_factory=list)
+
 
 class AgentLLMAdapter:
     def __init__(self, llm_service: Any, model: str | None = None, temperature: float = 0.7) -> None:
@@ -67,6 +70,7 @@ class AgentLLMAdapter:
         response = await self.ainvoke(messages)
         if response.content:
             yield AgentLLMStreamChunk(content=response.content)
+
 
 class LitigationLLMProvider:
     def __init__(self, llm_service: Any | None = None) -> None:

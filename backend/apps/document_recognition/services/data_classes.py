@@ -11,6 +11,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Any
 
+
 class DocumentType(str, Enum):
     """
     文书类型枚举
@@ -21,6 +22,7 @@ class DocumentType(str, Enum):
     SUMMONS = "summons"  # 传票
     EXECUTION_RULING = "execution"  # 执行裁定书
     OTHER = "other"  # 其他
+
 
 @dataclass
 class RecognitionResult:
@@ -76,6 +78,7 @@ class RecognitionResult:
             confidence=data.get("confidence", 0.0),
             extraction_method=data.get("extraction_method", ""),
         )
+
 
 @dataclass
 class BindingResult:
@@ -157,6 +160,7 @@ class BindingResult:
             error_code=error_code,
         )
 
+
 @dataclass
 class NotificationResult:
     """
@@ -226,7 +230,7 @@ class NotificationResult:
         """
         return cls(
             success=True,
-            message=str("通知发送成功"),
+            message="通知发送成功",
             sent_at=sent_at,
             file_sent=file_sent,
         )
@@ -252,6 +256,7 @@ class NotificationResult:
             message=message,
             error_code=error_code,
         )
+
 
 @dataclass
 class RecognitionResponse:

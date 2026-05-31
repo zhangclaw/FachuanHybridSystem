@@ -5,6 +5,7 @@ from typing import Any, ClassVar
 
 from django.db import models
 
+
 class EvidenceChunk(models.Model):
     evidence_item_id: int  # Django 自动生成的外键 ID 字段
     evidence_item: models.ForeignKey[models.Model, models.Model] = models.ForeignKey(

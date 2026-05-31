@@ -14,6 +14,7 @@ __all__: list[str] = [
     "BusinessError",
 ]
 
+
 class BusinessException(Exception):
     """
     业务异常基类
@@ -62,6 +63,7 @@ class BusinessException(Exception):
             "error": self.message,
             "errors": self.errors,
         }
+
 
 class BusinessError(BusinessException):
     """业务逻辑异常基类(向后兼容)"""

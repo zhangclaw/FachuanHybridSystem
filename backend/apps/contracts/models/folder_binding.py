@@ -8,6 +8,7 @@ from django.db import models
 
 from .contract import Contract
 
+
 class ContractFolderBinding(models.Model):
     """合同文件夹绑定"""
 
@@ -16,9 +17,7 @@ class ContractFolderBinding(models.Model):
     contract = models.OneToOneField(
         Contract, on_delete=models.CASCADE, related_name="folder_binding", verbose_name="合同"
     )
-    folder_path = models.CharField(
-        max_length=1000, verbose_name="文件夹路径", help_text="绑定的本地或网络文件夹路径"
-    )
+    folder_path = models.CharField(max_length=1000, verbose_name="文件夹路径", help_text="绑定的本地或网络文件夹路径")
     folder_inode = models.BigIntegerField(
         null=True, blank=True, verbose_name="inode", help_text="文件夹 inode 编号，用于路径自动修复"
     )

@@ -14,6 +14,7 @@ from .wiring import get_organization_service, get_reminder_service
 
 logger = logging.getLogger("apps.cases")
 
+
 class CaseLogInternalService:
     def create_case_log_internal(self, case_id: int, content: str, user_id: int | None = None) -> Any:
         try:
@@ -27,7 +28,7 @@ class CaseLogInternalService:
                 raise NotFoundError(
                     message="系统中没有律师用户,无法创建日志",
                     code="NO_DEFAULT_ACTOR",
-                    errors={"actor": str("请先创建律师用户")},
+                    errors={"actor": "请先创建律师用户"},
                 )
         case_log = CaseLog.objects.create(case=case, content=content, actor_id=actor_id)
         logger.info(

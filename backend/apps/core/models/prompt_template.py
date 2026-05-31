@@ -10,6 +10,7 @@ from django.db import models
 
 from apps.core.infrastructure import CacheKeys, delete_cache_key
 
+
 class PromptTemplate(models.Model):
     """Prompt 模板模型
 

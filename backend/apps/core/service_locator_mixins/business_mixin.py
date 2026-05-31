@@ -28,6 +28,7 @@ if TYPE_CHECKING:
         IReminderService,
     )
 
+
 class BusinessServiceLocatorMixin(_ServiceLocatorStub):
     @classmethod
     def get_lawyer_service(cls) -> ILawyerService:

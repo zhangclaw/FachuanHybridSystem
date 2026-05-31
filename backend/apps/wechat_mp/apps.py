@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from django.apps import AppConfig
 
+
 class WechatMpConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
     name = "apps.wechat_mp"

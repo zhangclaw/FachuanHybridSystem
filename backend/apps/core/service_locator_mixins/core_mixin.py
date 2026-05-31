@@ -17,6 +17,7 @@ if TYPE_CHECKING:
     )
     from apps.core.tasking import TaskSubmissionService
 
+
 class CoreServiceLocatorMixin(_ServiceLocatorStub):
     @classmethod
     def get_system_config_service(cls) -> ISystemConfigService:

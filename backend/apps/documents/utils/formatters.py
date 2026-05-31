@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 # 默认日期格式
 DEFAULT_DATE_FORMAT = "%Y年%m月%d日"
 
+
 def format_date(d: date | str | None, fmt: str = DEFAULT_DATE_FORMAT) -> str:
     """
     格式化日期
@@ -34,6 +35,7 @@ def format_date(d: date | str | None, fmt: str = DEFAULT_DATE_FORMAT) -> str:
     except Exception as e:
         logger.warning("格式化日期失败: %s", e)
         return ""
+
 
 def format_date_chinese(d: date | None, default_today: bool = False) -> str:
     """
@@ -58,6 +60,7 @@ def format_date_chinese(d: date | None, default_today: bool = False) -> str:
         logger.warning("格式化日期失败: %s", e)
         return "____年____月____日"
 
+
 def format_currency(amount: Decimal | None, include_symbol: bool = False) -> str:
     """
     格式化货币金额
@@ -81,6 +84,7 @@ def format_currency(amount: Decimal | None, include_symbol: bool = False) -> str
         logger.warning("格式化货币失败: %s", e)
         return ""
 
+
 def format_percentage(rate: Decimal | None, decimal_places: int = 2) -> str:
     """
     格式化百分比
@@ -102,6 +106,7 @@ def format_percentage(rate: Decimal | None, decimal_places: int = 2) -> str:
     except Exception as e:
         logger.warning("格式化百分比失败: %s", e)
         return ""
+
 
 def get_choice_display(value: str, choices_class: type[Any]) -> str:
     """

@@ -18,6 +18,7 @@ from ._perf_models import AlertLevel, LoadingPerformanceData, PerformanceAlert, 
 
 logger = logging.getLogger(__name__)
 
+
 class SteeringPerformanceMonitor:
     """Steering 性能监控器"""
 
@@ -233,6 +234,7 @@ class SteeringPerformanceMonitor:
         """关闭性能监控器"""
         if self.enabled:
             logger.info("Steering 性能监控器已关闭")
+
 
 def create_performance_monitor_from_config(config: dict[str, Any]) -> SteeringPerformanceMonitor:
     """根据配置创建性能监控器"""

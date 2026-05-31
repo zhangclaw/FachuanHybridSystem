@@ -18,6 +18,7 @@ from django.utils.safestring import SafeString
 
 from apps.organization.models import AccountCredential
 
+
 @admin.register(AccountCredential)
 class AccountCredentialAdmin(admin.ModelAdmin):
     list_display: ClassVar[list[str]] = [
@@ -103,22 +104,22 @@ class AccountCredentialAdmin(admin.ModelAdmin):
 
         if delta.days > 30:
             color = "#dc3545"
-            time_str = str("%(days)d天前") % {"days": delta.days}
+            time_str = "%(days)d天前" % {"days": delta.days}
         elif delta.days > 7:
             color = "#ffc107"
-            time_str = str("%(days)d天前") % {"days": delta.days}
+            time_str = "%(days)d天前" % {"days": delta.days}
         elif delta.days > 0:
             color = "#007bff"
-            time_str = str("%(days)d天前") % {"days": delta.days}
+            time_str = "%(days)d天前" % {"days": delta.days}
         else:
             hours = delta.seconds // 3600
             if hours > 0:
                 color = "#28a745"
-                time_str = str("%(hours)d小时前") % {"hours": hours}
+                time_str = "%(hours)d小时前" % {"hours": hours}
             else:
                 minutes = delta.seconds // 60
                 color = "#28a745"
-                time_str = str("%(minutes)d分钟前") % {"minutes": minutes}
+                time_str = "%(minutes)d分钟前" % {"minutes": minutes}
 
         return format_html('<span style="color: {}; font-weight: bold;">{}</span>', color, time_str)
 

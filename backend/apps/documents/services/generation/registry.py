@@ -15,6 +15,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+
 class GeneratorRegistry:
     """
     生成器注册表
@@ -201,6 +202,7 @@ class GeneratorRegistry:
     def __repr__(self) -> str:
         """调试表示"""
         return f"<GeneratorRegistry: {list(self._generators.keys())}>"
+
 
 # 模块加载时自动发现生成器
 GeneratorRegistry.auto_discover()

@@ -14,6 +14,7 @@ if TYPE_CHECKING:
 
     from apps.client.models import Client
 
+
 class ClientQueryFacade:
     def __init__(
         self,

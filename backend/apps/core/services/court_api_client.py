@@ -15,6 +15,7 @@ from apps.core.exceptions import ValidationException
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class CauseItem:
     """案由数据项"""
@@ -26,6 +27,7 @@ class CauseItem:
     parent_code: str | None = None
     children: list["CauseItem"] = field(default_factory=list)
 
+
 @dataclass
 class CourtItem:
     """法院数据项"""
@@ -36,6 +38,7 @@ class CourtItem:
     province: str = ""
     parent_code: str | None = None
     children: list["CourtItem"] = field(default_factory=list)
+
 
 class CourtApiClient:
     """法院 API 客户端

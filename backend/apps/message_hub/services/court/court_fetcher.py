@@ -31,6 +31,7 @@ _MAX_API_RETRIES = 2
 _RETRYABLE_STATUS_CODES = frozenset({429, 500, 502, 503, 504})
 _RETRY_BACKOFF_SECONDS = (0.6, 1.2)
 
+
 def _api_post(url: str, token: str, data: dict[str, Any]) -> dict[str, Any]:
     """发送 POST 请求到一张网 API，内置重试与退避。"""
     headers = {
@@ -86,6 +87,7 @@ def _api_post(url: str, token: str, data: dict[str, Any]) -> dict[str, Any]:
 
     raise RuntimeError("一张网 API 请求失败")
 
+
 def _run_callable_with_timeout(func: Callable[[], str], timeout_seconds: float) -> str:
     """在 daemon 线程中执行 callable，超时时快速失败，避免阻塞 worker 退出。"""
     result_queue: queue.Queue[tuple[bool, str | BaseException]] = queue.Queue(maxsize=1)
@@ -110,6 +112,7 @@ def _run_callable_with_timeout(func: Callable[[], str], timeout_seconds: float) 
     if isinstance(payload, Exception):
         raise payload
     raise RuntimeError("Token 获取失败：未知异常")
+
 
 def _acquire_token(credential_id: int) -> str:
     """复用现有 token 获取链路（优先缓存 → DB → 自动登录）。"""
@@ -162,10 +165,12 @@ def _acquire_token(credential_id: int) -> str:
     cache_manager.cache_token(credential.site_name, credential.account, token)
     return token
 
+
 def _build_subject(record: dict[str, Any]) -> str:
     ah = record.get("ah", "")
     wsmc = record.get("wsmc", "")
-    return f"{ah} - {wsmc}" if ah else wsmc or str("(无主题)")
+    return f"{ah} - {wsmc}" if ah else wsmc or "(无主题)"
+
 
 def _build_body(record: dict[str, Any]) -> str:
     lines = [
@@ -179,7 +184,9 @@ def _build_body(record: dict[str, Any]) -> str:
     ]
     return "\n".join(lines)
 
+
 from datetime import datetime as _dt
+
 
 def _parse_datetime(s: str) -> _dt:
     try:
@@ -187,6 +194,7 @@ def _parse_datetime(s: str) -> _dt:
         return timezone.make_aware(dt)
     except (ValueError, TypeError):
         return timezone.now()
+
 
 def _fetch_attachments_meta(token: str, sdbh: str) -> list[dict[str, Any]]:
     """获取文书详情（附件元信息 + 下载链接）。"""
@@ -217,6 +225,7 @@ def _fetch_attachments_meta(token: str, sdbh: str) -> list[dict[str, Any]]:
     except Exception as e:
         logger.warning("获取文书详情失败 sdbh=%s: %s", sdbh, e)
         return []
+
 
 class CourtInboxFetcher(MessageFetcher):
     """一张网（zxfw.court.gov.cn）收件箱拉取器。"""
@@ -462,6 +471,7 @@ class CourtInboxFetcher(MessageFetcher):
                     return new_wjlj
         return str(att.get("wjlj", "")).strip()
 
+
 def _invalidate_token(credential_id: int) -> None:
     """清除缓存和 DB 中的 Token，强制下次重新登录。"""
     from apps.automation.services.token.cache_manager import cache_manager
@@ -475,11 +485,13 @@ def _invalidate_token(credential_id: int) -> None:
     CourtToken.objects.filter(site_name="court_zxfw").update(expires_at=timezone.now())
     logger.info("一张网收件箱: 已清除过期 Token")
 
+
 def _mark_success(source: MessageSource) -> None:
     source.last_sync_at = timezone.now()
     source.last_sync_status = SyncStatus.SUCCESS
     source.last_sync_error = ""
     source.save(update_fields=["last_sync_at", "last_sync_status", "last_sync_error"])
+
 
 def _mark_failed(source: MessageSource, error: str) -> None:
     source.last_sync_at = timezone.now()

@@ -8,6 +8,7 @@ from django.db import models
 
 from apps.core.filesystem.upload_paths import DatedUUIDPath
 
+
 class WeChatAccount(models.Model):
     """公众号账号配置"""
 
@@ -34,6 +35,7 @@ class WeChatAccount(models.Model):
     def __str__(self) -> str:
         return self.name
 
+
 class PublishTaskStatus(models.TextChoices):
     PENDING = "pending", "待处理"
     LOGGING_IN = "logging_in", "登录中"
@@ -42,9 +44,11 @@ class PublishTaskStatus(models.TextChoices):
     SUCCESS = "success", "成功"
     FAILED = "failed", "失败"
 
+
 class FormatMethod(models.TextChoices):
     RULE = "rule", "规则排版"
     LLM = "llm", "AI 排版"
+
 
 class PublishTask(models.Model):
     """公众号文章发布任务"""

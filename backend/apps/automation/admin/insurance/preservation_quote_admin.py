@@ -20,11 +20,13 @@ from django.utils.safestring import SafeString, mark_safe
 
 from apps.automation.models import InsuranceQuote, PreservationQuote, QuoteItemStatus, QuoteStatus
 
+
 def _get_preservation_quote_admin_service() -> Any:
     """工厂函数：创建财产保全询价管理服务"""
     from apps.automation.services.admin import PreservationQuoteAdminService
 
     return PreservationQuoteAdminService()
+
 
 class InsuranceQuoteInline(admin.TabularInline[InsuranceQuote, InsuranceQuote]):
     """保险公司报价内联显示"""
@@ -167,6 +169,7 @@ class InsuranceQuoteInline(admin.TabularInline[InsuranceQuote, InsuranceQuote]):
                 output_field=IntegerField(),
             )
         ).order_by("status_priority", "min_amount", "id")
+
 
 @admin.register(PreservationQuote)
 class PreservationQuoteAdmin(admin.ModelAdmin):

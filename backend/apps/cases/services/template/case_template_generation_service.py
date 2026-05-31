@@ -24,6 +24,7 @@ from .wiring import get_case_service, get_client_service, get_document_service
 
 logger = logging.getLogger("apps.cases.services")
 
+
 class CaseTemplateGenerationService:
     """案件模板生成服务"""
 

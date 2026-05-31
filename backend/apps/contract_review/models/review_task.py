@@ -3,6 +3,7 @@ import uuid
 from django.conf import settings
 from django.db import models
 
+
 class TaskStatus(models.TextChoices):
     UPLOADED = "uploaded", "已上传"
     PARTIES_IDENTIFIED = "parties_identified", "已识别当事人"
@@ -12,6 +13,7 @@ class TaskStatus(models.TextChoices):
     FAILED = "failed", "失败"
     EXTRACTION_FAILED = "extraction_failed", "提取失败"
 
+
 class ProcessStep(models.TextChoices):
     TITLE_EXTRACTION = "title_extraction", "标题提取"
     TYPO_CHECK = "typo_check", "错别字检测"
@@ -20,11 +22,13 @@ class ProcessStep(models.TextChoices):
     PAGE_NUMBERING = "page_numbering", "页码标准化"
     HEADING_NUMBERING = "heading_numbering", "标题序号"
 
+
 class RepresentedParty(models.TextChoices):
     PARTY_A = "party_a", "甲方"
     PARTY_B = "party_b", "乙方"
     PARTY_C = "party_c", "丙方"
     PARTY_D = "party_d", "丁方"
+
 
 class ReviewTask(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

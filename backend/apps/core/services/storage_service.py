@@ -17,6 +17,7 @@ _INVALID_FILENAME_CHARS = re.compile(r"[^0-9A-Za-z\u4e00-\u9fff._-]+")
 _MULTIPLE_UNDERSCORES = re.compile(r"_+")
 _WINDOWS_ABS_PATH = re.compile(r"^[A-Za-z]:[\\/]")
 
+
 class FileValidator(Protocol):
     def validate_uploaded_file(
         self,
@@ -25,6 +26,7 @@ class FileValidator(Protocol):
         max_size_bytes: int | None = None,
         field_name: str = "file",
     ) -> Any: ...
+
 
 class _DefaultFileValidator:
     """Fallback validator used outside app-specific adapters."""
@@ -78,6 +80,7 @@ class _DefaultFileValidator:
 
         return uploaded_file
 
+
 def sanitize_upload_filename(filename: str, max_length: int = 120) -> str:
     raw = (filename or "").replace("\\", "/").split("/")[-1].strip()
     raw = raw.strip(" .")
@@ -105,6 +108,7 @@ def sanitize_upload_filename(filename: str, max_length: int = 120) -> str:
 
     return safe
 
+
 def is_absolute_path(path_str: str) -> bool:
     p = (path_str or "").strip()
     if not p:
@@ -112,6 +116,7 @@ def is_absolute_path(path_str: str) -> bool:
     if p.startswith(("/", "\\")):
         return True
     return bool(_WINDOWS_ABS_PATH.match(p))
+
 
 def _get_media_root() -> str | None:
     """Prefer Django settings MEDIA_ROOT, fallback to config."""
@@ -122,6 +127,7 @@ def _get_media_root() -> str | None:
         return str(media_root)
     result: str | None = get_config("django.media_root", None)
     return result
+
 
 def to_media_abs(file_path: str) -> Path:
     if not file_path:
@@ -152,6 +158,7 @@ def to_media_abs(file_path: str) -> Path:
             errors={"file_path": "文件路径不在 MEDIA_ROOT 下"},
         ) from None
     return p
+
 
 def normalize_to_media_rel(file_path: str) -> str:
     if not file_path:
@@ -184,6 +191,7 @@ def normalize_to_media_rel(file_path: str) -> str:
         ) from None
     return str(rel).replace("\\", "/")
 
+
 def save_uploaded_file(
     uploaded_file: Any,
     rel_dir: str,
@@ -194,9 +202,7 @@ def save_uploaded_file(
     file_validator: FileValidator | None = None,
 ) -> tuple[str, str]:
     if not hasattr(uploaded_file, "name"):
-        raise ValidationException(
-            message="上传文件缺少文件名", code="INVALID_UPLOAD", errors={"file": "缺少文件名"}
-        )
+        raise ValidationException(message="上传文件缺少文件名", code="INVALID_UPLOAD", errors={"file": "缺少文件名"})
 
     original_name = str(getattr(uploaded_file, "name", "") or "")
     safe_original_name = sanitize_upload_filename(original_name)
@@ -244,6 +250,7 @@ def save_uploaded_file(
     rel_path = Path(rel_dir) / filename
     return str(rel_path).replace("\\", "/"), safe_original_name
 
+
 def delete_media_file(file_path: str) -> bool:
     if not file_path:
         return False
@@ -274,6 +281,7 @@ def delete_media_file(file_path: str) -> bool:
         return False
 
     return True
+
 
 __all__ = [
     "_get_media_root",

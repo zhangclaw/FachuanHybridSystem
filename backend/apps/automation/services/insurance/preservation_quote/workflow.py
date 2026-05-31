@@ -14,6 +14,7 @@ from .token_provider import BaoquanTokenProvider
 
 logger = logging.getLogger("apps.automation")
 
+
 class PreservationQuoteWorkflow:
     def __init__(
         self,
@@ -66,7 +67,7 @@ class PreservationQuoteWorkflow:
 
             error_message: str | None = None
             if success_count == 0:
-                error_message = str("所有保险公司查询均失败")
+                error_message = "所有保险公司查询均失败"
 
             await self.repo.finalize_quote(
                 quote=quote,

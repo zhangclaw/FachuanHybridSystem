@@ -8,6 +8,7 @@ from apps.core.exceptions import NotFoundError
 from apps.workbench.models import WorkbenchMessage, WorkbenchSession
 from apps.workbench.services.session_service import WorkbenchSessionService
 
+
 @pytest.fixture
 def svc() -> WorkbenchSessionService:
     return WorkbenchSessionService()

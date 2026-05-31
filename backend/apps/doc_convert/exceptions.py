@@ -14,6 +14,7 @@ ERROR_FILE_TOO_LARGE = "FILE_TOO_LARGE"
 ERROR_ZNSZJ_UNAVAILABLE = "ZNSZJ_UNAVAILABLE"
 ERROR_ZNSZJ_INVALID_RESPONSE = "ZNSZJ_INVALID_RESPONSE"
 
+
 class ZnszjDisabledError(BusinessException):
     """znszj 功能未启用（HTTP 403）。"""
 
@@ -24,6 +25,7 @@ class ZnszjDisabledError(BusinessException):
             message="要素式转换功能未启用",
             code=ERROR_ZNSZJ_DISABLED,
         )
+
 
 class ZnszjNotConfiguredError(BusinessException):
     """znszj 私有实现未配置（HTTP 503）。"""
@@ -36,6 +38,7 @@ class ZnszjNotConfiguredError(BusinessException):
             code=ERROR_ZNSZJ_NOT_CONFIGURED,
         )
 
+
 class InvalidFileTypeError(ValidationException):
     """文件类型不支持（HTTP 400）。"""
 
@@ -45,6 +48,7 @@ class InvalidFileTypeError(ValidationException):
             code=ERROR_INVALID_FILE_TYPE,
             errors={"filename": filename},
         )
+
 
 class InvalidMbidError(ValidationException):
     """无效的 mbid（HTTP 400）。"""
@@ -56,6 +60,7 @@ class InvalidMbidError(ValidationException):
             errors={"mbid": mbid},
         )
 
+
 class FileTooLargeError(ValidationException):
     """文件过大（HTTP 400）。"""
 
@@ -65,6 +70,7 @@ class FileTooLargeError(ValidationException):
             code=ERROR_FILE_TOO_LARGE,
             errors={"size_mb": size_mb, "max_size_mb": max_size_mb},
         )
+
 
 class ZnszjUnavailableError(BusinessException):
     """znszj 系统不可用（HTTP 502）。"""
@@ -77,6 +83,7 @@ class ZnszjUnavailableError(BusinessException):
             code=ERROR_ZNSZJ_UNAVAILABLE,
             errors={"detail": detail} if detail else {},
         )
+
 
 class ZnszjInvalidResponseError(BusinessException):
     """znszj 返回格式异常（HTTP 502）。"""

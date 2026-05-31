@@ -13,6 +13,7 @@ from .session_service import WorkbenchSessionService, _calc_message_bytes
 
 logger = logging.getLogger(__name__)
 
+
 class WorkbenchMessageService(PermissionMixin):
     """工作台消息管理服务"""
 

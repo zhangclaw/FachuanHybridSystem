@@ -17,6 +17,7 @@ from .service import CaseAdminServiceMixin
 
 logger = logging.getLogger(__name__)
 
+
 class CaseAdminActionsMixin(CaseAdminServiceMixin):
     def response_change(self, request: HttpRequest, obj: Case) -> HttpResponse:
         if "_save_and_duplicate" in request.POST:
@@ -102,5 +103,6 @@ class CaseAdminActionsMixin(CaseAdminServiceMixin):
             messages.info(request, "选中的案件均在办，无需更新")
 
     mark_as_active.short_description = "恢复为在办"  # type: ignore[attr-defined]
+
 
 __all__: list[str] = ["CaseAdminActionsMixin"]

@@ -10,6 +10,7 @@ from django.utils.safestring import SafeString
 
 from apps.pdf_splitting.models import PdfSplitJob, PdfSplittingTool
 
+
 @admin.register(PdfSplittingTool)
 class PdfSplittingToolAdmin(admin.ModelAdmin):
     def changelist_view(
@@ -36,6 +37,7 @@ class PdfSplittingToolAdmin(admin.ModelAdmin):
 
     def get_model_perms(self, request: HttpRequest) -> dict[str, bool]:
         return {"view": True}
+
 
 @admin.register(PdfSplitJob)
 class PdfSplitJobAdmin(admin.ModelAdmin):

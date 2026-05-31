@@ -11,6 +11,7 @@ from .types import WeikeSession
 
 logger = logging.getLogger(__name__)
 
+
 class WeikeTransportMixin:
     DEFAULT_RETRYABLE_STATUSES = frozenset({408, 409, 425, 429, 500, 502, 503, 504})
 

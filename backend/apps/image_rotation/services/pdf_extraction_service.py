@@ -20,6 +20,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("apps.image_rotation.pdf_extraction")
 
+
 class PDFExtractionService:
     """
     PDF 页面提取服务

@@ -10,6 +10,7 @@ from apps.cases.services.case.case_admin_export_bridge import (
     get_case_admin_file_prefetches,
 )
 
+
 def test_get_case_admin_export_prefetches_returns_nonempty_tuple() -> None:
     result = get_case_admin_export_prefetches()
     assert isinstance(result, tuple)

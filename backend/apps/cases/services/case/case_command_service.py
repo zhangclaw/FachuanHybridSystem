@@ -18,6 +18,7 @@ from .case_queryset import get_case_queryset
 
 logger = logging.getLogger("apps.cases")
 
+
 class CaseCommandService(PermissionMixin):
     """案件命令服务，封装所有案件写操作业务逻辑。"""
 
@@ -43,12 +44,12 @@ class CaseCommandService(PermissionMixin):
         if case_type and not business_config.is_stage_valid_for_case_type(stage, case_type):
             raise ValidationException(
                 "该案件类型不支持此阶段",
-                errors={"current_stage": str("阶段不适用于此案件类型")},
+                errors={"current_stage": "阶段不适用于此案件类型"},
             )
         if representation_stages and stage not in representation_stages:
             raise ValidationException(
                 "当前阶段必须属于代理阶段集合",
-                errors={"current_stage": str("阶段不在代理范围内")},
+                errors={"current_stage": "阶段不在代理范围内"},
             )
         return stage
 
@@ -82,7 +83,7 @@ class CaseCommandService(PermissionMixin):
             raise ValidationException(
                 message="合同未激活",
                 code="CONTRACT_INACTIVE",
-                errors={"contract_id": str("合同状态不是 active")},
+                errors={"contract_id": "合同状态不是 active"},
             )
 
     # ------------------------------------------------------------------

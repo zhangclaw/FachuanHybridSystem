@@ -4,6 +4,7 @@ from typing import ClassVar
 
 from django.db import models
 
+
 class ChatRecordProject(models.Model):
     name = models.CharField(max_length=255, verbose_name="项目名称")
     id: int

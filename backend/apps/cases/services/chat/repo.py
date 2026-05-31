@@ -9,13 +9,14 @@ from apps.cases.models import Case, CaseChat
 from apps.core.exceptions import NotFoundError, ValidationException
 from apps.core.models.enums import ChatPlatform
 
+
 class CaseChatRepository:
     def get_case(self, *, case_id: int) -> Case:
         if not case_id or not isinstance(case_id, int) or case_id <= 0:
             raise ValidationException(
                 message="无效的案件ID",
                 code="INVALID_CASE_ID",
-                errors={"case_id": str("案件ID必须是正整数")},
+                errors={"case_id": "案件ID必须是正整数"},
             )
         try:
             return Case.objects.get(id=case_id)
@@ -38,7 +39,7 @@ class CaseChatRepository:
             raise ValidationException(
                 message="无效的群聊ID",
                 code="INVALID_CHAT_ID",
-                errors={"chat_id": str("群聊ID必须是正整数")},
+                errors={"chat_id": "群聊ID必须是正整数"},
             )
 
         updated_count: int = CaseChat.objects.filter(id=chat_id, is_active=True).update(is_active=False)

@@ -21,6 +21,7 @@ __all__ = [
     "ConfigChangeEvent",
 ]
 
+
 class ConfigManager:
     """统一配置管理器"""
 

@@ -31,6 +31,7 @@ _HEADING_STYLES = {
     "Title",
 }
 
+
 class DocxFormatter:
     """合同文档格式标准化"""
 

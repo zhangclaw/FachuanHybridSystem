@@ -6,6 +6,7 @@ from typing import Any
 
 from mcp_server.client import client
 
+
 def create_project(name: str) -> dict[str, Any]:
     """创建聊天记录取证项目。"""
     return client.post("/chat-records/projects", json={"name": name})  # type: ignore[no-any-return]

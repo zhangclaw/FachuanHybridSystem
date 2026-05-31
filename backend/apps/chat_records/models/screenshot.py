@@ -4,16 +4,17 @@ import uuid
 from typing import Any, ClassVar
 
 from django.db import models
-
 from django_lifecycle import BEFORE_UPDATE, LifecycleModel, hook
 
 from apps.core.filesystem.upload_paths import EntityIdPath
 
 from .choices import ScreenshotSource
 
+
 def _screenshot_upload_to(instance: Any, filename: str) -> str:
     """Deprecated: 保留用于旧 migration 兼容，新代码请使用 EntityIdPath。"""
     return f"chat_records/screenshots/{instance.project_id}/{instance.id}/{filename}"
+
 
 class ChatRecordScreenshot(LifecycleModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

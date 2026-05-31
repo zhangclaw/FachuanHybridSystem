@@ -15,6 +15,7 @@ __all__: list[str] = [
     "ReminderOut",
 ]
 
+
 class ClientIdentityDocLiteOut(Schema):
     doc_type: str
     file_path: str
@@ -29,6 +30,7 @@ class ClientIdentityDocLiteOut(Schema):
             uploaded_at=obj.uploaded_at,
             media_url=obj.media_url if hasattr(obj, "media_url") else None,
         )
+
 
 class ClientLiteOut(SchemaMixin, Schema):
     id: int
@@ -63,6 +65,7 @@ class ClientLiteOut(SchemaMixin, Schema):
             client_type_label=SchemaMixin._get_display(obj, "client_type") or "",
             identity_docs=docs,
         )
+
 
 class ReminderLiteOut(SchemaMixin, Schema):
     id: int
@@ -112,6 +115,7 @@ class ReminderLiteOut(SchemaMixin, Schema):
         if isinstance(updated_at, str):
             return updated_at
         return SchemaMixin._resolve_datetime_iso(updated_at) or ""
+
 
 # Backward-compatible alias for modules that still import ReminderOut by name.
 ReminderOut = ReminderLiteOut

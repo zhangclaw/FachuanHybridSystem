@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
+
 def get_default_folder_templates() -> list[dict[str, Any]]:
     return [
         {

@@ -9,6 +9,7 @@ from django.core.exceptions import ValidationError
 
 from .models import Lawyer
 
+
 class LawyerRegistrationForm(UserCreationForm[Lawyer]):
     class Meta:
         model = Lawyer
@@ -19,21 +20,21 @@ class LawyerRegistrationForm(UserCreationForm[Lawyer]):
         self.fields["username"].widget.attrs.update(
             {
                 "class": "form-input",
-                "placeholder": str("请输入中文姓名"),
+                "placeholder": "请输入中文姓名",
                 "autocomplete": "username",
             }
         )
         self.fields["password1"].widget.attrs.update(
             {
                 "class": "form-input",
-                "placeholder": str("请输入密码"),
+                "placeholder": "请输入密码",
                 "autocomplete": "new-password",
             }
         )
         self.fields["password2"].widget.attrs.update(
             {
                 "class": "form-input",
-                "placeholder": str("请确认密码"),
+                "placeholder": "请确认密码",
                 "autocomplete": "new-password",
             }
         )

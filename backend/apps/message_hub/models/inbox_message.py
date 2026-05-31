@@ -6,6 +6,7 @@ from typing import Any, ClassVar
 
 from django.db import models
 
+
 class InboxMessage(models.Model):
     """统一收件箱消息，来自各数据源的消息聚合到此表。"""
 

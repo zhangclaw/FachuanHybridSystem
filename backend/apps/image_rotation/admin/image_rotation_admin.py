@@ -13,6 +13,7 @@ from apps.image_rotation.models import ImageRotationTool
 
 logger = logging.getLogger("apps.image_rotation")
 
+
 @admin.register(ImageRotationTool)
 class ImageRotationAdmin(admin.ModelAdmin):
     """

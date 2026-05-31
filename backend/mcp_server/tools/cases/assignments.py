@@ -6,6 +6,7 @@ from typing import Any
 
 from mcp_server.client import client
 
+
 def list_case_assignments(case_id: int) -> list[dict[str, Any]]:
     """查询案件的律师指派记录。"""
     return client.get("/cases/assignments", params={"case_id": case_id})  # type: ignore[return-value]

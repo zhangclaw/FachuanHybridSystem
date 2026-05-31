@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from apps.message_hub.services.base import MessageFetcher
 
+
 def get_fetcher(source_type: str) -> MessageFetcher:
     from apps.message_hub.models import SourceType
     from apps.message_hub.services.court.court_fetcher import CourtInboxFetcher
@@ -17,5 +18,6 @@ def get_fetcher(source_type: str) -> MessageFetcher:
     if source_type == SourceType.COURT_SCHEDULE:
         return CourtScheduleFetcher()
     raise ValueError(f"未知来源类型: {source_type}")
+
 
 __all__ = ["MessageFetcher", "get_fetcher"]

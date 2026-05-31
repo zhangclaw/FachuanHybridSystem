@@ -21,6 +21,7 @@ SITE_NAME_LABELS: dict[str, str] = {
     "court_baoquan": "人民法院保全系统",
 }
 
+
 @admin.register(CourtToken)
 class CourtTokenAdmin(admin.ModelAdmin):
     """

@@ -4,6 +4,7 @@ from typing import Any
 
 __all__ = ["get_filename_template_configs"]
 
+
 def get_filename_template_configs() -> list[dict[str, Any]]:
     """获取文件名模板配置项"""
     return [

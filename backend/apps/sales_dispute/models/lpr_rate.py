@@ -6,6 +6,7 @@ from typing import ClassVar
 
 from django.db import models
 
+
 class LPRRate(models.Model):
     id: int
     effective_date: date = models.DateField(unique=True, verbose_name="生效日期")  # type: ignore[assignment]

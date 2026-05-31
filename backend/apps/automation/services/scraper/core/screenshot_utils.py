@@ -11,6 +11,7 @@ from django.conf import settings
 
 logger = logging.getLogger("apps.automation")
 
+
 class ScreenshotUtils:
     """截图相关工具方法"""
 

@@ -8,6 +8,7 @@ from typing import Any, cast
 
 logger = logging.getLogger("apps.document_recognition")
 
+
 class ResponseParserMixin:
     """Ollama 响应解析 Mixin"""
 

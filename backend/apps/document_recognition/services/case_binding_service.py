@@ -24,6 +24,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("apps.document_recognition")
 
+
 class CaseBindingService:
     """
     案件绑定服务
@@ -275,7 +276,7 @@ class CaseBindingService:
         # 1. 检查案号是否存在
         if not case_number:
             return BindingResult.failure_result(
-                message=str("未识别到案号，无法绑定案件"),
+                message="未识别到案号，无法绑定案件",
                 error_code="CASE_NUMBER_NOT_FOUND",
             )
 

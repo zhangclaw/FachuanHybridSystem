@@ -18,6 +18,7 @@ if TYPE_CHECKING:
 
     from ..domain import ContractValidator
 
+
 class ContractMutationService:
     def __init__(
         self,

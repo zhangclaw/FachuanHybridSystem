@@ -13,6 +13,7 @@ from apps.litigation_ai.models import LitigationSession
 
 logger = logging.getLogger("apps.litigation_ai")
 
+
 class DocumentGeneratorService:
     @transaction.atomic
     def generate_document(self, session_id: str, template_id: int | None = None) -> GenerationTaskDTO:

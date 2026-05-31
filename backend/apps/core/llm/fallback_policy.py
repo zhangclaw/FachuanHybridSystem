@@ -21,6 +21,7 @@ logger = logging.getLogger("apps.core.llm.service")
 _RETRIABLE_ERRORS = (LLMTimeoutError, LLMNetworkError, LLMAPIError)
 TResult = TypeVar("TResult")
 
+
 def _resolve_backends_from_router(
     router: LLMBackendRouter, backend: str | None, fallback: bool
 ) -> list[tuple[str, ILLMBackend]]:
@@ -33,6 +34,7 @@ def _resolve_backends_from_router(
                     result.append((name, b))
         return result
     return router.get_backends_by_priority()
+
 
 def _handle_call_error(name: str, e: Exception, fallback: bool, errors: list[Any]) -> None:
     """处理后端调用错误,决定是否继续尝试"""
@@ -52,6 +54,7 @@ def _handle_call_error(name: str, e: Exception, fallback: bool, errors: list[Any
         if not fallback:
             raise LLMAPIError(message=f"调用后端 {name} 时发生错误: {e!s}", errors={"detail": str(e)}) from e
 
+
 def _raise_all_unavailable(
     errors: list[Any],
     skipped: list[tuple[str, str]] | None = None,
@@ -63,6 +66,7 @@ def _raise_all_unavailable(
         message="所有 LLM 后端均不可用",
         errors={"attempts": attempts_detail, "skipped": skipped or []},
     )
+
 
 def _diagnose_unavailable(name: str, backend: ILLMBackend) -> str:
     """诊断后端不可用的原因,返回可读描述"""
@@ -97,6 +101,7 @@ def _diagnose_unavailable(name: str, backend: ILLMBackend) -> str:
         )
     except Exception as e:
         return f"诊断失败: {e}"
+
 
 class LLMFallbackPolicy:
     def __init__(self, *, router: LLMBackendRouter) -> None:

@@ -31,6 +31,7 @@ from .template.case_template_generation_service import CaseTemplateGenerationSer
 from .template.folder_binding_service import CaseFolderBindingService
 from .template.unified_template_generation_service import UnifiedTemplateGenerationService
 
+
 class CaseService(CaseQueryService, CaseCommandService):
     """案件服务兼容层（继承 CaseQueryService + CaseCommandService）。"""
 
@@ -47,6 +48,7 @@ class CaseService(CaseQueryService, CaseCommandService):
         resolved_search: _CaseSearchService = search_service or _CaseSearchService(access_policy=resolved_policy)
         CaseQueryService.__init__(self, search_service=resolved_search, access_policy=resolved_policy)
         CaseCommandService.__init__(self, contract_service=contract_service, access_policy=resolved_policy)
+
 
 __all__ = [
     "CaseService",

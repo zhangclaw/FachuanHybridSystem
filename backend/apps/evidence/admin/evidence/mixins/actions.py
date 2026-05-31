@@ -11,6 +11,7 @@ from .views import EvidenceListAdminServiceMixin
 
 logger = logging.getLogger(__name__)
 
+
 class EvidenceListAdminActionsMixin(EvidenceListAdminServiceMixin):
     @admin.action(description="合并选中清单的 PDF")
     def merge_pdfs(self, request: Any, queryset: Any) -> None:
@@ -91,5 +92,6 @@ class EvidenceListAdminActionsMixin(EvidenceListAdminServiceMixin):
         response = HttpResponse(content, content_type="application/zip")
         response["Content-Disposition"] = f'attachment; filename="{filename}"'
         return response
+
 
 __all__: list[str] = ["EvidenceListAdminActionsMixin"]

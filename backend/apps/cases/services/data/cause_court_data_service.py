@@ -15,6 +15,7 @@ logger = logging.getLogger("apps.cases")
 if TYPE_CHECKING:
     from apps.core.protocols import ICauseCourtQueryService
 
+
 class CauseCourtDataCache:
     def __init__(self, data_dir: Path) -> None:
         self.data_dir = data_dir
@@ -75,6 +76,7 @@ class CauseCourtDataCache:
                 errors={"filename": filename, "error": str(e)},
             ) from e
 
+
 class CauseCourtDataParser:
     def flatten_tree(self, data: dict[str, Any], result: list[dict[str, Any]] | None = None) -> list[dict[str, Any]]:
         if result is None:
@@ -114,6 +116,7 @@ class CauseCourtDataParser:
         matching_items.sort(key=sort_key)
         return matching_items
 
+
 class CauseCourtDbProvider:
     def __init__(self, *, cause_court_query_service: ICauseCourtQueryService) -> None:
         self.cause_court_query_service = cause_court_query_service
@@ -146,6 +149,7 @@ class CauseCourtDbProvider:
 
     def list_causes_by_parent(self, parent_id: int | None) -> list[dict[str, Any]]:
         return self.cause_court_query_service.list_causes_by_parent_internal(parent_id)
+
 
 class CauseCourtJsonProvider:
     def __init__(
@@ -270,6 +274,7 @@ class CauseCourtJsonProvider:
         except Exception:
             logger.exception("search_courts_from_json_failed", extra={"query": query})
             raise
+
 
 class CauseCourtDataService:
     """

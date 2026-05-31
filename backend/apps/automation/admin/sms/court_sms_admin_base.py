@@ -22,11 +22,13 @@ from apps.automation.services.sms.court_sms_document_reference_service import Co
 
 logger = logging.getLogger("apps.automation")
 
+
 def _get_case_service() -> Any:
     """获取案件服务实例(工厂函数)"""
     from apps.core.interfaces import ServiceLocator
 
     return ServiceLocator.get_case_service()
+
 
 class CourtSMSAdminBase(admin.ModelAdmin):
     """法院短信管理基础配置"""
@@ -504,7 +506,7 @@ class CourtSMSAdminBase(admin.ModelAdmin):
         if obj is None:
             return [
                 (
-                    str("短信信息"),
+                    "短信信息",
                     {
                         "fields": ("content", "received_at"),
                         "description": (

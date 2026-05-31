@@ -24,11 +24,13 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+
 def _is_headless() -> bool:
     """读取 SystemConfig PLAYWRIGHT_HEADED 决定是否无头模式。"""
     from apps.core.services.system_config_service import SystemConfigService
 
     return SystemConfigService().get_value("PLAYWRIGHT_HEADED", "").lower() not in ("true", "1", "yes")
+
 
 class ContractOASyncService:
     """合同 OA 链接与 OA 案件编号同步服务。"""
@@ -55,8 +57,8 @@ class ContractOASyncService:
                 self._update_session(
                     existing,
                     status=ContractOASyncStatus.FAILED,
-                    progress_message=str("检测到陈旧会话，已重置"),
-                    error_message=str("上一次同步任务异常中断，请重新发起"),
+                    progress_message="检测到陈旧会话，已重置",
+                    error_message="上一次同步任务异常中断，请重新发起",
                     completed_at=timezone.now(),
                 )
             else:
@@ -65,7 +67,7 @@ class ContractOASyncService:
         started_by_user = started_by if getattr(started_by, "is_authenticated", False) else None
         return ContractOASyncSession.objects.create(
             status=ContractOASyncStatus.PENDING,
-            progress_message=str("等待启动"),
+            progress_message="等待启动",
             started_by=started_by_user,
         )
 
@@ -82,7 +84,7 @@ class ContractOASyncService:
         ContractOASyncSession.objects.filter(id=session.id).update(
             status=ContractOASyncStatus.PENDING,
             task_id=str(task_id),
-            progress_message=str("同步任务已入队，等待执行"),
+            progress_message="同步任务已入队，等待执行",
             error_message="",
             updated_at=timezone.now(),
         )
@@ -131,7 +133,7 @@ class ContractOASyncService:
             try:
                 contract_id = int(str(contract_id_raw)) if contract_id_raw is not None else 0
             except (TypeError, ValueError):
-                errors.append({"contract_id": str(contract_id_raw or ""), "message": str("合同ID无效")})
+                errors.append({"contract_id": str(contract_id_raw or ""), "message": "合同ID无效"})
                 continue
 
             case_number = str(row.get("law_firm_oa_case_number") or "").strip()
@@ -141,7 +143,7 @@ class ContractOASyncService:
                 try:
                     validate_url(oa_url)
                 except ValidationError:
-                    errors.append({"contract_id": str(contract_id), "message": str("律所OA链接格式无效")})
+                    errors.append({"contract_id": str(contract_id), "message": "律所OA链接格式无效"})
                     continue
 
             with transaction.atomic():
@@ -151,7 +153,7 @@ class ContractOASyncService:
                 )
 
             if affected == 0:
-                errors.append({"contract_id": str(contract_id), "message": str("合同不存在")})
+                errors.append({"contract_id": str(contract_id), "message": "合同不存在"})
                 continue
             updated_count += 1
 
@@ -195,7 +197,7 @@ class ContractOASyncService:
                 multiple_count=0,
                 not_found_count=0,
                 error_count=0,
-                progress_message=str("正在连接金诚同达OA"),
+                progress_message="正在连接金诚同达OA",
                 error_message="",
                 started_at=session.started_at or timezone.now(),
                 result_payload={"items": [], "summary": {}, "remaining_contracts": []},
@@ -206,7 +208,7 @@ class ContractOASyncService:
                 self._update_session(
                     session,
                     status=ContractOASyncStatus.COMPLETED,
-                    progress_message=str("没有需要同步的合同"),
+                    progress_message="没有需要同步的合同",
                     completed_at=timezone.now(),
                     result_payload={"items": [], "summary": {}, "remaining_contracts": []},
                 )
@@ -241,7 +243,7 @@ class ContractOASyncService:
                         if not contract_name:
                             status = "error"
                             error_count += 1
-                            message = str("合同名称为空，无法查询")
+                            message = "合同名称为空，无法查询"
                         else:
                             candidates = self._search_candidates_with_fallback_keywords(
                                 script=script,
@@ -262,15 +264,15 @@ class ContractOASyncService:
                             if len(candidates) == 1:
                                 status = "matched"
                                 matched_count += 1
-                                message = str("已命中唯一候选，请人工确认后手动保存")
+                                message = "已命中唯一候选，请人工确认后手动保存"
                             elif len(candidates) > 1:
                                 status = "multiple"
                                 multiple_count += 1
-                                message = str("命中多个结果，请人工确认")
+                                message = "命中多个结果，请人工确认"
                             else:
                                 status = "not_found"
                                 not_found_count += 1
-                                message = str("未找到匹配的OA案件")
+                                message = "未找到匹配的OA案件"
                     except Exception as exc:
                         logger.exception("contract_oa_sync_item_failed", extra={"contract_id": contract.id})
                         status = "error"
@@ -344,7 +346,7 @@ class ContractOASyncService:
                 session,
                 status=ContractOASyncStatus.COMPLETED,
                 completed_at=timezone.now(),
-                progress_message=str("同步完成"),
+                progress_message="同步完成",
                 result_payload={
                     "items": items,
                     "summary": {
@@ -363,7 +365,7 @@ class ContractOASyncService:
             self._update_session(
                 session,
                 status=ContractOASyncStatus.FAILED,
-                progress_message=str("同步失败"),
+                progress_message="同步失败",
                 error_message=error_message,
                 completed_at=timezone.now(),
                 result_payload={
@@ -683,7 +685,7 @@ class ContractOASyncService:
         from apps.organization.models import AccountCredential
 
         if lawyer_id is None:
-            raise RuntimeError(str("当前用户无效，无法获取OA凭证"))
+            raise RuntimeError("当前用户无效，无法获取OA凭证")
 
         credential = (
             AccountCredential.objects.filter(
@@ -694,7 +696,7 @@ class ContractOASyncService:
             .first()
         )
         if credential is None:
-            raise RuntimeError(str("未找到金诚同达OA账号，请先在账号密码中配置"))
+            raise RuntimeError("未找到金诚同达OA账号，请先在账号密码中配置")
         return credential
 
     def _extract_sso_login_url(self, text: str) -> str:
@@ -714,6 +716,7 @@ class ContractOASyncService:
         for key, value in fields.items():
             if key != "updated_at":
                 setattr(session, key, value)
+
 
 def run_contract_oa_sync_task(session_id: int) -> None:
     """Django-Q 任务入口。"""

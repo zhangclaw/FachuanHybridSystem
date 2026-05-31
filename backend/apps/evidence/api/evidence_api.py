@@ -17,22 +17,26 @@ from apps.core.security.auth import JWTOrSessionAuth
 
 router = Router(tags=["证据管理"], auth=JWTOrSessionAuth())
 
+
 def _get_evidence_service() -> Any:
     """工厂函数获取证据服务"""
     from apps.evidence.services.wiring import get_evidence_service
 
     return get_evidence_service()
 
+
 class ReorderItemsRequest(Schema):
     """重新排序请求"""
 
     item_ids: list[int]
+
 
 class ReorderItemsResponse(Schema):
     """重新排序响应"""
 
     success: bool
     message: str = ""
+
 
 @router.post(
     "/evidence-lists/{list_id}/reorder",
@@ -56,7 +60,9 @@ def reorder_evidence_items(request: HttpRequest, list_id: int, data: ReorderItem
     service.reorder_items(list_id, data.item_ids)
     return ReorderItemsResponse(success=True, message="排序成功")
 
+
 # --- AI 辅助 ---
+
 
 class AIPurposeRequest(Schema):
     """AI 证明目的建议请求"""
@@ -66,10 +72,12 @@ class AIPurposeRequest(Schema):
     evidence_name: str = ""
     content_summary: str = ""
 
+
 class AIPurposeResponse(Schema):
     """AI 证明目的建议响应"""
 
     suggestions: list[str]
+
 
 class AICrossExamRequest(Schema):
     """AI 质证意见请求"""
@@ -79,15 +87,18 @@ class AICrossExamRequest(Schema):
     evidence_name: str = ""
     content_summary: str = ""
 
+
 class AICrossExamResponse(Schema):
     """AI 质证意见响应"""
 
     cross_examination: dict[str, Any]
 
+
 def _get_ai_service() -> Any:
     from apps.evidence.services.ai.evidence_ai_service import EvidenceAIService
 
     return EvidenceAIService()
+
 
 @router.post(
     "/ai/suggest-purpose",
@@ -103,6 +114,7 @@ def ai_suggest_purpose(request: HttpRequest, data: AIPurposeRequest) -> Any:
         content_summary=data.content_summary,
     )
     return AIPurposeResponse(suggestions=suggestions)
+
 
 @router.post(
     "/ai/generate-cross-examination",

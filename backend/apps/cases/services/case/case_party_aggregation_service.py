@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from .repo import CasePartyRepo
 
+
 class CasePartyAggregationService:
     def __init__(self, case_party_repo: CasePartyRepo | None = None) -> None:
         self._case_party_repo = case_party_repo

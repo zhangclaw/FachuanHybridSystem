@@ -9,7 +9,6 @@ from django.db.models import QuerySet
 from django.forms import ModelForm
 from django.http import HttpRequest, JsonResponse
 from django.utils.html import format_html
-
 from simple_history.admin import SimpleHistoryAdmin
 
 from apps.client.models import Client, ClientIdentityDoc, PropertyClue, PropertyClueAttachment
@@ -20,15 +19,18 @@ from apps.core.admin.mixins import AdminImportExportMixin
 
 logger = logging.getLogger("apps.client")
 
+
 def _get_admin_service() -> Any:
     """工厂函数：创建 ClientAdminService 实例"""
     from apps.client.services import ClientAdminService
 
     return ClientAdminService()
 
+
 def _get_gsxt_report_task_model() -> type[Any]:
     """延迟获取 GsxtReportTask 模型。"""
     return django_apps.get_model("automation", "GsxtReportTask")
+
 
 class GsxtReportTaskInlineForm(forms.ModelForm[Any]):  # type: ignore[misc]
     class Meta:
@@ -43,6 +45,7 @@ class GsxtReportTaskInlineForm(forms.ModelForm[Any]):  # type: ignore[misc]
 
     class Media:
         css = {"all": ("automation/gsxt_inline.css",)}
+
 
 class GsxtReportTaskInline(admin.TabularInline[Any]):  # type: ignore[type-arg]
     model = _get_gsxt_report_task_model()
@@ -131,12 +134,14 @@ class GsxtReportTaskInline(admin.TabularInline[Any]):  # type: ignore[type-arg]
             )
         formset.save_m2m()
 
+
 class ClientIdentityDocInlineForm(forms.ModelForm[ClientIdentityDoc]):
     upload = forms.FileField(required=False, label="上传文件")
 
     class Meta:
         model = ClientIdentityDoc
         fields = ["doc_type", "upload"]
+
 
 class ClientIdentityDocInline(admin.TabularInline[ClientIdentityDoc]):  # type: ignore[type-arg]
     model = ClientIdentityDoc
@@ -153,12 +158,14 @@ class ClientIdentityDocInline(admin.TabularInline[ClientIdentityDoc]):  # type: 
 
     file_link.short_description = "文件"  # type: ignore[attr-defined]
 
+
 class PropertyClueInline(admin.TabularInline[PropertyClue]):  # type: ignore[type-arg]
     model = PropertyClue
     extra = 1
     fields = ("clue_type", "content")  # type: ignore[assignment]
     verbose_name = "财产线索"
     verbose_name_plural = "财产线索"
+
 
 class ClientAdminForm(forms.ModelForm[Client]):
     class Meta:
@@ -179,6 +186,7 @@ class ClientAdminForm(forms.ModelForm[Client]):
         elif self.initial.get("client_type"):
             ct = self.initial.get("client_type")
         self.fields["id_number"].label = "身份证号码" if ct == "natural" else "统一社会信用代码"
+
 
 @admin.register(Client)
 class ClientAdmin(SimpleHistoryAdmin, AdminImportExportMixin, admin.ModelAdmin):

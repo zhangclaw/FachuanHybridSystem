@@ -22,6 +22,7 @@ from simple_history.admin import SimpleHistoryAdmin
 
 from ..models import Reminder, ReminderType
 
+
 class ReminderAdminForm(forms.ModelForm[Reminder]):
     class Meta:
         model = Reminder
@@ -52,6 +53,7 @@ class ReminderAdminForm(forms.ModelForm[Reminder]):
                 raise forms.ValidationError("请输入合法的 JSON 对象（非数组或标量）")
             return parsed
         raise forms.ValidationError("请输入合法的 JSON 格式")
+
 
 @admin.register(Reminder)
 class ReminderAdmin(SimpleHistoryAdmin, admin.ModelAdmin):
@@ -353,7 +355,7 @@ class ReminderAdmin(SimpleHistoryAdmin, admin.ModelAdmin):
                 "id": row["id"],
                 "name": row["name"],
                 "target_type": "contract",
-                "target_type_label": str("合同"),
+                "target_type_label": "合同",
             }
             for row in contract_queryset.order_by("-id").values("id", "name")[:limit_per_group]
         ]
@@ -361,7 +363,7 @@ class ReminderAdmin(SimpleHistoryAdmin, admin.ModelAdmin):
             groups.append(
                 {
                     "key": "contract",
-                    "label": str("合同"),
+                    "label": "合同",
                     "items": contract_items,
                 }
             )
@@ -371,7 +373,7 @@ class ReminderAdmin(SimpleHistoryAdmin, admin.ModelAdmin):
                 "id": row["id"],
                 "name": row["name"],
                 "target_type": "case",
-                "target_type_label": str("案件"),
+                "target_type_label": "案件",
             }
             for row in case_queryset.order_by("-id").values("id", "name")[:limit_per_group]
         ]
@@ -379,7 +381,7 @@ class ReminderAdmin(SimpleHistoryAdmin, admin.ModelAdmin):
             groups.append(
                 {
                     "key": "case",
-                    "label": str("案件"),
+                    "label": "案件",
                     "items": case_items,
                 }
             )
@@ -399,14 +401,14 @@ class ReminderAdmin(SimpleHistoryAdmin, admin.ModelAdmin):
                     "id": item.id,
                     "name": label,
                     "target_type": "case_log",
-                    "target_type_label": str("案件日志"),
+                    "target_type_label": "案件日志",
                 }
             )
         if case_log_items:
             groups.append(
                 {
                     "key": "case_log",
-                    "label": str("案件日志"),
+                    "label": "案件日志",
                     "items": case_log_items,
                 }
             )

@@ -9,6 +9,7 @@ import apps.oa_filing.services.oa_scripts.jtn.case_import.http_client as jtn_htt
 import apps.oa_filing.services.oa_scripts.jtn.case_import.playwright_browser as jtn_playwright_browser
 from apps.oa_filing.services.oa_scripts.jtn.case_import import CaseListFormState, JtnCaseImportScript
 
+
 def test_login_prefers_cached_http_cookies(monkeypatch: pytest.MonkeyPatch) -> None:
     script = JtnCaseImportScript(account="example", password="example", headless=True)
 

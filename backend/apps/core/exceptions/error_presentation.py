@@ -8,6 +8,7 @@ from typing import Any
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass(frozen=True)
 class ErrorEnvelope:
     code: str
@@ -28,6 +29,7 @@ class ErrorEnvelope:
         if include_legacy_error:
             payload["error"] = self.message
         return payload
+
 
 class ExceptionPresenter:
     def present(

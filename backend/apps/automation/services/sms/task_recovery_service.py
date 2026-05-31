@@ -15,6 +15,7 @@ from apps.core.tasking import ScheduleQueryService, submit_task
 
 logger = logging.getLogger("apps.automation")
 
+
 class TaskRecoveryService:
     """任务恢复服务"""
 
@@ -210,7 +211,7 @@ class TaskRecoveryService:
             else:
                 # 重试次数用完，标记为失败
                 sms.status = CourtSMSStatus.FAILED
-                sms.error_message = str("恢复时发现重试次数已用完")
+                sms.error_message = "恢复时发现重试次数已用完"
                 sms.save()
                 return False
 
@@ -223,9 +224,10 @@ class TaskRecoveryService:
                     f"疑似 OCR 内存不足导致 worker 反复崩溃，标记为待人工处理"
                 )
                 sms.status = CourtSMSStatus.PENDING_MANUAL
-                sms.error_message = str(
+                sms.error_message = (
                     "匹配阶段反复失败（已重试%(count)d次），可能因OCR内存不足导致处理中断，需要人工处理"
-                ) % {"count": sms.retry_count}
+                    % {"count": sms.retry_count}
+                )
                 sms.save()
                 return False
 
@@ -262,7 +264,7 @@ class TaskRecoveryService:
                         )
                     else:
                         sms.status = CourtSMSStatus.FAILED
-                        sms.error_message = str("下载重试次数已用完")
+                        sms.error_message = "下载重试次数已用完"
                         sms.save()
                         return False
                 else:
@@ -311,6 +313,7 @@ class TaskRecoveryService:
         )
 
         logger.info(f"已安排定期恢复任务，间隔 {interval_minutes} 分钟")
+
 
 def periodic_recovery_task() -> dict[str, Any]:
     """定期恢复任务的入口函数"""

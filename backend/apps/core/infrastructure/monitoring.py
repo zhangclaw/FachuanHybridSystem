@@ -21,6 +21,7 @@ from django.db import connection, reset_queries
 
 logger = logging.getLogger("apps.core.monitoring")
 
+
 class PerformanceMonitor:
     """
     性能监控器

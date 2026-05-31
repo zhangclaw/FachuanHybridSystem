@@ -16,6 +16,7 @@ try:
 except ImportError:
     CaseContactOut = None  # type: ignore[assignment,misc]
 
+
 class CaseIn(ModelSchema):
     class Meta:
         model = Case
@@ -32,10 +33,12 @@ class CaseIn(ModelSchema):
             "specified_date",
         ]
 
+
 class CaseChatOut(ModelSchema):
     class Meta:
         model = CaseChat
         fields: ClassVar = ["id", "platform", "name", "is_active"]
+
 
 class CaseOut(ModelSchema):
     parties: list[CasePartyOut]
@@ -108,6 +111,7 @@ class CaseOut(ModelSchema):
         # 上游已预取 contacts__authority，直接使用预取数据
         return list(obj.contacts.all())
 
+
 class CaseUpdate(Schema):
     name: str | None = None
     status: str | None = None
@@ -119,6 +123,7 @@ class CaseUpdate(Schema):
     current_stage: str | None = None
     effective_date: str | None = None
 
+
 class CaseCreateFull(Schema):
     case: CaseIn
     parties: list[CasePartyCreate] | None = None
@@ -126,6 +131,7 @@ class CaseCreateFull(Schema):
     logs: list[CaseLogCreate] | None = None
     case_numbers: list[CaseNumberIn] | None = None
     supervising_authorities: list[SupervisingAuthorityIn] | None = None
+
 
 class CaseFullOut(Schema):
     case: CaseOut
@@ -135,9 +141,11 @@ class CaseFullOut(Schema):
     case_numbers: list[CaseNumberOut]
     supervising_authorities: list[SupervisingAuthorityOut]
 
+
 class LegalStatusItem(Schema):
     value: str
     label: str
+
 
 class UnifiedGenerateRequest(Schema):
     template_id: int | None = None
@@ -145,6 +153,7 @@ class UnifiedGenerateRequest(Schema):
     client_id: int | None = None
     client_ids: list[int] | None = None
     mode: str | None = None
+
 
 __all__: list[str] = [
     "CaseChatOut",

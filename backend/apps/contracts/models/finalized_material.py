@@ -11,6 +11,7 @@ from .contract import Contract
 if TYPE_CHECKING:
     pass
 
+
 class MaterialCategory(models.TextChoices):
     CONTRACT_ORIGINAL = "contract_original", "合同正本"
     SUPPLEMENTARY_AGREEMENT = "supplementary_agreement", "补充协议"
@@ -20,6 +21,7 @@ class MaterialCategory(models.TextChoices):
     AUTHORIZATION_MATERIAL = "authorization_material", "授权委托材料"
     CASE_MATERIAL = "case_material", "案件材料同步"
     ARCHIVE_UPLOAD = "archive_upload", "归档上传"
+
 
 class FinalizedMaterial(models.Model):
     """归档材料模型，存储上传的 PDF 文件元数据。"""

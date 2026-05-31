@@ -10,6 +10,7 @@ from apps.core.exceptions import ValidationException
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass(frozen=True)
 class TimelineNode:
     """时间线节点"""
@@ -18,6 +19,7 @@ class TimelineNode:
     stage_display: str
     planned_date: date
     is_completed: bool
+
 
 @dataclass(frozen=True)
 class ReminderItem:
@@ -29,6 +31,7 @@ class ReminderItem:
     current_stage: str
     next_due_date: date
     days_until_due: int
+
 
 class CollectionReminderService:
     """催收时间线与到期提醒服务"""

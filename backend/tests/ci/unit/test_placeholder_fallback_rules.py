@@ -10,6 +10,7 @@ from apps.documents.services.placeholders.fallback import (
 )
 from apps.litigation_ai.services.generation.placeholder_render_service import PlaceholderRenderService
 
+
 class _DocStub:
     def get_undeclared_template_variables(self, context: dict[str, object] | None = None) -> set[str]:
         if context and "known" in context:

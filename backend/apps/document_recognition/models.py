@@ -7,6 +7,7 @@ from typing import Any, ClassVar
 
 from django.db import models
 
+
 class DocumentRecognitionStatus(models.TextChoices):
     """文书识别任务状态。"""
 
@@ -14,6 +15,7 @@ class DocumentRecognitionStatus(models.TextChoices):
     PROCESSING = "processing", "识别中"
     SUCCESS = "success", "成功"
     FAILED = "failed", "失败"
+
 
 class DocumentRecognitionTool(models.Model):
     """Admin entry model for document recognition."""
@@ -25,6 +27,7 @@ class DocumentRecognitionTool(models.Model):
         managed = False
         verbose_name = "文书智能识别"
         verbose_name_plural = "文书智能识别"
+
 
 class DocumentRecognitionTask(models.Model):
     """文书识别任务。"""
@@ -65,9 +68,7 @@ class DocumentRecognitionTask(models.Model):
         verbose_name="案件日志",
     )
     binding_message: str | None = models.CharField(max_length=512, null=True, blank=True, verbose_name="绑定消息")
-    binding_error_code: str | None = models.CharField(
-        max_length=64, null=True, blank=True, verbose_name="绑定错误码"
-    )
+    binding_error_code: str | None = models.CharField(max_length=64, null=True, blank=True, verbose_name="绑定错误码")
     error_message: str | None = models.TextField(null=True, blank=True, verbose_name="错误信息")
     notification_sent: bool = models.BooleanField(default=False, verbose_name="通知已发送")
     notification_sent_at: datetime | None = models.DateTimeField(null=True, blank=True, verbose_name="通知发送时间")

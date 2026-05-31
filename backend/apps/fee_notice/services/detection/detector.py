@@ -15,6 +15,7 @@ from ..types import DetectionResult
 
 logger = logging.getLogger("apps.fee_notice")
 
+
 class FeeNoticeDetector:
     """交费通知书检测器"""
 

@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING, ClassVar
 
 from django.core.exceptions import ValidationError
 from django.db import models
-
 from simple_history.models import HistoricalRecords
 
 if TYPE_CHECKING:
@@ -14,6 +13,7 @@ if TYPE_CHECKING:
 
     from .identity_doc import ClientIdentityDoc
     from .property_clue import PropertyClue
+
 
 class Client(models.Model):
     id: int
@@ -29,9 +29,7 @@ class Client(models.Model):
     name = models.CharField(max_length=255, verbose_name="名称")
     phone = models.CharField(max_length=20, blank=True, null=True, verbose_name="联系电话")
     address = models.CharField(max_length=255, blank=True, null=True, default="", verbose_name="住所地")
-    client_type = models.CharField(
-        max_length=16, choices=CLIENT_TYPE_CHOICES, default=LEGAL, verbose_name="主体类型"
-    )
+    client_type = models.CharField(max_length=16, choices=CLIENT_TYPE_CHOICES, default=LEGAL, verbose_name="主体类型")
     id_number = models.CharField(
         max_length=64, blank=True, null=True, unique=True, verbose_name="身份证号码或统一社会信用代码"
     )

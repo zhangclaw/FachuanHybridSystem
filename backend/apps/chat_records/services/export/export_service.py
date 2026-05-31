@@ -17,6 +17,7 @@ from .pdf_export_service import PdfExportService
 
 logger = logging.getLogger(__name__)
 
+
 class ExportService:
     """门面类：根据导出类型委托给对应的子服务。"""
 
@@ -62,6 +63,7 @@ class ExportService:
             filename=filename,
             progress_callback=progress_callback,
         )
+
 
 __all__ = [
     "ExportLayout",

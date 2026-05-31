@@ -6,12 +6,14 @@ from typing import ClassVar
 
 from django.db import models
 
+
 class ContractOASyncStatus(models.TextChoices):
     PENDING = "pending", "待执行"
     RUNNING = "running", "执行中"
     COMPLETED = "completed", "已完成"
     FAILED = "failed", "失败"
     CANCELLED = "cancelled", "已取消"
+
 
 class ContractOASyncSession(models.Model):
     """合同 OA 信息批量同步会话。"""

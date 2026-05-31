@@ -14,6 +14,7 @@ from .recognition_result import RecognitionResult
 
 logger = logging.getLogger(__name__)
 
+
 class QuickRecognitionService:
     """快速识别服务：不创建任务，直接返回识别结果。"""
 

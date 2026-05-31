@@ -13,6 +13,7 @@ from apps.documents.services.placeholders.registry import PlaceholderRegistry
 
 logger = logging.getLogger(__name__)
 
+
 @PlaceholderRegistry.register
 class DatePlaceholderService(BasePlaceholderService):
     """日期格式化服务"""

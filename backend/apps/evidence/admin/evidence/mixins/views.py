@@ -13,11 +13,13 @@ from apps.evidence.models import EvidenceList, ListType
 
 logger = logging.getLogger(__name__)
 
+
 class EvidenceListAdminServiceMixin:
     def _get_admin_service(self) -> Any:
         from apps.evidence.services.admin.evidence_admin_service import EvidenceAdminService
 
         return EvidenceAdminService()
+
 
 class EvidenceListAdminViewsMixin(EvidenceListAdminServiceMixin):
     def changeform_view(
@@ -386,8 +388,7 @@ class EvidenceListAdminViewsMixin(EvidenceListAdminServiceMixin):
             if result["updated"] > 0:
                 messages.success(
                     request,
-                    "已重新识别 %(n)s 个文件的页数,总页数:%(p)s"
-                    % {"n": result["updated"], "p": result["total_pages"]},
+                    "已重新识别 %(n)s 个文件的页数,总页数:%(p)s" % {"n": result["updated"], "p": result["total_pages"]},
                 )
             else:
                 messages.info(request, "没有需要更新的文件")
@@ -403,5 +404,6 @@ class EvidenceListAdminViewsMixin(EvidenceListAdminServiceMixin):
             messages.error(request, "识别页数失败: %(e)s" % {"e": e})
 
         return redirect("admin:documents_evidencelist_changelist")
+
 
 __all__: list[str] = ["EvidenceListAdminServiceMixin", "EvidenceListAdminViewsMixin"]

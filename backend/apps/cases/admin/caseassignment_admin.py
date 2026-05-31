@@ -4,6 +4,7 @@ from django.contrib import admin
 
 from apps.cases.models import CaseAssignment
 
+
 @admin.register(CaseAssignment)
 class CaseAssignmentAdmin(admin.ModelAdmin):
     list_display = ("id", "case", "lawyer")

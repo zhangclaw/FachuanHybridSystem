@@ -17,6 +17,7 @@ from apps.organization.services.access.organization_access_policy import Organiz
 
 logger = logging.getLogger("apps.organization")
 
+
 class TeamService:
     def __init__(self) -> None:
         self._access_policy = OrganizationAccessPolicy()
@@ -151,5 +152,5 @@ class TeamService:
             raise ValidationException(
                 message="非法团队类型",
                 code="INVALID_TEAM_TYPE",
-                errors={"team_type": str("团队类型必须是 %(valid_types)s 之一") % {"valid_types": TeamType.values}},
+                errors={"team_type": "团队类型必须是 %(valid_types)s 之一" % {"valid_types": TeamType.values}},
             )

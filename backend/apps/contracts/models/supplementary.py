@@ -12,6 +12,7 @@ from .party import PartyRole
 if TYPE_CHECKING:
     from django.db.models.fields.related_descriptors import RelatedManager
 
+
 class SupplementaryAgreement(models.Model):
     """补充协议模型"""
 
@@ -38,6 +39,7 @@ class SupplementaryAgreement(models.Model):
     def __str__(self) -> str:
         return f"{self.contract.name} - {self.name or '未命名补充协议'}"
 
+
 class SupplementaryAgreementParty(models.Model):
     """补充协议当事人模型"""
 
@@ -50,9 +52,7 @@ class SupplementaryAgreementParty(models.Model):
     client = models.ForeignKey(
         "client.Client", on_delete=models.CASCADE, related_name="supplementary_agreements", verbose_name="当事人"
     )
-    role = models.CharField(
-        max_length=16, choices=PartyRole.choices, default=PartyRole.PRINCIPAL, verbose_name="身份"
-    )
+    role = models.CharField(max_length=16, choices=PartyRole.choices, default=PartyRole.PRINCIPAL, verbose_name="身份")
 
     class Meta:
         unique_together = ("supplementary_agreement", "client")

@@ -21,6 +21,7 @@ from .session_shared import SessionDTO
 
 logger = logging.getLogger("apps.litigation_ai")
 
+
 class SessionLifecycleService:
     """会话生命周期服务 - 管理会话的创建、查询、状态更新和删除"""
 

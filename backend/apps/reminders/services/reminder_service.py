@@ -27,6 +27,7 @@ logger: logging.Logger = logging.getLogger(__name__)
 if TYPE_CHECKING:
     from ..ports import CaseLogTargetQueryPort, CaseTargetQueryPort, ContractTargetQueryPort
 
+
 class ReminderService:
     def __init__(
         self,

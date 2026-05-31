@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from apps.core.security.permissions import AccessContext
 
+
 @dataclass(frozen=True)
 class RequestContext:
     """请求上下文 DTO"""
@@ -23,6 +24,7 @@ class RequestContext:
             org_access=self.org_access,
             perm_open_access=self.perm_open_access,
         )
+
 
 def extract_request_context(request: Any) -> RequestContext:
     """

@@ -11,6 +11,7 @@ from .data_classes import DocumentDeliveryRecord
 
 logger = logging.getLogger("apps.automation")
 
+
 class DocumentDeliveryParsingMixin:
     """页面解析相关方法"""
 

@@ -13,6 +13,7 @@ from apps.core.services import storage_service as storage
 
 logger = logging.getLogger("apps.contracts")
 
+
 class ClientPaymentImageService:
     """
     客户回款凭证图片服务

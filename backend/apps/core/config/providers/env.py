@@ -11,6 +11,7 @@ from apps.core.config.exceptions import ConfigException
 
 from .base import ConfigProvider
 
+
 class EnvProvider(ConfigProvider):
     """环境变量配置提供者"""
 

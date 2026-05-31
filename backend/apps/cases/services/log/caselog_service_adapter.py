@@ -6,6 +6,7 @@ from typing import Any, cast
 
 from apps.core.interfaces import ICaseLogService
 
+
 class CaseLogServiceAdapter(ICaseLogService):
     """
     案件日志服务适配器

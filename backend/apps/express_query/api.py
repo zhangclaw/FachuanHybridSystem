@@ -11,6 +11,7 @@ from apps.express_query.models import ExpressQueryTask
 
 router = Router()
 
+
 class ExpressQueryTaskOut(Schema):
     id: int
     title: str
@@ -20,6 +21,7 @@ class ExpressQueryTaskOut(Schema):
     result_pdf: str | None = None
     created_at: Any
     updated_at: Any
+
 
 @router.get("/tasks", response=list[ExpressQueryTaskOut])
 def list_tasks(request: HttpRequest) -> Any:

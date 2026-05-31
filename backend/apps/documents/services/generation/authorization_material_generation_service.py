@@ -23,6 +23,7 @@ TEMPLATE_NAME_AUTHORITY_LETTER = "所函"
 TEMPLATE_NAME_LEGAL_REP_CERT = "法定代表人身份证明书"
 TEMPLATE_NAME_POWER_OF_ATTORNEY = "授权委托书"
 
+
 class AuthorizationMaterialGenerationService:
     def _authority_letter_template_path(self) -> Path:
         template_dir = get_docx_templates_root() / "2-案件材料" / "4-通用材料" / "1-授权委托材料"

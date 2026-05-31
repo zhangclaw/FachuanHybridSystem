@@ -14,6 +14,7 @@ from apps.documents.services.placeholders import BasePlaceholderService, Placeho
 
 logger = logging.getLogger(__name__)
 
+
 @PlaceholderRegistry.register
 class PreservationPartyService(BasePlaceholderService):
     """财产保全申请书当事人信息服务"""

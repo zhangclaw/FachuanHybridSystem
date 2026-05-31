@@ -20,6 +20,7 @@ from apps.documents.models.folder_template import FolderTemplate
 
 logger = logging.getLogger(__name__)
 
+
 class TemplateMatchingService:
     _MISSING_SENTINEL = "__documents_template_matching_missing__"
 

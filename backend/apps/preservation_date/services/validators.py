@@ -9,6 +9,7 @@ from .models import PreservationMeasure
 
 logger = logging.getLogger(__name__)
 
+
 class MeasureValidator:
     """保全措施法律约束校验器.
 
@@ -18,15 +19,15 @@ class MeasureValidator:
 
     # 法定期限上限（天数, 提示文案）
     DURATION_LIMITS: ClassVar[dict[str, tuple[int, str]]] = {
-        "查封": (1095, str("不动产查封最长3年")),
-        "冻结": (365, str("银行存款冻结最长1年")),
-        "扣押": (730, str("动产扣押最长2年")),
+        "查封": (1095, "不动产查封最长3年"),
+        "冻结": (365, "银行存款冻结最长1年"),
+        "扣押": (730, "动产扣押最长2年"),
     }
 
     # ---- 校验提示文案 ----
-    _MSG_DATE_INVERTED: str = str("到期日期早于起算日期，请人工核实")
-    _MSG_DURATION_EXCEEDED: str = str("期限超过法定上限（{limit_desc}），请人工核实")
-    _MSG_PENDING_HAS_END_DATE: str = str("轮候状态不应有确定到期日期，请人工核实")
+    _MSG_DATE_INVERTED: str = "到期日期早于起算日期，请人工核实"
+    _MSG_DURATION_EXCEEDED: str = "期限超过法定上限（{limit_desc}），请人工核实"
+    _MSG_PENDING_HAS_END_DATE: str = "轮候状态不应有确定到期日期，请人工核实"
 
     # 多条提示之间的分隔符
     _SEP: str = "；"

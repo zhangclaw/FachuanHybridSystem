@@ -20,6 +20,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+
 class RateSegment(NamedTuple):
     """LPR利率分段区间"""
 
@@ -27,6 +28,7 @@ class RateSegment(NamedTuple):
     end: date
     rate_1y: Decimal
     rate_5y: Decimal
+
 
 class LprRateService:
     """LPR利率查询服务"""

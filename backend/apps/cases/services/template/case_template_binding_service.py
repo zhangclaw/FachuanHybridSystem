@@ -23,6 +23,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+
 class CaseTemplateBindingService:
     """案件模板绑定服务"""
 
@@ -232,7 +233,7 @@ class CaseTemplateBindingService:
             raise ValidationException(
                 message="自动推荐的模板不能手动移除",
                 code="CANNOT_DELETE_AUTO_RECOMMENDED",
-                errors={"binding_id": str("自动推荐的绑定不允许删除")},
+                errors={"binding_id": "自动推荐的绑定不允许删除"},
             )
 
         template_id = binding.template_id
@@ -340,7 +341,7 @@ class CaseTemplateBindingService:
                         "name": t.name,
                         "function_code": getattr(t, "function_code", None),
                         "binding_source": "general",
-                        "binding_source_display": str("通用"),
+                        "binding_source_display": "通用",
                     }
                 )
 

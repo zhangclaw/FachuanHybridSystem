@@ -18,6 +18,7 @@ from django.utils import timezone
 
 logger = logging.getLogger("apps.automation")
 
+
 class Command(BaseCommand):
     help = "恢复未完成的法院短信处理任务"
 

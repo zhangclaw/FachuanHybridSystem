@@ -10,6 +10,7 @@ from django.utils import timezone
 
 from apps.batch_printing.models import PrintKeywordRule, PrintPresetSnapshot
 
+
 @pytest.mark.django_db
 def test_batch_printing_rule_and_preset_endpoints_support_full_crud(authenticated_client) -> None:
     now = timezone.now()

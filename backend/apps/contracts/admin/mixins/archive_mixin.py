@@ -19,11 +19,13 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("apps.contracts")
 
+
 def _get_contract_admin_service() -> Any:
     """工厂函数获取合同 Admin 服务"""
     from apps.contracts.admin.wiring_admin import get_contract_admin_service
 
     return get_contract_admin_service()
+
 
 class ContractArchiveMixin:
     """归档相关 Admin 视图的 Mixin"""
@@ -44,7 +46,7 @@ class ContractArchiveMixin:
         from django.http import JsonResponse
 
         if not self.has_change_permission(request):
-            return JsonResponse({"success": False, "error": str("无权限")}, status=403)
+            return JsonResponse({"success": False, "error": "无权限"}, status=403)
 
         try:
             admin_service = _get_contract_admin_service()
@@ -59,7 +61,7 @@ class ContractArchiveMixin:
 
             if not binding or not binding.folder_path:
                 return JsonResponse(
-                    {"success": False, "error": str("请先在「文档与提醒」中绑定文件夹")},
+                    {"success": False, "error": "请先在「文档与提醒」中绑定文件夹"},
                     status=400,
                 )
 
@@ -99,7 +101,7 @@ class ContractArchiveMixin:
             return JsonResponse({"success": False, "error": "Method not allowed"}, status=405)
 
         if not self.has_change_permission(request):
-            return JsonResponse({"success": False, "error": str("无权限")}, status=403)
+            return JsonResponse({"success": False, "error": "无权限"}, status=403)
 
         try:
             admin_service = _get_contract_admin_service()
@@ -221,7 +223,7 @@ class ContractArchiveMixin:
             return JsonResponse({"success": False, "error": "Method not allowed"}, status=405)
 
         if not self.has_change_permission(request):
-            return JsonResponse({"success": False, "error": str("无权限")}, status=403)
+            return JsonResponse({"success": False, "error": "无权限"}, status=403)
 
         try:
             admin_service = _get_contract_admin_service()
@@ -255,7 +257,7 @@ class ContractArchiveMixin:
             return JsonResponse({"success": False, "error": "Method not allowed"}, status=405)
 
         if not self.has_change_permission(request):
-            return JsonResponse({"success": False, "error": str("无权限")}, status=403)
+            return JsonResponse({"success": False, "error": "无权限"}, status=403)
 
         try:
             import json
@@ -308,7 +310,7 @@ class ContractArchiveMixin:
             return JsonResponse({"success": False, "error": "Method not allowed"}, status=405)
 
         if not self.has_change_permission(request):
-            return JsonResponse({"success": False, "error": str("无权限")}, status=403)
+            return JsonResponse({"success": False, "error": "无权限"}, status=403)
 
         try:
             import json
@@ -402,7 +404,7 @@ class ContractArchiveMixin:
             return JsonResponse({"success": False, "error": "Method not allowed"}, status=405)
 
         if not self.has_change_permission(request):
-            return JsonResponse({"success": False, "error": str("无权限")}, status=403)
+            return JsonResponse({"success": False, "error": "无权限"}, status=403)
 
         try:
             admin_service = _get_contract_admin_service()
@@ -430,7 +432,7 @@ class ContractArchiveMixin:
             return JsonResponse({"success": False, "error": "Method not allowed"}, status=405)
 
         if not self.has_change_permission(request):
-            return JsonResponse({"success": False, "error": str("无权限")}, status=403)
+            return JsonResponse({"success": False, "error": "无权限"}, status=403)
 
         try:
             data = json.loads(request.body)
@@ -460,7 +462,7 @@ class ContractArchiveMixin:
             return JsonResponse({"success": False, "error": "Method not allowed"}, status=405)
 
         if not self.has_change_permission(request):
-            return JsonResponse({"success": False, "error": str("无权限")}, status=403)
+            return JsonResponse({"success": False, "error": "无权限"}, status=403)
 
         try:
             data = json.loads(request.body)
@@ -513,7 +515,7 @@ class ContractArchiveMixin:
             return JsonResponse({"success": False, "error": "Method not allowed"}, status=405)
 
         if not self.has_change_permission(request):
-            return JsonResponse({"success": False, "error": str("无权限")}, status=403)
+            return JsonResponse({"success": False, "error": "无权限"}, status=403)
 
         try:
             uploaded_file = request.FILES.get("file")
@@ -556,7 +558,7 @@ class ContractArchiveMixin:
             return JsonResponse({"success": False, "error": "Method not allowed"}, status=405)
 
         if not self.has_change_permission(request):
-            return JsonResponse({"success": False, "error": str("无权限")}, status=403)
+            return JsonResponse({"success": False, "error": "无权限"}, status=403)
 
         try:
             material = FinalizedMaterial.objects.filter(
@@ -594,7 +596,7 @@ class ContractArchiveMixin:
             return JsonResponse({"success": False, "error": "Method not allowed"}, status=405)
 
         if not self.has_change_permission(request):
-            return JsonResponse({"success": False, "error": str("无权限")}, status=403)
+            return JsonResponse({"success": False, "error": "无权限"}, status=403)
 
         try:
             materials = FinalizedMaterial.objects.filter(contract_id=object_id)

@@ -26,17 +26,20 @@ from apps.documents.models import (
 
 logger = logging.getLogger(__name__)
 
+
 def _get_admin_service() -> Any:
     """工厂函数:获取Admin服务实例"""
     from apps.documents.services.template.folder_template.admin_service import FolderTemplateAdminService
 
     return FolderTemplateAdminService()
 
+
 class MultiSelectWidget(forms.CheckboxSelectMultiple):
     """多选复选框组件"""
 
     template_name: str = "django/forms/widgets/checkbox_select.html"
     option_template_name: str = "django/forms/widgets/checkbox_option.html"
+
 
 class FolderTemplateForm(forms.ModelForm):
     """文件夹模板表单,包含ID验证逻辑和多选字段"""
@@ -177,6 +180,7 @@ class FolderTemplateForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
+
 
 @admin.register(FolderTemplate)
 class FolderTemplateAdmin(admin.ModelAdmin):

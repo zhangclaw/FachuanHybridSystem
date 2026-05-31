@@ -15,6 +15,7 @@ from .types import WeikeCaseDetail, WeikeSearchItem, WeikeSession
 
 logger = logging.getLogger(__name__)
 
+
 class WeikeCaseClient(WeikeAuthMixin, WeikeSearchMixin, WeikeDocumentMixin, WeikeTransportMixin):
     LOGIN_URL = "https://www.wkinfo.com.cn/login/index"
     LAW_LIST_URL = "https://law.wkinfo.com.cn/judgment-documents/list"
@@ -113,6 +114,7 @@ class WeikeCaseClient(WeikeAuthMixin, WeikeSearchMixin, WeikeDocumentMixin, Weik
             except Exception:
                 pass
             raise
+
 
 __all__ = [
     "WeikeCaseClient",

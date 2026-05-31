@@ -10,6 +10,7 @@ from apps.core.exceptions import ChatProviderException, ConfigurationException
 
 logger = logging.getLogger(__name__)
 
+
 class FeishuTokenMixin:
     """负责飞书配置加载和 tenant_access_token 获取"""
 

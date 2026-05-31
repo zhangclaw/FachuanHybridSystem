@@ -73,6 +73,7 @@ _SKIP_PARTS: frozenset[str] = frozenset(
     }
 )
 
+
 class FingerprintService:
     """结构指纹计算与缓存匹配"""
 

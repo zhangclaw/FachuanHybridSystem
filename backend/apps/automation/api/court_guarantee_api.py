@@ -51,6 +51,7 @@ router = Router()
 
 _EXECUTOR = ThreadPoolExecutor(max_workers=2, thread_name_prefix="court-guarantee")
 
+
 def _check_plugin() -> bool:
     """检查法院自动化插件是否已安装。"""
     try:
@@ -59,6 +60,7 @@ def _check_plugin() -> bool:
         return has_court_automation_plugin()
     except ImportError:
         return False
+
 
 @router.get("/case-info/{case_id}", response=CaseGuaranteeInfoOut)
 def get_case_guarantee_info(request: HttpRequest, case_id: int) -> Any:
@@ -120,6 +122,7 @@ def get_case_guarantee_info(request: HttpRequest, case_id: int) -> Any:
         "plugin_available": True,
     }
 
+
 @router.post("/quote/ensure", response=CaseQuoteOperationOut)
 def ensure_case_quote(request: HttpRequest, payload: CaseQuoteOperationIn) -> Any:
     from apps.automation.models import CasePreservationQuoteBinding
@@ -177,6 +180,7 @@ def ensure_case_quote(request: HttpRequest, payload: CaseQuoteOperationIn) -> An
         "quote_context": _build_case_quote_context(case=case),
     }
 
+
 @router.post("/quote/{quote_id}/bind", response=CaseQuoteOperationOut)
 def bind_case_quote(request: HttpRequest, quote_id: int, payload: CaseQuoteOperationIn) -> Any:
     from apps.automation.models import CasePreservationQuoteBinding, PreservationQuote
@@ -221,6 +225,7 @@ def bind_case_quote(request: HttpRequest, quote_id: int, payload: CaseQuoteOpera
         "message": "已绑定所选询价记录",
         "quote_context": _build_case_quote_context(case=case),
     }
+
 
 @router.post("/quote/{quote_id}/retry", response=CaseQuoteOperationOut)
 def retry_case_quote(request: HttpRequest, quote_id: int, payload: CaseQuoteOperationIn) -> Any:
@@ -287,6 +292,7 @@ def retry_case_quote(request: HttpRequest, quote_id: int, payload: CaseQuoteOper
         "quote_context": _build_case_quote_context(case=case),
     }
 
+
 @router.post("/quote/{quote_id}/delete", response=CaseQuoteOperationOut)
 def delete_case_quote(request: HttpRequest, quote_id: int, payload: CaseQuoteOperationIn) -> Any:
     from apps.automation.models import CasePreservationQuoteBinding, PreservationQuote
@@ -316,6 +322,7 @@ def delete_case_quote(request: HttpRequest, quote_id: int, payload: CaseQuoteOpe
         "quote_context": _build_case_quote_context(case=case),
     }
 
+
 @router.post("/quote-binding/{binding_id}/delete", response=CaseQuoteOperationOut)
 def delete_case_quote_binding(request: HttpRequest, binding_id: int, payload: CaseQuoteOperationIn) -> Any:
     from apps.automation.models import CasePreservationQuoteBinding
@@ -336,6 +343,7 @@ def delete_case_quote_binding(request: HttpRequest, binding_id: int, payload: Ca
         "message": "绑定关系已删除",
         "quote_context": _build_case_quote_context(case=case),
     }
+
 
 @router.post("/execute", response=ExecuteCourtGuaranteeOut)
 def execute_court_guarantee(request: HttpRequest, payload: ExecuteCourtGuaranteeIn) -> Any:
@@ -483,6 +491,7 @@ def execute_court_guarantee(request: HttpRequest, payload: ExecuteCourtGuarantee
         "session_id": session.id,
         "status": "in_progress",
     }
+
 
 @router.get("/session/{session_id}", response=ExecuteCourtGuaranteeOut)
 def get_court_guarantee_session_status(request: HttpRequest, session_id: int) -> Any:

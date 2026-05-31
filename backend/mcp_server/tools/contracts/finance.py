@@ -6,6 +6,7 @@ from typing import Any
 
 from mcp_server.client import client
 
+
 def list_payments(
     contract_id: int | None = None,
     payment_type: str | None = None,

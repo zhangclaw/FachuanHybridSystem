@@ -7,9 +7,11 @@ from typing import ClassVar
 
 from .base import ModelSchema, Schema, SchemaMixin, SupervisingAuthority
 
+
 class SupervisingAuthorityIn(Schema):
     name: str | None = None
     authority_type: str | None = None
+
 
 class SupervisingAuthorityOut(ModelSchema, SchemaMixin):
     authority_type_display: str | None
@@ -26,9 +28,11 @@ class SupervisingAuthorityOut(ModelSchema, SchemaMixin):
     def resolve_created_at(obj: SupervisingAuthority) -> datetime | None:
         return SchemaMixin._resolve_datetime(getattr(obj, "created_at", None))
 
+
 class SupervisingAuthorityUpdate(Schema):
     name: str | None = None
     authority_type: str | None = None
+
 
 __all__: list[str] = [
     "SupervisingAuthorityIn",

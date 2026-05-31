@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 __all__: list[str] = ["ExportLayout"]
 
+
 @dataclass(frozen=True)
 class ExportLayout:
     """导出布局配置，包含每页图片数、是否显示页码、页眉文本。"""

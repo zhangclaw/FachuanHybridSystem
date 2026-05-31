@@ -2,10 +2,12 @@ from __future__ import annotations
 
 from django.db import models
 
+
 class ReviewStatus(models.TextChoices):
     DRAFT = "draft", "待审核"
     APPROVED = "approved", "已通过"
     REJECTED = "rejected", "已驳回"
+
 
 class GeneratedArticle(models.Model):
     task = models.ForeignKey(

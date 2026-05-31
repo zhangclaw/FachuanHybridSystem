@@ -6,6 +6,7 @@ from typing import Any
 
 from mcp_server.client import client
 
+
 def trigger_client_import(
     headless: bool = True,
     limit: int | None = None,

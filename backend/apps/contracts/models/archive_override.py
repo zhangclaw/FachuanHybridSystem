@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from django.db import models
 
+
 class ArchivePlaceholderOverride(models.Model):
     """归档文书占位符覆盖值
 

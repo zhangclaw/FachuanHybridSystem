@@ -14,6 +14,7 @@ if TYPE_CHECKING:
 
     from apps.automation.models.court_document import DocumentQueryHistory
 
+
 class CourtSMSStatus(models.TextChoices):
     """短信处理状态"""
 
@@ -28,12 +29,14 @@ class CourtSMSStatus(models.TextChoices):
     COMPLETED = "completed", "已完成"
     FAILED = "failed", "处理失败"
 
+
 class CourtSMSType(models.TextChoices):
     """短信类型"""
 
     DOCUMENT_DELIVERY = "document_delivery", "文书送达"
     INFO_NOTIFICATION = "info_notification", "信息通知"
     FILING_NOTIFICATION = "filing_notification", "立案通知"
+
 
 class CourtSMS(models.Model):
     """法院短信记录"""

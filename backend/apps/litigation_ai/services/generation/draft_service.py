@@ -14,6 +14,7 @@ from apps.litigation_ai.models import LitigationSession
 
 logger = logging.getLogger("apps.litigation_ai")
 
+
 class DraftService:
     """
     草稿生成服务(简化版,供 Agent 工具调用)
@@ -70,6 +71,7 @@ class DraftService:
             "draft": result.draft,
             "model": result.model,
         }
+
 
 class LitigationDraftService:
     async def generate_draft_async(

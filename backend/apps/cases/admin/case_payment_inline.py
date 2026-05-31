@@ -19,6 +19,7 @@ else:
     except ImportError:
         BaseTabularInline = admin.TabularInline  # type: ignore[assignment,misc]
 
+
 class CaseClientPaymentInline(BaseTabularInline[ClientPaymentRecord, ClientPaymentRecord]):
     model = ClientPaymentRecord
     extra = 0

@@ -10,6 +10,7 @@ from apps.legal_research.schemas.legal_research_schemas import (
     AgentSearchResponseV1,
 )
 
+
 @pytest.mark.django_db
 def test_capability_search_endpoint_returns_contract_and_passes_idempotency_key(
     authenticated_client,

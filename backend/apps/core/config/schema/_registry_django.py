@@ -2,6 +2,7 @@
 
 from .field import ConfigField
 
+
 def register_django_configs(registry: dict[str, ConfigField]) -> None:
     registry["django.secret_key"] = ConfigField(
         name="django.secret_key",

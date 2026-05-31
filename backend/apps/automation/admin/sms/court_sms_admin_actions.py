@@ -19,17 +19,20 @@ from apps.automation.models import CourtSMS, CourtSMSStatus
 
 logger = logging.getLogger("apps.automation")
 
+
 def _get_court_sms_service() -> Any:
     """获取法院短信服务实例(工厂函数)"""
     from apps.core.interfaces import ServiceLocator
 
     return ServiceLocator.get_court_sms_service()
 
+
 def _get_case_service() -> Any:
     """获取案件服务实例(工厂函数)"""
     from apps.core.interfaces import ServiceLocator
 
     return ServiceLocator.get_case_service()
+
 
 class CourtSMSAdminActions:
     """法院短信 Admin 操作混入类"""

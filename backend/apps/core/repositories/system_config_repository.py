@@ -10,6 +10,7 @@ from django.db.models import QuerySet
 
 from apps.core.models.system_config import SystemConfig
 
+
 class SystemConfigRepository:
     """系统配置数据访问层"""
 

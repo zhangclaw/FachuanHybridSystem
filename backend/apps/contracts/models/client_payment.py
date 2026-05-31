@@ -6,7 +6,6 @@ from decimal import Decimal
 from typing import TYPE_CHECKING, Any, ClassVar
 
 from django.db import models
-
 from simple_history.models import HistoricalRecords
 
 if TYPE_CHECKING:
@@ -15,6 +14,7 @@ if TYPE_CHECKING:
     from apps.cases.models import Case
 
     from .contract import Contract
+
 
 class ClientPaymentRecord(models.Model):
     """客户回款记录"""

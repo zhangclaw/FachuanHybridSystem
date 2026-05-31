@@ -9,6 +9,7 @@ from django.db import models
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
 
+
 class BatchPrintJobStatus(models.TextChoices):
     PENDING = "pending", "待处理"
     PROCESSING = "processing", "处理中"
@@ -17,6 +18,7 @@ class BatchPrintJobStatus(models.TextChoices):
     FAILED = "failed", "失败"
     CANCELLED = "cancelled", "已取消"
 
+
 class BatchPrintItemStatus(models.TextChoices):
     PENDING = "pending", "待处理"
     PROCESSING = "processing", "处理中"
@@ -24,9 +26,11 @@ class BatchPrintItemStatus(models.TextChoices):
     FAILED = "failed", "失败"
     CANCELLED = "cancelled", "已取消"
 
+
 class BatchPrintFileType(models.TextChoices):
     PDF = "pdf", "PDF"
     DOCX = "docx", "DOCX"
+
 
 class BatchPrintingTool(models.Model):
     id: int
@@ -37,11 +41,10 @@ class BatchPrintingTool(models.Model):
         verbose_name = "批量打印"
         verbose_name_plural = "批量打印"
 
+
 class PrintPresetSnapshot(models.Model):
     printer_name: str = models.CharField(max_length=255, verbose_name="打印机名称")
-    printer_display_name: str = models.CharField(
-        max_length=255, blank=True, default="", verbose_name="打印机展示名称"
-    )
+    printer_display_name: str = models.CharField(max_length=255, blank=True, default="", verbose_name="打印机展示名称")
     preset_name: str = models.CharField(max_length=255, verbose_name="预置名称")
     preset_source: str = models.CharField(max_length=255, blank=True, default="", verbose_name="预置来源")
     raw_settings_payload: Any = models.JSONField(default=dict, blank=True, verbose_name="原始设置")
@@ -64,6 +67,7 @@ class PrintPresetSnapshot(models.Model):
 
     def __str__(self) -> str:
         return f"{self.printer_name} / {self.preset_name}"
+
 
 class PrintKeywordRule(models.Model):
     keyword: str = models.CharField(max_length=255, verbose_name="关键词")
@@ -90,6 +94,7 @@ class PrintKeywordRule(models.Model):
 
     def __str__(self) -> str:
         return f"{self.keyword} -> {self.printer_name}/{self.preset_snapshot.preset_name}"
+
 
 class BatchPrintJob(models.Model):
     id: UUID = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -134,6 +139,7 @@ class BatchPrintJob(models.Model):
     def __str__(self) -> str:
         return f"{self.id} ({self.get_status_display()})"
 
+
 class BatchPrintItem(models.Model):
     job: Any = models.ForeignKey(
         BatchPrintJob,
@@ -144,9 +150,7 @@ class BatchPrintItem(models.Model):
     order: int = models.PositiveIntegerField(default=1, verbose_name="排序")
     source_original_name: str = models.CharField(max_length=255, verbose_name="原始文件名")
     source_relpath: str = models.CharField(max_length=1024, verbose_name="源文件相对路径")
-    prepared_relpath: str = models.CharField(
-        max_length=1024, blank=True, default="", verbose_name="打印文件相对路径"
-    )
+    prepared_relpath: str = models.CharField(max_length=1024, blank=True, default="", verbose_name="打印文件相对路径")
     file_type: str = models.CharField(max_length=16, choices=BatchPrintFileType.choices, verbose_name="文件类型")
     matched_rule: Any = models.ForeignKey(
         PrintKeywordRule,
@@ -194,6 +198,7 @@ class BatchPrintItem(models.Model):
 
     def __str__(self) -> str:
         return f"{self.source_original_name} ({self.get_status_display()})"
+
 
 @receiver(post_delete, sender=BatchPrintJob)
 def delete_job_files(sender: type, instance: BatchPrintJob, **kwargs: object) -> None:

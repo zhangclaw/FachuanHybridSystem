@@ -40,6 +40,7 @@ _KNOWN_CONTEXT_WINDOWS: dict[str, int] = {
     "mimo-v2.5-pro": 1048576,
 }
 
+
 def _make_model(model_id: str, context_window: int = 0) -> dict[str, Any]:
     """构建标准模型字典"""
     ctx = context_window or _KNOWN_CONTEXT_WINDOWS.get(model_id, 0)
@@ -48,6 +49,7 @@ def _make_model(model_id: str, context_window: int = 0) -> dict[str, Any]:
         "name": model_id.split("/")[-1].split(":")[-1],
         "context_window": ctx,
     }
+
 
 @dataclass
 class ModelListResult:
@@ -60,6 +62,7 @@ class ModelListResult:
     @property
     def is_ok(self) -> bool:
         return not self.is_fallback
+
 
 class ModelListService:
     """模型列表公共服务（SiliconFlow / Ollama / OpenAI-compatible）"""

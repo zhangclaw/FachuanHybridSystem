@@ -48,6 +48,7 @@ LEGAL_STATUS_ORDER = [
     "orig_third",
 ]
 
+
 class EvidenceListPlaceholderService:
     """
     证据清单占位符服务

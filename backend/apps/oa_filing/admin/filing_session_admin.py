@@ -4,6 +4,7 @@ from django.contrib import admin
 
 from apps.oa_filing.models import FilingSession
 
+
 class FilingSessionAdmin(admin.ModelAdmin):
     list_display = [
         "id",

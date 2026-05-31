@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from apps.documents.services.extractors.judgment_pdf_extractor import JudgmentPdfExtractor
 
+
 def test_extract_main_text_removes_inline_page_noise() -> None:
     extractor = JudgmentPdfExtractor()
     text = (

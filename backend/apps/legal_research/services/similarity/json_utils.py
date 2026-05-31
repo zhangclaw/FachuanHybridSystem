@@ -28,6 +28,7 @@ HARD_CONFLICT_NEEDLES = (
 )
 MIN_EVIDENCE_SPAN_CHARS = 4
 
+
 def extract_json(text: str) -> dict[str, object] | None:
     if not text:
         return None
@@ -57,6 +58,7 @@ def extract_json(text: str) -> dict[str, object] | None:
 
     return None
 
+
 def normalize_text_list(value: object) -> list[str]:
     if isinstance(value, list):
         return [str(item).strip() for item in value if str(item).strip()]
@@ -64,12 +66,14 @@ def normalize_text_list(value: object) -> list[str]:
         return [value.strip()]
     return []
 
+
 def normalize_match_text(text: str) -> str:
     if not text:
         return ""
     normalized = re.sub(r"\s+", "", text)
     normalized = re.sub(r"[，。；：、“”‘’\"'（）()【】\[\]《》<>、,.!?！？:;·\-]", "", normalized)
     return normalized.lower()
+
 
 def evidence_span_hit_count(*, evidence_spans: list[str], context_text: str) -> tuple[int, int]:
     normalized_context = normalize_match_text(context_text)
@@ -86,6 +90,7 @@ def evidence_span_hit_count(*, evidence_spans: list[str], context_text: str) -> 
         if normalized_span in normalized_context:
             hits += 1
     return hits, total
+
 
 def apply_structured_adjustments(
     *,
@@ -138,6 +143,7 @@ def apply_structured_adjustments(
 
     return max(0.0, min(1.0, adjusted))
 
+
 def extract_structured_metadata(
     *,
     payload: dict[str, object],
@@ -175,6 +181,7 @@ def extract_structured_metadata(
             metadata["evidence_hit_ratio"] = round(hit_count / valid_count, 4)
 
     return metadata
+
 
 def extract_transaction_tags(text: str) -> list[str]:
     normalized = (text or "").strip().lower()

@@ -2,12 +2,14 @@
 
 from django.db import models
 
+
 class EvidenceDirection(models.TextChoices):
     """证据方向"""
 
     OUR = "our", "我方证据"
     OPPONENT = "opponent", "对方证据"
     COURT = "court", "法院调取"
+
 
 class EvidenceType(models.TextChoices):
     """证据种类（民事诉讼法第六十六条）"""
@@ -20,6 +22,7 @@ class EvidenceType(models.TextChoices):
     APPRAISAL = "appraisal", "鉴定意见"
     INSPECTION = "inspection", "勘验笔录"
     STATEMENT = "statement", "当事人陈述"
+
 
 class OriginalStatus(models.TextChoices):
     """原件状态"""

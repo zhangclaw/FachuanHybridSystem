@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from django.db import models
 
+
 class PreservationDateTool(models.Model):
     """Admin entry model for preservation date extraction."""
 

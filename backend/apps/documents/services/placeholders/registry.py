@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 
 T = TypeVar("T", bound=BasePlaceholderService)
 
+
 class PlaceholderRegistry:
     """占位符服务注册表(单例模式)"""
 

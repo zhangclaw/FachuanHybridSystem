@@ -10,6 +10,7 @@ from django.db.models import Q, QuerySet
 
 logger = logging.getLogger("apps.evidence")
 
+
 class EvidenceOCRService:
     """从证据文件提取 OCR 文本并保存"""
 
@@ -82,6 +83,7 @@ class EvidenceOCRService:
         ocr_svc = ServiceLocator.get_ocr_service()
         result = ocr_svc.extract_text(image_bytes)
         return result.text if hasattr(result, "text") else str(result)
+
 
 class EvidenceSearchService:
     """证据全文搜索"""

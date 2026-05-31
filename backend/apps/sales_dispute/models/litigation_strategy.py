@@ -2,12 +2,14 @@ from __future__ import annotations
 
 from django.db import models
 
+
 class StrategyType(models.TextChoices):
     PAYMENT_ORDER = "payment_order", "支付令"
     SMALL_CLAIMS = "small_claims", "小额诉讼"
     SUMMARY_PROCEDURE = "summary_procedure", "简易程序"
     ORDINARY_PROCEDURE = "ordinary_procedure", "普通程序"
     PRE_LITIGATION_MEDIATION = "pre_litigation_mediation", "诉前调解"
+
 
 class LitigationStrategy(models.Model):
     id: int

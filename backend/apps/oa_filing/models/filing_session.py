@@ -4,12 +4,14 @@ from typing import Any, ClassVar
 
 from django.db import models
 
+
 class SessionStatus(models.TextChoices):
     PENDING = "pending", "待开始"
     IN_PROGRESS = "in_progress", "进行中"
     COMPLETED = "completed", "已完成"
     FAILED = "failed", "失败"
     CANCELLED = "cancelled", "已取消"
+
 
 class FilingSession(models.Model):
     """OA立案执行记录"""

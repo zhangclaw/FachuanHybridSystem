@@ -11,6 +11,7 @@ import pytest
 
 from apps.core.filesystem.inode_resolver import InodeResolver
 
+
 @pytest.fixture
 def resolver() -> InodeResolver:
     return InodeResolver()

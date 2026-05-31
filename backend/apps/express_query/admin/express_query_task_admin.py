@@ -22,6 +22,7 @@ logger = logging.getLogger("apps.express_query")
 _SF_PATTERN: Final[re.Pattern[str]] = re.compile(r"(?<![A-Z0-9])SF\d{10,20}(?![A-Z0-9])", re.IGNORECASE)
 _EMS_PATTERN: Final[re.Pattern[str]] = re.compile(r"(?<!\d)\d{13}(?!\d)")
 
+
 @admin.register(ExpressQueryTool)
 class ExpressQueryToolAdmin(admin.ModelAdmin):
     def changelist_view(
@@ -167,6 +168,7 @@ class ExpressQueryToolAdmin(admin.ModelAdmin):
         logger.info("快递查询任务已创建并入队", extra={"task_id": task.id, "queue_task_id": queue_task_id})
         self.message_user(request, "上传成功，任务已创建并进入队列。", level=messages.SUCCESS)
         return HttpResponseRedirect(reverse("admin:express_query_expressquerytask_changelist"))
+
 
 @admin.register(ExpressQueryTask)
 class ExpressQueryTaskAdmin(admin.ModelAdmin):

@@ -17,6 +17,7 @@ from apps.automation.models import InsuranceQuote, PreservationQuote, QuoteItemS
 from apps.core.exceptions import BusinessException, NotFoundError, ValidationException
 from apps.core.interfaces import ServiceLocator
 
+
 class PreservationQuoteAdminService:
     """
     财产保全询价管理服务
@@ -439,9 +440,7 @@ class PreservationQuoteAdminService:
             }
 
         except PreservationQuote.DoesNotExist as e:
-            raise NotFoundError(
-                message="询价任务不存在", code="QUOTE_NOT_FOUND", errors={"quote_id": quote_id}
-            ) from e
+            raise NotFoundError(message="询价任务不存在", code="QUOTE_NOT_FOUND", errors={"quote_id": quote_id}) from e
         """
         获取询价结果对比分析
 

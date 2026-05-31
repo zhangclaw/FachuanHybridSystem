@@ -22,10 +22,12 @@ logger = logging.getLogger(__name__)
 
 router = Router(tags=["模拟庭审"], auth=JWTOrSessionAuth())
 
+
 def _get_service() -> Any:
     from apps.litigation_ai.services import LitigationConversationService
 
     return LitigationConversationService()
+
 
 @router.post(
     "/sessions",
@@ -50,6 +52,7 @@ def create_session(request: HttpRequest, payload: CreateMockTrialSessionRequest)
         "messages": [],
     }
 
+
 @router.get("/sessions", response={200: MockTrialSessionListResponse, 403: ErrorResponse})
 def list_sessions(request: HttpRequest, case_id: int | None = None, limit: int = 20, offset: int = 0) -> Any:
     service = _get_service()
@@ -62,6 +65,7 @@ def list_sessions(request: HttpRequest, case_id: int | None = None, limit: int =
         offset=offset,
     )
     return {"count": data["total"], "results": data["sessions"]}
+
 
 @router.get(
     "/sessions/{session_id}",
@@ -85,6 +89,7 @@ def get_session(request: HttpRequest, session_id: str) -> Any:
         ],
     }
 
+
 @router.get(
     "/sessions/{session_id}/report",
     response={200: MockTrialReportResponse, 404: ErrorResponse},
@@ -101,6 +106,7 @@ def get_report(request: HttpRequest, session_id: str) -> Any:
         "report": report_data,
     }
 
+
 @router.delete(
     "/sessions/{session_id}",
     response={204: None, 404: ErrorResponse},
@@ -110,6 +116,7 @@ def delete_session(request: HttpRequest, session_id: str) -> Any:
     user = getattr(request, "user", None)
     service.delete_session(session_id, user)
     return Status(204, None)
+
 
 @router.get(
     "/sessions/{session_id}/export",

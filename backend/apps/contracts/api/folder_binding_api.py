@@ -6,7 +6,6 @@ import logging
 from typing import Any
 
 from django.http import HttpRequest
-
 from ninja import Router
 
 from apps.contracts.schemas import (
@@ -21,6 +20,7 @@ from apps.core.security import get_request_access_context
 logger = logging.getLogger("apps.contracts.api")
 router = Router()
 
+
 def _get_folder_binding_service() -> Any:
     """
     工厂函数:创建 FolderBindingService 实例
@@ -33,16 +33,19 @@ def _get_folder_binding_service() -> Any:
 
     return FolderBindingService(document_template_binding_service=build_document_template_binding_service())
 
+
 def _require_contract_access(request: HttpRequest, contract_id: int) -> None:
     from apps.contracts.services.contract import wiring
 
     ctx = get_request_access_context(request)
     wiring.get_contract_query_facade().get_contract_ctx(contract_id=contract_id, ctx=ctx)
 
+
 def _require_admin(request: HttpRequest) -> None:
     user = getattr(request, "user", None)
     if not user or not getattr(user, "is_authenticated", False):
         raise PermissionDenied("需要登录")
+
 
 @router.post("/{contract_id}/folder-binding", response=FolderBindingResponseSchema)
 def create_folder_binding(request: HttpRequest, contract_id: int, data: FolderBindingCreateSchema) -> Any:
@@ -90,6 +93,7 @@ def create_folder_binding(request: HttpRequest, contract_id: int, data: FolderBi
         path_auto_repaired=False,
     )
 
+
 @router.get("/{contract_id}/folder-binding", response=FolderBindingResponseSchema | None)
 def get_folder_binding(request: HttpRequest, contract_id: int) -> Any:
     """
@@ -123,6 +127,7 @@ def get_folder_binding(request: HttpRequest, contract_id: int) -> Any:
         path_auto_repaired=path_auto_repaired,
     )
 
+
 @router.delete("/{contract_id}/folder-binding")
 def delete_folder_binding(request: HttpRequest, contract_id: int) -> Any:
     """
@@ -154,6 +159,7 @@ def delete_folder_binding(request: HttpRequest, contract_id: int) -> Any:
     )
 
     return {"success": success, "message": "绑定已删除" if success else "绑定不存在"}
+
 
 @router.get("/folder-browse", response=FolderBrowseResponseSchema)
 def browse_folders(request: HttpRequest, path: str | None = None, include_hidden: bool = False) -> Any:

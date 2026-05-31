@@ -19,6 +19,7 @@ _repository = SystemConfigRepository()
 
 # ─── Schemas ────────────────────────────────────────────────────────────────────
 
+
 class SystemConfigItemOut(Schema):
     key: str
     value: str
@@ -28,20 +29,25 @@ class SystemConfigItemOut(Schema):
     is_active: bool
     has_value: bool = True
 
+
 class SystemConfigGroupOut(Schema):
     category: str
     items: list[SystemConfigItemOut]
 
+
 class SystemConfigListOut(Schema):
     groups: list[SystemConfigGroupOut]
+
 
 class SystemConfigUpdateIn(Schema):
     category: str
     updates: dict[str, str]
 
+
 class SystemConfigUpdateOut(Schema):
     success: bool
     updated_count: int
+
 
 class SystemConfigCreateIn(Schema):
     key: str
@@ -50,6 +56,7 @@ class SystemConfigCreateIn(Schema):
     description: str = ""
     is_secret: bool = False
 
+
 class SystemConfigPatchIn(Schema):
     value: str | None = None
     category: str | None = None
@@ -57,10 +64,13 @@ class SystemConfigPatchIn(Schema):
     is_secret: bool | None = None
     is_active: bool | None = None
 
+
 class SystemConfigDeleteOut(Schema):
     success: bool
 
+
 # ─── Endpoints ──────────────────────────────────────────────────────────────────
+
 
 @router.get("/system-configs", response=SystemConfigListOut)
 def list_system_configs(request: HttpRequest) -> dict[str, Any]:
@@ -82,6 +92,7 @@ def list_system_configs(request: HttpRequest) -> dict[str, Any]:
         )
     groups = [SystemConfigGroupOut(category=cat, items=items) for cat, items in grouped.items()]
     return {"groups": groups}
+
 
 @router.put("/system-configs", response=SystemConfigUpdateOut)
 def update_system_configs(request: HttpRequest, payload: SystemConfigUpdateIn) -> dict[str, bool | int]:
@@ -112,6 +123,7 @@ def update_system_configs(request: HttpRequest, payload: SystemConfigUpdateIn) -
         updated += 1
     return {"success": True, "updated_count": updated}
 
+
 @router.post("/system-configs", response=SystemConfigItemOut)
 def create_system_config(request: HttpRequest, payload: SystemConfigCreateIn) -> Any:
     """创建新的系统配置项。"""
@@ -140,6 +152,7 @@ def create_system_config(request: HttpRequest, payload: SystemConfigCreateIn) ->
         is_active=config.is_active,
         has_value=bool(config.value),
     )
+
 
 @router.patch("/system-configs/{key}", response=SystemConfigItemOut)
 def patch_system_config(request: HttpRequest, key: str, payload: SystemConfigPatchIn) -> Any:
@@ -170,6 +183,7 @@ def patch_system_config(request: HttpRequest, key: str, payload: SystemConfigPat
         is_active=updated.is_active,
         has_value=bool(updated.value),
     )
+
 
 @router.delete("/system-configs/{key}", response=SystemConfigDeleteOut)
 def delete_system_config(request: HttpRequest, key: str) -> Any:

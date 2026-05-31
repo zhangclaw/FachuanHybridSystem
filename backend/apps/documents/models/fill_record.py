@@ -18,6 +18,7 @@ from .external_template import ExternalTemplate
 
 logger: logging.Logger = logging.getLogger(__name__)
 
+
 class BatchFillTask(models.Model):
     """
     批量填充任务
@@ -78,6 +79,7 @@ class BatchFillTask(models.Model):
 
     def __str__(self) -> str:
         return f"BatchFillTask #{self.id}"
+
 
 class FillRecord(models.Model):
     """

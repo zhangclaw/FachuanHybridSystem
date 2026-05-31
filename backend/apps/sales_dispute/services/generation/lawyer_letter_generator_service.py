@@ -18,12 +18,14 @@ logger = logging.getLogger(__name__)
 
 TEMPLATE_DIR: Path = Path(str(get_docx_templates_root() / "2-案件材料" / "3-催收材料"))
 
+
 class LetterTone(str, Enum):
     """律师函语气枚举"""
 
     MILD = "mild"
     FIRM = "firm"
     ULTIMATUM = "ultimatum"
+
 
 TONE_TEMPLATE_MAP: dict[LetterTone, str] = {
     LetterTone.MILD: "律师函-温和版.docx",
@@ -36,6 +38,7 @@ _TONE_DISPLAY: dict[LetterTone, str] = {
     LetterTone.FIRM: "强硬版",
     LetterTone.ULTIMATUM: "最后通牒",
 }
+
 
 @dataclass(frozen=True)
 class LawyerLetterParams:
@@ -50,12 +53,14 @@ class LawyerLetterParams:
     contract_no: str = ""
     deadline_days: int = 7
 
+
 @dataclass(frozen=True)
 class GeneratedDocument:
     """生成文档结果"""
 
     filename: str
     content: bytes
+
 
 class LawyerLetterGeneratorService:
     """律师函生成服务"""

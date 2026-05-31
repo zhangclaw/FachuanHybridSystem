@@ -26,6 +26,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("apps.automation")
 
+
 class SMSMatchingStage(BaseSMSStage):
     """
     SMS 匹配阶段处理器
@@ -312,6 +313,7 @@ class SMSMatchingStage(BaseSMSStage):
                 continue
             valid.append(n)
         return valid
+
 
 def create_sms_matching_stage(
     matcher: Optional["CaseMatcher"] = None,

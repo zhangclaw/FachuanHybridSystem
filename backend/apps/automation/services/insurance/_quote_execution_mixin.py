@@ -13,6 +13,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("apps.automation")
 
+
 def get_or_create_token(site_name: str = "court_zxfw", account: Any | None = None) -> str | None:
     """获取或创建 Token（模块级工具函数）"""
     from django.utils import timezone
@@ -42,6 +43,7 @@ def get_or_create_token(site_name: str = "court_zxfw", account: Any | None = Non
 
     logger.warning(f"⚠️ 未找到有效 Token: {site_name}，需要手动登录获取")
     return None
+
 
 class QuoteExecutionMixin:
     """负责询价执行流程的私有方法"""
@@ -138,7 +140,7 @@ class QuoteExecutionMixin:
                 ),
             )
             if not companies:
-                raise CompanyListEmptyError(message=str("未获取到保险公司列表，请检查分类 ID 和法院 ID 是否正确"))
+                raise CompanyListEmptyError(message="未获取到保险公司列表，请检查分类 ID 和法院 ID 是否正确")
             logger.info(f"✅ 获取到 {len(companies)} 家保险公司")
             return companies
         except CompanyListEmptyError:

@@ -7,6 +7,7 @@ from django.contrib import admin
 from apps.cases.admin.base_admin import BaseModelAdmin, BaseTabularInline
 from apps.sales_dispute.models import CollectionLog, CollectionRecord
 
+
 class CollectionLogInline(BaseTabularInline):
     """催收操作日志 Inline"""
 
@@ -21,6 +22,7 @@ class CollectionLogInline(BaseTabularInline):
         "created_at",
     )
     ordering = ("-action_date", "-created_at")
+
 
 @admin.register(CollectionRecord)
 class CollectionRecordAdmin(BaseModelAdmin):

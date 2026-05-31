@@ -8,6 +8,7 @@ from unittest.mock import MagicMock, call
 
 import pytest
 
+
 class FakeRequest:
     """Minimal mock of playwright.sync_api.Request."""
 

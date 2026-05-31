@@ -14,11 +14,13 @@ from apps.client.models import ClientIdentityDoc
 
 logger = logging.getLogger("apps.client")
 
+
 def _get_identity_doc_service() -> Any:
     """工厂函数：获取当事人证件服务"""
     from apps.client.services.client_identity_doc_service import ClientIdentityDocService
 
     return ClientIdentityDocService()
+
 
 class ClientIdentityDocForm(forms.ModelForm[ClientIdentityDoc]):
     """当事人证件表单"""
@@ -37,6 +39,7 @@ class ClientIdentityDocForm(forms.ModelForm[ClientIdentityDoc]):
         super().__init__(*args, **kwargs)
         if self.instance and self.instance.pk:
             self.fields["file_upload"].help_text = "当前文件：" + Path(self.instance.file_path or "").name
+
 
 @admin.register(ClientIdentityDoc)
 class ClientIdentityDocAdmin(admin.ModelAdmin):

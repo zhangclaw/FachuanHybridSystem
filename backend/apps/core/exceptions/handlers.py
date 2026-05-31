@@ -37,6 +37,7 @@ _CreateResponse = Callable[..., HttpResponse]
 # 辅助函数
 # ---------------------------------------------------------------------------
 
+
 def _get_user_id(request: HttpRequest) -> int | str | None:
     user = getattr(request, "user", None)
     user_id: Any = getattr(user, "id", None) if user is not None else None
@@ -47,6 +48,7 @@ def _get_user_id(request: HttpRequest) -> int | str | None:
     if isinstance(auth_id, (int, str)):
         return auth_id
     return None
+
 
 def _safe_log_value(value: Any, *, depth: int = 0) -> Any:
     if depth >= 4:
@@ -68,6 +70,7 @@ def _safe_log_value(value: Any, *, depth: int = 0) -> Any:
         return tuple(_safe_log_value(v, depth=depth + 1) for v in value[:50])
     return str(value)[:200]
 
+
 def _log_extra(request: HttpRequest, **extra: Any) -> dict[str, Any]:
     base: dict[str, Any] = {
         "path": getattr(request, "path", None),
@@ -78,6 +81,7 @@ def _log_extra(request: HttpRequest, **extra: Any) -> dict[str, Any]:
         extra["errors"] = _safe_log_value(extra.get("errors"))
     base.update(extra)
     return base
+
 
 def _attach_request_meta(request: HttpRequest, payload: Any) -> Any:
     """Attach request metadata (request_id, trace_id) to response payload."""
@@ -96,6 +100,7 @@ def _attach_request_meta(request: HttpRequest, payload: Any) -> Any:
         payload.setdefault("span_id", span_id)
     return payload
 
+
 def _parse_retry_after(raw: Any) -> int | None:
     """Parse retry_after value from RateLimitError errors dict."""
     if isinstance(raw, int):
@@ -107,6 +112,7 @@ def _parse_retry_after(raw: Any) -> int | None:
             return None
     return None
 
+
 def _set_retry_after_header(response: HttpResponse, retry_after: int) -> None:
     """Set Retry-After response header."""
     try:
@@ -114,14 +120,17 @@ def _set_retry_after_header(response: HttpResponse, retry_after: int) -> None:
     except (AttributeError, TypeError, KeyError):
         response["Retry-After"] = str(max(0, retry_after))
 
+
 def _resolve_llm_status_code(upstream: int | None) -> int:
     """Resolve HTTP status code for LLM API errors based on upstream status."""
     upstream_map = {429: 429, 503: 503, 504: 504}
     return upstream_map.get(upstream, 502) if upstream else 502
 
+
 # ---------------------------------------------------------------------------
 # 注册函数
 # ---------------------------------------------------------------------------
+
 
 def register_exception_handlers(api: NinjaAPI) -> None:
     """注册全局异常处理器"""
@@ -136,10 +145,12 @@ def register_exception_handlers(api: NinjaAPI) -> None:
     _register_jwt_handler(api, _create_response)
     _register_fallback_handler(api, _create_response)
 
+
 def _register_business_handlers(api: NinjaAPI, create_response: _CreateResponse) -> None:
     """注册业务异常处理器"""
     _register_client_error_handlers(api, create_response)
     _register_server_error_handlers(api, create_response)
+
 
 def _register_client_error_handlers(api: NinjaAPI, create_response: _CreateResponse) -> None:
     """注册 4xx 业务异常处理器"""
@@ -190,6 +201,7 @@ def _register_client_error_handlers(api: NinjaAPI, create_response: _CreateRespo
         status = int(getattr(exc, "status", 400))
         return create_response(request, exc.to_dict(), status=status)
 
+
 def _register_server_error_handlers(api: NinjaAPI, create_response: _CreateResponse) -> None:
     """注册 5xx 业务异常处理器"""
 
@@ -229,6 +241,7 @@ def _register_server_error_handlers(api: NinjaAPI, create_response: _CreateRespo
             extra=_log_extra(request, code=exc.code, errors=exc.errors),
         )
         return create_response(request, exc.to_dict(), status=502)
+
 
 def _register_llm_handlers(api: NinjaAPI, create_response: _CreateResponse) -> None:
     """注册 LLM 相关异常处理器（可选依赖，ImportError 时静默跳过）"""
@@ -271,6 +284,7 @@ def _register_llm_handlers(api: NinjaAPI, create_response: _CreateResponse) -> N
         pass
     except Exception:
         logger.exception("Failed to register LLM exception handlers")
+
 
 def _register_django_handlers(api: NinjaAPI, create_response: _CreateResponse) -> None:
     """注册 Django 内置异常处理器"""
@@ -327,6 +341,7 @@ def _register_django_handlers(api: NinjaAPI, create_response: _CreateResponse) -
             status=int(exc.status_code),
         )
 
+
 def _register_jwt_handler(api: NinjaAPI, create_response: _CreateResponse) -> None:
     """注册 JWT 异常处理器（可选依赖，ImportError 时静默跳过）"""
     try:
@@ -348,6 +363,7 @@ def _register_jwt_handler(api: NinjaAPI, create_response: _CreateResponse) -> No
 
     except ImportError:
         pass
+
 
 def _register_fallback_handler(api: NinjaAPI, create_response: _CreateResponse) -> None:
     """注册兜底异常处理器"""

@@ -25,6 +25,7 @@ else:
         BaseStackedInline = admin.StackedInline
         BaseModelAdmin = admin.ModelAdmin
 
+
 class CaseContactAdminForm(forms.ModelForm[CaseContact]):
     """案件联系人表单 - 主管机关支持自动补全"""
 
@@ -66,6 +67,7 @@ class CaseContactAdminForm(forms.ModelForm[CaseContact]):
         else:
             self.instance.authority = None
         return cleaned
+
 
 class CaseContactInlineForm(forms.ModelForm[CaseContact]):
     """案件联系人内联表单 - 主管机关支持自动补全"""
@@ -109,11 +111,13 @@ class CaseContactInlineForm(forms.ModelForm[CaseContact]):
             self.instance.authority = None
         return cleaned
 
+
 class CaseContactInline(BaseStackedInline):
     model = CaseContact
     form = CaseContactInlineForm
     extra = 1
     fields = ("name", "role", "phone", "stage", "authority_name", "note")
+
 
 @admin.register(CaseContact)
 class CaseContactAdmin(BaseModelAdmin):

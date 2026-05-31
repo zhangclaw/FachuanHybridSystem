@@ -15,11 +15,13 @@ from django.utils.safestring import SafeString
 
 from apps.automation.models import CourtDocument, DocumentDownloadStatus
 
+
 def _get_court_document_admin_service() -> Any:
     """工厂函数：创建法院文书管理服务"""
     from apps.automation.services.admin import CourtDocumentAdminService
 
     return CourtDocumentAdminService()
+
 
 @admin.register(CourtDocument)
 class CourtDocumentAdmin(admin.ModelAdmin):

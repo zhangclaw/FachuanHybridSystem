@@ -16,6 +16,7 @@ from apps.core.services.filename_template_service import FilenameTemplateService
 
 logger = logging.getLogger(__name__)
 
+
 class DocumentRenamer:
     """文书重命名服务"""
 

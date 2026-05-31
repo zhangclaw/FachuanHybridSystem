@@ -23,6 +23,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("apps.automation")
 
+
 class SMSNotifyingStage(BaseSMSStage):
     """
     SMS 通知阶段处理器
@@ -122,9 +123,7 @@ class SMSNotifyingStage(BaseSMSStage):
         else:
             sms.status = CourtSMSStatus.FAILED
             error_detail = "; ".join(f"{r.platform}: {r.error}" for r in result.attempts if not r.success)
-            sms.error_message = (
-                f"案件群聊通知发送失败: {error_detail}" if error_detail else str("案件群聊通知发送失败")
-            )
+            sms.error_message = f"案件群聊通知发送失败: {error_detail}" if error_detail else "案件群聊通知发送失败"
             logger.error(f"案件群聊通知发送失败，短信标记为失败: SMS ID={sms.id}")
 
     def _handle_notification_error(self, sms: CourtSMS, error: Exception) -> None:
@@ -135,6 +134,7 @@ class SMSNotifyingStage(BaseSMSStage):
         sms.error_message = f"案件群聊通知发送失败: {error_msg}"
         sms.save()
         logger.error(f"案件群聊通知发送失败: SMS ID={sms.id}, 错误: {error_msg}")
+
 
 def create_sms_notifying_stage(
     notification_service: Optional["SMSNotificationService"] = None,

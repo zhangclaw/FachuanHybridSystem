@@ -25,11 +25,13 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("apps.contracts")
 
+
 def _get_contract_detail_reminders(contract: Any) -> list[dict[str, Any]]:
     from apps.core.interfaces import ServiceLocator
 
     reminder_service = ServiceLocator.get_reminder_service()
     return reminder_service.export_contract_reminders_internal(contract_id=contract.id)
+
 
 class ContractDisplayMixin(ContractArchiveMixin, ContractDisplayFormatMixin):
     """合同 Admin 视图方法的 Mixin（继承归档和显示方法）"""
@@ -259,7 +261,7 @@ class ContractDisplayMixin(ContractArchiveMixin, ContractDisplayFormatMixin):
             return JsonResponse({"success": False, "error": "Method not allowed"}, status=405)
 
         if not self.has_view_permission(request):
-            return JsonResponse({"success": False, "error": str("无权限")}, status=403)
+            return JsonResponse({"success": False, "error": "无权限"}, status=403)
 
         try:
             from apps.contracts.models.folder_binding import ContractFolderBinding
@@ -267,11 +269,11 @@ class ContractDisplayMixin(ContractArchiveMixin, ContractDisplayFormatMixin):
             try:
                 binding = ContractFolderBinding.objects.get(contract_id=object_id)
             except ContractFolderBinding.DoesNotExist:
-                return JsonResponse({"success": False, "error": str("未绑定文件夹")}, status=404)
+                return JsonResponse({"success": False, "error": "未绑定文件夹"}, status=404)
 
             folder_path = binding.folder_path
             if not folder_path:
-                return JsonResponse({"success": False, "error": str("文件夹路径为空")}, status=400)
+                return JsonResponse({"success": False, "error": "文件夹路径为空"}, status=400)
 
             folder = Path(folder_path).expanduser()
             if not folder.exists():

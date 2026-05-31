@@ -21,6 +21,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("apps.cases")
 
+
 class CaseInternalQueryService:
     _MISSING_SENTINEL = "__case_access_grants_missing__"
 

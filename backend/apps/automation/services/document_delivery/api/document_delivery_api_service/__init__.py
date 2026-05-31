@@ -22,6 +22,7 @@ logger = logging.getLogger("apps.automation")
 
 __all__ = ["DocumentDeliveryApiService"]
 
+
 class DocumentDeliveryApiService(DocumentQueryMixin, DocumentProcessMixin, DocumentMatchingMixin):
     """
     文书送达 API 查询服务

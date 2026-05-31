@@ -22,6 +22,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+
 class CaseDocumentTemplateAdminService:
     """
     案件文件模板 Admin 服务

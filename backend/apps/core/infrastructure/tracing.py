@@ -6,6 +6,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 def get_current_trace_ids() -> tuple[str | None, str | None]:
     try:
         from opentelemetry import trace

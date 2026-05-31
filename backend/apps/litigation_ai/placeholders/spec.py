@@ -1,5 +1,6 @@
 """Module for spec."""
 
+
 class LitigationPlaceholderKeys:
     PLAINTIFF = "原告"
     DEFENDANT = "被告"

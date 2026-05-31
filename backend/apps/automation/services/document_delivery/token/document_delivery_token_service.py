@@ -18,6 +18,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("apps.automation")
 
+
 class DocumentDeliveryTokenService:
     """
     文书送达 Token 管理服务

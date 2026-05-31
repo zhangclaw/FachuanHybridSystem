@@ -22,6 +22,7 @@ from apps.core.dto.request_context import extract_request_context
 
 router = Router()
 
+
 def _prefetch_log_reminders(cases: list[Any]) -> None:
     """批量预加载案件日志的提醒数据，避免 N+1 查询。"""
     log_ids: list[int] = []
@@ -44,16 +45,20 @@ def _prefetch_log_reminders(cases: list[Any]) -> None:
     except (TypeError, ValueError):
         pass
 
+
 def _get_case_service() -> CaseService:
     from apps.contracts.services.contract.wiring import get_contract_service
 
     return CaseService(contract_service=get_contract_service())
 
+
 def _get_case_query_facade() -> CaseService:
     return _get_case_service()
 
+
 def _get_case_mutation_facade() -> CaseService:
     return _get_case_service()
+
 
 @router.get("/cases/search", response=list[CaseOut])
 def search_cases(
@@ -76,6 +81,7 @@ def search_cases(
     )
     _prefetch_log_reminders(cases)
     return cast(list[CaseOut], cases)
+
 
 @router.get("/cases", response=list[CaseOut])
 def list_cases(
@@ -111,6 +117,7 @@ def list_cases(
     _prefetch_log_reminders(cases)
     return cast(list[CaseOut], cases)
 
+
 @router.get("/cases/{case_id}", response=CaseOut)
 def get_case(request: HttpRequest, case_id: int) -> CaseOut:
     """获取单个案件"""
@@ -126,6 +133,7 @@ def get_case(request: HttpRequest, case_id: int) -> CaseOut:
     _prefetch_log_reminders([case])
     return cast(CaseOut, case)
 
+
 @router.post("/cases", response=CaseOut)
 def create_case(request: HttpRequest, payload: CaseIn) -> CaseOut:
     """创建案件"""
@@ -134,6 +142,7 @@ def create_case(request: HttpRequest, payload: CaseIn) -> CaseOut:
     data = payload.model_dump()
 
     return cast(CaseOut, service.create_case(data, user=ctx.user))
+
 
 @router.put("/cases/{case_id}", response=CaseOut)
 def update_case(request: HttpRequest, case_id: int, payload: CaseUpdate) -> CaseOut:
@@ -144,6 +153,7 @@ def update_case(request: HttpRequest, case_id: int, payload: CaseUpdate) -> Case
 
     return cast(CaseOut, service.update_case(case_id, data, user=ctx.user))
 
+
 @router.delete("/cases/{case_id}")
 def delete_case(request: HttpRequest, case_id: int) -> dict[str, bool]:
     """删除案件"""
@@ -153,6 +163,7 @@ def delete_case(request: HttpRequest, case_id: int) -> dict[str, bool]:
     service.delete_case(case_id, user=ctx.user)
 
     return {"success": True}
+
 
 @router.post("/cases/full", response=CaseFullOut)
 def create_case_full(request: HttpRequest, payload: CaseCreateFull) -> CaseFullOut:

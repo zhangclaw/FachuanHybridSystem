@@ -19,6 +19,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("apps.litigation_ai")
 
+
 class MockTrialFlowService:
     """模拟庭审主流程."""
 

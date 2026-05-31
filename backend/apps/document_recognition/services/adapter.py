@@ -10,6 +10,7 @@ from typing import Any, cast
 
 from .data_classes import RecognitionResponse, RecognitionResult
 
+
 class CourtDocumentRecognitionServiceAdapter:
     """
     法院文书智能识别服务适配器

@@ -7,6 +7,7 @@ import pytest
 from apps.core.exceptions import ChatCreationException, ConfigurationException, MessageSendException
 from apps.core.models.enums import ChatPlatform
 
+
 @pytest.fixture
 def mock_config():
     """Telegram 完整配置"""

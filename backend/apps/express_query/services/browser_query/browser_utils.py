@@ -11,6 +11,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("apps.express_query")
 
+
 async def click_locator_if_visible(locator: Locator, description: str) -> bool:
     """点击 Locator 中第一个可见元素。"""
     try:
@@ -31,6 +32,7 @@ async def click_locator_if_visible(locator: Locator, description: str) -> bool:
             continue
     return False
 
+
 async def fill_first(page: Page, selectors: list[str], value: str) -> None:
     for selector in selectors:
         locator = page.locator(selector)
@@ -45,6 +47,7 @@ async def fill_first(page: Page, selectors: list[str], value: str) -> None:
         except Exception:
             continue
     raise RuntimeError("No input field found")
+
 
 async def click_first(page: Page, selectors: list[str]) -> bool:
     for selector in selectors:
@@ -65,6 +68,7 @@ async def click_first(page: Page, selectors: list[str]) -> bool:
             except Exception:
                 continue
     return False
+
 
 async def has_any_visible(page: Page, selectors: list[str]) -> bool:
     for selector in selectors:

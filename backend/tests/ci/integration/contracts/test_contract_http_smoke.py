@@ -24,6 +24,7 @@ from apps.contracts.models import (
 )
 from apps.testing.factories import ClientFactory, ContractFactory, LawyerFactory
 
+
 def create_authenticated_client(user: Any) -> Client:
     client = Client()
     client.force_login(user)

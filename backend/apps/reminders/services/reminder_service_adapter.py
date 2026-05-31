@@ -35,6 +35,7 @@ logger = logging.getLogger(__name__)
 
 CASE_LOG_API_REMINDER_SOURCE = "case_log_api"
 
+
 class ReminderServiceAdapter(ReminderService):
     """提醒服务适配器，继承 ReminderService 提供 API 方法，同时实现 IReminderService 供其他模块调用。"""
 

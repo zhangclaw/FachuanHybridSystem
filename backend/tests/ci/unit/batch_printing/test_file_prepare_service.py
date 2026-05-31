@@ -5,6 +5,7 @@ from pathlib import Path
 
 from apps.batch_printing.services.job.file_prepare_service import FilePrepareService
 
+
 def test_resolve_soffice_path_prefers_path_command(monkeypatch) -> None:
     monkeypatch.setattr(shutil, "which", lambda cmd: "/opt/homebrew/bin/soffice" if cmd == "soffice" else None)
 

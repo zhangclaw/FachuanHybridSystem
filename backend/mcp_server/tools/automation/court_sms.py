@@ -6,6 +6,7 @@ from typing import Any
 
 from mcp_server.client import client
 
+
 def submit_court_sms(
     content: str,
     received_at: str | None = None,

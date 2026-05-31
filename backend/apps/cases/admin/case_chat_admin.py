@@ -13,6 +13,7 @@ from apps.cases.admin.base_admin import BaseTabularInline
 from apps.cases.admin.mixins import CaseAdminServiceMixin
 from apps.cases.models import CaseChat
 
+
 @admin.register(CaseChat)
 class CaseChatAdmin(CaseAdminServiceMixin, admin.ModelAdmin):
     """案件群聊管理"""
@@ -126,6 +127,7 @@ class CaseChatAdmin(CaseAdminServiceMixin, admin.ModelAdmin):
             return HttpResponseRedirect(reverse("admin:cases_casechat_changelist"))
 
         return super().response_change(request, obj)
+
 
 class CaseChatInline(BaseTabularInline):
     """案件群聊内联管理"""

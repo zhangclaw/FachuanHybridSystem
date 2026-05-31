@@ -7,6 +7,7 @@ from typing import Any
 
 from ninja import Field, Schema
 
+
 class CaseImportSessionOut(Schema):
     """案件导入会话输出。"""
 
@@ -28,6 +29,7 @@ class CaseImportSessionOut(Schema):
     created_at: datetime | None = None
     updated_at: datetime | None = None
 
+
 class CasePreviewItem(Schema):
     """案件预览项。"""
 
@@ -37,6 +39,7 @@ class CasePreviewItem(Schema):
     customer_names: list[str] = Field(default_factory=list, description="客户名称列表")
     error_message: str = Field(default="", description="错误信息")
 
+
 class CasePreviewResponse(Schema):
     """案件预览响应。"""
 
@@ -44,6 +47,7 @@ class CasePreviewResponse(Schema):
     matched: int = Field(description="已匹配数")
     unmatched: int = Field(description="需从OA导入数")
     preview: list[CasePreviewItem] = Field(default_factory=list, description="预览列表")
+
 
 class CaseImportResult(Schema):
     """单个案件导入结果。"""
@@ -54,6 +58,7 @@ class CaseImportResult(Schema):
     message: str = ""
     customer_ids: list[int] = Field(default_factory=list, description="创建的客户ID列表")
     conflict_warnings: list[str] = Field(default_factory=list, description="利益冲突警告")
+
 
 class CaseImportResponse(Schema):
     """案件导入执行响应。"""

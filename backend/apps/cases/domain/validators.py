@@ -20,13 +20,16 @@ APPLICABLE_TYPES: set[str] = {
     str(CaseType.INTL),
 }
 
+
 def is_applicable(case_type: str | None) -> bool:
     """检查案件类型是否适用阶段管理。"""
     return bool(case_type) and case_type in APPLICABLE_TYPES
 
+
 def _allowed_stages() -> set[str]:
     """获取所有允许的案件阶段值。"""
     return {str(c[0]) for c in CaseStage.choices}
+
 
 def normalize_stages(
     case_type: str | None,

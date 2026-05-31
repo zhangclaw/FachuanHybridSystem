@@ -6,6 +6,7 @@ from typing import Any
 
 from apps.core.interfaces import CaseSearchResultDTO, ICaseSearchService
 
+
 class CaseSearchServiceAdapter(ICaseSearchService):
     """
     案件搜索服务适配器

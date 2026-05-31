@@ -13,6 +13,7 @@ from apps.litigation_ai.placeholders.spec import LitigationPlaceholderKeys
 
 logger = logging.getLogger(__name__)
 
+
 @PlaceholderRegistry.register
 class EnforcementApplicantPartyService(BasePlaceholderService):
     """强制执行申请书申请人信息服务"""
@@ -77,6 +78,7 @@ class EnforcementApplicantPartyService(BasePlaceholderService):
         logger.info("生成强制执行申请书申请人信息成功: case_id=%s, 申请人数=%s", case_id, len(applicants))
         return result
 
+
 @PlaceholderRegistry.register
 class EnforcementApplicantBasicFieldsService(BasePlaceholderService):
     """强制执行申请书申请人基础字段服务"""
@@ -126,6 +128,7 @@ class EnforcementApplicantBasicFieldsService(BasePlaceholderService):
             seen.add(value)
             values.append(value)
         return sep.join(values)
+
 
 @PlaceholderRegistry.register
 class EnforcementRespondentPartyService(BasePlaceholderService):
@@ -190,6 +193,7 @@ class EnforcementRespondentPartyService(BasePlaceholderService):
         result = "\n\n".join(party_blocks)
         logger.info("生成强制执行申请书被申请人信息成功: case_id=%s, 被申请人数=%s", case_id, len(respondents))
         return result
+
 
 @PlaceholderRegistry.register
 class EnforcementRespondentNameService(BasePlaceholderService):

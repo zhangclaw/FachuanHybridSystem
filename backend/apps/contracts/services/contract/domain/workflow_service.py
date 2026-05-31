@@ -17,6 +17,7 @@ if TYPE_CHECKING:
 
     from ..mutation import ContractMutationService
 
+
 class ContractWorkflowService:
     def __init__(
         self,

@@ -37,6 +37,7 @@ from .quality_card_detector import has_quality_card_on_last_page
 
 logger = logging.getLogger(__name__)
 
+
 class ContractFolderScanService:
     """合同自动捕获扫描、轮询、确认导入服务。"""
 
@@ -860,9 +861,11 @@ class ContractFolderScanService:
             else:
                 candidate["already_imported"] = False
 
+
 def run_contract_folder_scan_task(session_id: str) -> None:
     """Django-Q 任务入口。"""
     ContractFolderScanService().run_scan_task(session_id=session_id)
+
 
 def _normalize_docx_name(filename: str) -> str:
     """标准化文件名用于关键词匹配。"""

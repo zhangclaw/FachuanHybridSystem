@@ -9,6 +9,7 @@ from docx.document import Document as DocumentType
 
 logger = logging.getLogger(__name__)
 
+
 class TitleExtractor:
     """从合同文档提取标题并生成标准文件名"""
 

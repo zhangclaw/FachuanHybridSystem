@@ -12,7 +12,6 @@ import zipfile
 from typing import Any, cast
 
 from django.utils import timezone
-
 from docxtpl import DocxTemplate
 
 from apps.core.exceptions import NotFoundError, ValidationException
@@ -25,6 +24,7 @@ from apps.documents.services.placeholders.fallback import build_docx_render_cont
 logger = logging.getLogger("apps.documents.generation")
 FUNCTION_CODE_PRESERVATION_APPLICATION = "preservation_application"
 FUNCTION_CODE_DELAY_DELIVERY_APPLICATION = "delay_delivery_application"
+
 
 class PreservationMaterialsGenerationService:
     """财产保全材料生成服务"""

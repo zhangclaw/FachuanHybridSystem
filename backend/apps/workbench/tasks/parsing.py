@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 
 # ─── 文档分段 ────────────────────────────────────────────────────────────────
 
+
 def chunk_text(text: str, max_size: int = CHUNK_SIZE, overlap: int = CHUNK_OVERLAP) -> list[str]:
     """将长文本分成重叠的段落"""
     if len(text) <= max_size:
@@ -39,7 +40,9 @@ def chunk_text(text: str, max_size: int = CHUNK_SIZE, overlap: int = CHUNK_OVERL
         start = end - overlap if end < len(text) else end
     return chunks
 
+
 # ─── 结果解析 ────────────────────────────────────────────────────────────────
+
 
 def parse_llm_result(result_text: str, file_name: str) -> dict[str, Any]:
     """解析 LLM 输出，优先 JSON 结构化，fallback 到正则"""
@@ -94,7 +97,9 @@ def parse_llm_result(result_text: str, file_name: str) -> dict[str, Any]:
         "parse_method": "regex",
     }
 
+
 # ─── 共享分析逻辑 ────────────────────────────────────────────────────────────
+
 
 def build_case_info(metadata: dict[str, str | None]) -> str:
     """从文档元数据构建案例信息字符串"""
@@ -110,6 +115,7 @@ def build_case_info(metadata: dict[str, str | None]) -> str:
     if metadata.get("clerk"):
         parts.append(f"书记员：{metadata['clerk']}")
     return "\n".join(parts) + "\n" if parts else ""
+
 
 def merge_chunk_results(chunk_results: list[str], file_name: str) -> str:
     """合并多个 chunk 的分析结果"""

@@ -18,6 +18,7 @@ from apps.core.interfaces import ICaptchaService
 
 logger = logging.getLogger("apps.automation")
 
+
 @dataclass
 class CaptchaResult:
     """验证码识别结果"""
@@ -26,6 +27,7 @@ class CaptchaResult:
     text: str | None
     processing_time: float
     error: str | None
+
 
 class CaptchaRecognitionService:
     """
@@ -232,7 +234,7 @@ class CaptchaRecognitionService:
             else:
                 AutomationLogger.log_captcha_recognition_failed(
                     processing_time=processing_time,
-                    error_message=str("无法识别验证码"),
+                    error_message="无法识别验证码",
                     image_size=len(image_bytes),
                 )
                 return CaptchaResult(success=False, text=None, processing_time=processing_time, error="无法识别验证码")
@@ -250,6 +252,7 @@ class CaptchaRecognitionService:
             return CaptchaResult(
                 success=False, text=None, processing_time=processing_time, error="系统错误，请稍后重试"
             )
+
 
 class CaptchaServiceAdapter(ICaptchaService):
     """

@@ -12,6 +12,7 @@ from apps.automation.services.insurance.exceptions import APIError, CompanyListE
 
 logger = logging.getLogger("apps.automation")
 
+
 class InsuranceClientFacade:
     def __init__(self, *, client: CourtInsuranceClient) -> None:
         self.client = client

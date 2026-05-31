@@ -6,6 +6,7 @@ from typing import ClassVar
 
 from django.db import models
 
+
 class CaseDownloadStatus(models.TextChoices):
     PENDING = "pending", "待执行"
     QUEUED = "queued", "排队中"
@@ -14,9 +15,11 @@ class CaseDownloadStatus(models.TextChoices):
     FAILED = "failed", "失败"
     CANCELLED = "cancelled", "已取消"
 
+
 class CaseDownloadFormat(models.TextChoices):
     PDF = "pdf", "PDF"
     DOC = "doc", "Word"
+
 
 class CaseDownloadTask(models.Model):
     """案例下载任务"""
@@ -74,6 +77,7 @@ class CaseDownloadTask(models.Model):
 
     def __str__(self) -> str:
         return f"{self.id} | {self.file_format} | {self.status}"
+
 
 class CaseDownloadResult(models.Model):
     """案例下载结果"""

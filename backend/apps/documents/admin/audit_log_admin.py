@@ -14,6 +14,7 @@ from django.utils.html import format_html, format_html_join
 
 from apps.documents.models import TemplateAuditLog
 
+
 class TemplateAuditLogAdmin(admin.ModelAdmin):
     """
     模板审计日志管理

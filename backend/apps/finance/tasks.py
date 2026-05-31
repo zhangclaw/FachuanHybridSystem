@@ -10,6 +10,7 @@ from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
+
 def sync_lpr_rates() -> dict:
     """同步LPR利率数据的定时任务.
 
@@ -32,6 +33,7 @@ def sync_lpr_rates() -> dict:
     except Exception as e:
         logger.error(f"[LPRSchedule] LPR sync failed: {e}")
         raise
+
 
 def setup_lpr_sync_schedule() -> None:
     """设置LPR同步定时任务.

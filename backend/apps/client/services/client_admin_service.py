@@ -17,6 +17,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("apps.client")
 
+
 @dataclass
 class ImportResult:
     """JSON 导入结果"""
@@ -24,6 +25,7 @@ class ImportResult:
     success: bool
     client: Client | None = None
     error_message: str | None = None
+
 
 class ClientAdminService(ClientAdminFileMixin):
     """客户 Admin 服务：JSON 导入、表单集文件上传、事务管理。"""

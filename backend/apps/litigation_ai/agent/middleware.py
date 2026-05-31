@@ -20,6 +20,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("apps.litigation_ai")
 
+
 class LitigationMemoryMiddleware(IMemoryMiddleware):
     """
     诉讼文书生成的 Memory 中间件
@@ -209,6 +210,7 @@ class LitigationMemoryMiddleware(IMemoryMiddleware):
                 },
             )
 
+
 class SummarizationConfig:
     """
     摘要配置
@@ -254,6 +256,7 @@ class SummarizationConfig:
             preserve_messages=getattr(settings, "LITIGATION_AGENT_PRESERVE_MESSAGES", 10),
             model=getattr(settings, "LITIGATION_AGENT_MODEL", None),
         )
+
 
 class LitigationSummarizationMiddleware:
     """

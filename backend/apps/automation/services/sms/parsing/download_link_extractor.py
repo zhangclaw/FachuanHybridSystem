@@ -3,6 +3,7 @@
 import re
 from urllib.parse import parse_qs, urlparse
 
+
 class DownloadLinkExtractor:
     DOWNLOAD_LINK_PATTERN = re.compile(
         r"https?://[^\s/]+/zxfw/#/pagesAjkj/app/wssd/index\?"

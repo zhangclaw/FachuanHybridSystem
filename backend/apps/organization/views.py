@@ -12,6 +12,7 @@ from .forms import LawyerRegistrationForm
 
 _auth_service = AuthService()
 
+
 class AuthLoginView(LoginView):
     """自定义登录视图，向模板注入注册所需的上下文。"""
 
@@ -24,6 +25,7 @@ class AuthLoginView(LoginView):
         ctx["reg_form"] = kwargs.get("reg_form", LawyerRegistrationForm())
         ctx["show_register"] = False
         return ctx
+
 
 def register(request: HttpRequest) -> HttpResponse:
     is_first_user = _auth_service.is_first_user()

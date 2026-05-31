@@ -23,11 +23,13 @@ SITE_NAME_LABELS: dict[str, str] = {
     "court_baoquan": "人民法院保全系统",
 }
 
+
 def _get_token_history_admin_service() -> Any:
     """工厂函数：创建一张网/保全Token历史管理服务"""
     from apps.automation.services.admin import TokenAcquisitionHistoryAdminService
 
     return TokenAcquisitionHistoryAdminService()
+
 
 class TokenAcquisitionHistoryAdmin(admin.ModelAdmin):
     """
@@ -292,7 +294,7 @@ class TokenAcquisitionHistoryAdmin(admin.ModelAdmin):
             format_html(
                 '<tr><td style="padding: 5px; font-weight: bold;">{}</td><td style="padding: 5px;">{}</td></tr>',
                 "总耗时:",
-                f"{obj.total_duration:.2f} " + str("秒"),
+                f"{obj.total_duration:.2f} " + "秒",
             ),
         ]
 
@@ -301,7 +303,7 @@ class TokenAcquisitionHistoryAdmin(admin.ModelAdmin):
                 format_html(
                     '<tr><td style="padding: 5px; font-weight: bold;">{}</td><td style="padding: 5px;">{}</td></tr>',
                     "登录耗时:",
-                    f"{obj.login_duration:.2f} " + str("秒"),
+                    f"{obj.login_duration:.2f} " + "秒",
                 )
             )
 

@@ -8,6 +8,7 @@ from apps.documents.services.placeholders.litigation.enforcement_party_service i
     EnforcementRespondentPartyService,
 )
 
+
 class _AccessorStub:
     def __init__(self, parties: list[dict[str, str]]) -> None:
         self._parties = parties

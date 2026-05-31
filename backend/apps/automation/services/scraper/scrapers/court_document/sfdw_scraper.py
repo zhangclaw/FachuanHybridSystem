@@ -25,6 +25,7 @@ from .base_court_scraper import BaseCourtDocumentScraper
 
 logger = logging.getLogger("apps.automation")
 
+
 class SfdwCourtScraper(BaseCourtDocumentScraper):
     """司法送达网 (sfpt.cdfy12368.gov.cn) 文书下载爬虫"""
 

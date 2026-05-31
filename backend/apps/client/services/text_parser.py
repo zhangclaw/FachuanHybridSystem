@@ -169,6 +169,7 @@ _LEGAL_KEYWORDS: tuple[str, ...] = (
     "银行",
 )
 
+
 def parse_client_text(text: str) -> dict[str, Any]:
     """
     解析当事人文本信息，支持有换行和无换行格式
@@ -188,6 +189,7 @@ def parse_client_text(text: str) -> dict[str, Any]:
 
     return parties[0]
 
+
 def parse_multiple_clients_text(text: str) -> list[dict[str, Any]]:
     """解析包含多个当事人的文本"""
     if not text or not text.strip():
@@ -196,12 +198,14 @@ def parse_multiple_clients_text(text: str) -> list[dict[str, Any]]:
     text = _normalize_text(text.strip())
     return _extract_parties(text)
 
+
 _FIELD_KEYWORDS_PATTERN = re.compile(r"(?<!\n)(" + "|".join(re.escape(kw) for kw in _FIELD_KEYWORDS) + r")\s*[:：]")
 _INLINE_BREAK_KEYWORDS_ALT = "|".join(
     re.escape(keyword) for keyword in dict.fromkeys([*_FIELD_KEYWORDS, *_ROLE_LABELS])
 )
 _INLINE_BREAK_PATTERN = re.compile(rf"(?<!\n)(?<=\S)\s+(?=(?:{_INLINE_BREAK_KEYWORDS_ALT})\s*(?:[:：]|为|是|\S))")
 _FULL_STOP_BREAK_PATTERN = re.compile(r"[。]+(?=\s*\S)")
+
 
 def _normalize_text(text: str) -> str:
     """预处理文本：统一换行、拆分内联字段、清理列表序号"""
@@ -214,9 +218,11 @@ def _normalize_text(text: str) -> str:
     text = re.sub(r"\n{2,}", "\n", text)
     return text.strip()
 
+
 def _parse_fields_directly(text: str) -> dict[str, Any]:
     """直接从文本提取字段（无角色标签时使用）"""
     return _parse_single_party(text, use_smart_name=True)
+
 
 _SMART_NAME_PATTERN = re.compile(
     r"^[甲乙丙丁]方\s*(?:（[^）]*）)?\s*[:：]\s*(.+?)(?=法定代表人|统一社会信用代码|地址|电话|$)",
@@ -248,6 +254,7 @@ _NON_NAME_KEYWORDS: tuple[str, ...] = (
     "经营地址",
     "联系地址",
 )
+
 
 def _extract_name_smart(text: str) -> str | None:
     """智能提取名称"""
@@ -308,6 +315,7 @@ def _extract_name_smart(text: str) -> str | None:
 
     return None
 
+
 def _clean_name_candidate(name_part: str) -> str:
     """清洗名称候选值（保留公司括号地名，不做激进删减）"""
     name = _ROLE_PREFIX_CLEANUP_PATTERN.sub("", name_part.strip())
@@ -316,6 +324,7 @@ def _clean_name_candidate(name_part: str) -> str:
     name = _TRAILING_BIRTH_INFO_PATTERN.sub("", name)
     name = _TRAILING_GENDER_PATTERN.sub("", name)
     return name.strip().strip("，,；;。")
+
 
 def _is_valid_name_candidate(name: str) -> bool:
     """判断名称候选值是否有效，避免把字段值误判为名称"""
@@ -340,6 +349,7 @@ def _is_valid_name_candidate(name: str) -> bool:
         return False
     return True
 
+
 def _extract_name_from_first_meaningful_line(text: str) -> str | None:
     """从第一条有效信息行提取名称"""
     for raw_line in text.splitlines():
@@ -351,6 +361,7 @@ def _extract_name_from_first_meaningful_line(text: str) -> str | None:
             return line
 
     return None
+
 
 def _extract_parties(text: str) -> list[dict[str, Any]]:
     """提取所有当事人信息"""
@@ -404,6 +415,7 @@ def _extract_parties(text: str) -> list[dict[str, Any]]:
 
     return parties
 
+
 def _parse_single_party(text: str, *, use_smart_name: bool = False) -> dict[str, Any]:
     """解析单个当事人信息"""
     result = _empty_result()
@@ -445,6 +457,7 @@ def _parse_single_party(text: str, *, use_smart_name: bool = False) -> dict[str,
 
     return result
 
+
 def _extract_name(text: str) -> str | None:
     """提取名称"""
     # 定义角色标签模式（支持 甲方（原告）、乙方（被告）等格式）
@@ -458,6 +471,7 @@ def _extract_name(text: str) -> str | None:
                 return name.strip()
 
     return None
+
 
 def _extract_credit_code(text: str) -> str | None:
     """提取统一社会信用代码"""
@@ -483,6 +497,7 @@ def _extract_credit_code(text: str) -> str | None:
 
     return None
 
+
 def _extract_id_number(text: str) -> str | None:
     """提取身份证号码"""
     match = _ID_NUMBER_PATTERN.search(text)
@@ -491,6 +506,7 @@ def _extract_id_number(text: str) -> str | None:
 
     fallback = _ID_NUMBER_FALLBACK_PATTERN.search(text)
     return fallback.group(1).strip().upper() if fallback else None
+
 
 def _extract_address(text: str) -> str | None:
     """提取地址"""
@@ -506,6 +522,7 @@ def _extract_address(text: str) -> str | None:
         if line and _ADDRESS_LINE_FALLBACK_PATTERN.fullmatch(line):
             return line
     return None
+
 
 def _extract_phone(text: str) -> str | None:
     """提取电话号码"""
@@ -526,6 +543,7 @@ def _extract_phone(text: str) -> str | None:
             fallback_phone = candidate
     return fallback_phone
 
+
 def _extract_legal_representative(text: str) -> str | None:
     """提取法定代表人"""
     match = _LEGAL_REP_PATTERN.search(text)
@@ -533,6 +551,7 @@ def _extract_legal_representative(text: str) -> str | None:
         return None
     legal_rep = _clean_name_candidate(match.group(1))
     return legal_rep or None
+
 
 def _determine_client_type(name: str, text: str) -> str:
     """根据名称和文本内容判断客户类型"""
@@ -545,6 +564,7 @@ def _determine_client_type(name: str, text: str) -> str:
     if _extract_id_number(text):
         return "natural"
     return "natural"
+
 
 def _empty_result() -> dict[str, Any]:
     """返回空的解析结果"""

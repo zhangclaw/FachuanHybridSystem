@@ -19,10 +19,12 @@ from apps.documents.models import (
 
 _CONFIG_TYPE_GENERATION_RULE = "generation_rule"
 
+
 @dataclass
 class ConfigValidationResult:
     is_valid: bool
     error: str = ""
+
 
 class GenerationService:
     def create_generation_config(

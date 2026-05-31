@@ -12,6 +12,7 @@ from apps.core.exceptions import NotFoundError
 
 from .case_log_query_repo import CaseLogQueryRepo
 
+
 class CaseLogQueryService:
     def __init__(
         self,

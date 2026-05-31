@@ -9,6 +9,7 @@ from apps.enterprise_data.services.clients import McpToolClient
 from apps.enterprise_data.services.providers.adapters import TianyanchaResponseAdapter
 from apps.enterprise_data.services.types import ProviderConfig, ProviderResponse
 
+
 class TianyanchaMcpProvider:
     name = "tianyancha"
 

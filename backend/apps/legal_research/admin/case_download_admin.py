@@ -22,6 +22,7 @@ from apps.legal_research.services.task.case_download_service import CaseDownload
 
 logger = logging.getLogger(__name__)
 
+
 class CaseDownloadResultInline(admin.TabularInline[CaseDownloadResult, CaseDownloadTask]):
     model = CaseDownloadResult
     extra = 0
@@ -48,6 +49,7 @@ class CaseDownloadResultInline(admin.TabularInline[CaseDownloadResult, CaseDownl
             '<a href="{}" target="_blank">下载</a>',
             reverse("admin:legal_research_casedownloadresult_download", args=[obj.pk]),
         )
+
 
 @admin.register(CaseDownloadTask)
 class CaseDownloadTaskAdmin(admin.ModelAdmin):
@@ -471,6 +473,7 @@ class CaseDownloadTaskAdmin(admin.ModelAdmin):
             as_attachment=True,
             filename=f"{result.case_number}.{result.file_format}",
         )
+
 
 # 避免循环导入
 from apps.organization.models import AccountCredential

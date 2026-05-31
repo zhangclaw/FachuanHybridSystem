@@ -16,6 +16,7 @@ CHUNK_THRESHOLD = 20000  # 超过此长度触发分段
 
 # ─── 结构化输出模型 ──────────────────────────────────────────────────────────
 
+
 class CaseAnalysisResult(BaseModel):
     """LLM 分析结果的结构化输出"""
 
@@ -27,6 +28,7 @@ class CaseAnalysisResult(BaseModel):
     is_relevant: bool = True
     conclusion: str = ""
     analysis: str = ""
+
 
 # ─── 系统提示词 ──────────────────────────────────────────────────────────────
 

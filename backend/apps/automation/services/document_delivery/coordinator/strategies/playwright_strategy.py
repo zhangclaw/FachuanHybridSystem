@@ -5,6 +5,7 @@ from typing import Any, cast
 
 from apps.automation.services.document_delivery.data_classes import DocumentQueryResult
 
+
 class DocumentDeliveryPlaywrightStrategy:
     def __init__(self, *, playwright_service: Any) -> None:
         self.playwright_service = playwright_service

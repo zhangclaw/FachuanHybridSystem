@@ -36,6 +36,7 @@ router = Router(auth=JWTOrSessionAuth())
 
 # ─── 会话 API ────────────────────────────────────────────────────────────────
 
+
 @router.post("/sessions", response=SessionOut)
 def create_session(request: Any, payload: SessionCreateIn) -> Any:
     """创建工作台会话"""
@@ -49,6 +50,7 @@ def create_session(request: Any, payload: SessionCreateIn) -> Any:
         perm_open_access=ctx.perm_open_access,
     )
 
+
 @router.get("/sessions")
 def list_sessions(request: Any, page: int = 1) -> dict[str, Any]:
     """获取当前用户的工作台会话列表"""
@@ -61,6 +63,7 @@ def list_sessions(request: Any, page: int = 1) -> dict[str, Any]:
         perm_open_access=ctx.perm_open_access,
     )
 
+
 @router.get("/sessions/{session_id}", response=SessionOut)
 def get_session(request: Any, session_id: int) -> Any:
     """获取会话详情"""
@@ -72,6 +75,7 @@ def get_session(request: Any, session_id: int) -> Any:
         org_access=ctx.org_access,
         perm_open_access=ctx.perm_open_access,
     )
+
 
 @router.patch("/sessions/{session_id}", response=SessionOut)
 def update_session(request: Any, session_id: int, payload: SessionUpdateIn) -> Any:
@@ -88,6 +92,7 @@ def update_session(request: Any, session_id: int, payload: SessionUpdateIn) -> A
         perm_open_access=ctx.perm_open_access,
     )
 
+
 @router.delete("/sessions/{session_id}")
 def delete_session(request: Any, session_id: int) -> dict[str, str]:
     """删除会话"""
@@ -101,7 +106,9 @@ def delete_session(request: Any, session_id: int) -> dict[str, str]:
     )
     return {"message": "已删除"}
 
+
 # ─── 消息 API ────────────────────────────────────────────────────────────────
+
 
 @router.get("/sessions/{session_id}/messages")
 def list_messages(
@@ -122,6 +129,7 @@ def list_messages(
         perm_open_access=ctx.perm_open_access,
     )
 
+
 @router.delete("/sessions/{session_id}/messages/from/{message_id}")
 def truncate_messages(request: Any, session_id: int, message_id: int) -> dict[str, str]:
     """删除指定消息及其之后的所有消息（用于编辑重发）"""
@@ -136,11 +144,13 @@ def truncate_messages(request: Any, session_id: int, message_id: int) -> dict[st
     )
     return {"message": "已截断"}
 
+
 class FeedbackIn(Schema):
     """消息反馈请求体"""
 
     rating: Literal["good", "bad"]
     comment: str = ""
+
 
 @router.patch("/messages/{message_id}/feedback")
 def submit_feedback(request: Any, message_id: int, payload: FeedbackIn) -> dict[str, Any]:
@@ -157,7 +167,9 @@ def submit_feedback(request: Any, message_id: int, payload: FeedbackIn) -> dict[
     )
     return {"success": True, "message": "反馈已提交"}
 
+
 # ─── 对话 API（SSE 流式） ────────────────────────────────────────────────────
+
 
 @router.post("/sessions/{session_id}/messages/stream")
 async def stream_chat(request: Any, session_id: int, payload: MessageIn) -> StreamingHttpResponse:
@@ -186,13 +198,16 @@ async def stream_chat(request: Any, session_id: int, payload: MessageIn) -> Stre
         },
     )
 
+
 # ─── 审批 API ────────────────────────────────────────────────────────────────
+
 
 class ApprovalIn(Schema):
     """审批请求体"""
 
     approval_id: str
     approved: bool
+
 
 @router.post("/approval")
 def respond_approval(request: Any, payload: ApprovalIn) -> dict[str, Any]:
@@ -206,7 +221,9 @@ def respond_approval(request: Any, payload: ApprovalIn) -> dict[str, Any]:
         "message": "审批已处理" if success else "审批 ID 不存在或已过期",
     }
 
+
 # ─── 批量分析 API ────────────────────────────────────────────────────────────
+
 
 @router.post("/batch/analyze", response=BatchJobOut)
 def submit_batch_analysis(
@@ -234,6 +251,7 @@ def submit_batch_analysis(
     )
     return job
 
+
 @router.get("/batch/{job_id}/progress", response=BatchProgressOut)
 def get_batch_progress(request: Any, job_id: UUID) -> dict[str, Any]:
     """查询批量分析任务进度"""
@@ -255,6 +273,7 @@ def get_batch_progress(request: Any, job_id: UUID) -> dict[str, Any]:
         "failed_items_detail": failed_detail,
     }
 
+
 @router.post("/batch/{job_id}/cancel")
 def cancel_batch_analysis(request: Any, job_id: UUID) -> dict[str, Any]:
     """取消批量分析任务"""
@@ -271,6 +290,7 @@ def cancel_batch_analysis(request: Any, job_id: UUID) -> dict[str, Any]:
         "status": job.status,
         "message": "取消请求已提交" if job.cancel_requested else "任务已完成或已取消",
     }
+
 
 @router.get("/batch/{job_id}/download")
 def download_batch_summary(request: Any, job_id: UUID, relevant_only: bool = False) -> FileResponse:
@@ -305,6 +325,7 @@ def download_batch_summary(request: Any, job_id: UUID, relevant_only: bool = Fal
         filename=job.summary_file.name.split("/")[-1] if job.summary_file.name else "summary.csv",
         content_type="text/csv; charset=utf-8",
     )
+
 
 def _generate_filtered_csv(job_id: UUID, *, only_relevant: bool) -> str:
     """生成过滤后的 CSV 内容（仅返回字符串）"""
@@ -348,6 +369,7 @@ def _generate_filtered_csv(job_id: UUID, *, only_relevant: bool) -> str:
     writer.writeheader()
     writer.writerows(rows)
     return output.getvalue()
+
 
 def _generate_filtered_zip(job_id: UUID, *, only_relevant: bool) -> bytes:
     """生成过滤后的 ZIP 内容"""
@@ -411,6 +433,7 @@ def _generate_filtered_zip(job_id: UUID, *, only_relevant: bool) -> bytes:
     zip_buffer.seek(0)
     return zip_buffer.getvalue()
 
+
 @router.get("/batch/{job_id}/download-detail")
 def download_batch_detail_zip(request: Any, job_id: UUID, relevant_only: bool = False) -> FileResponse:
     """下载批量分析详情 ZIP 文件"""
@@ -447,12 +470,14 @@ def download_batch_detail_zip(request: Any, job_id: UUID, relevant_only: bool = 
         content_type="application/zip",
     )
 
+
 class BatchMessageItemIn(Schema):
     """批量消息持久化请求体"""
 
     file_name: str
     content: str
     metadata: dict[str, Any] = {}
+
 
 @router.post("/batch/{job_id}/messages")
 def save_batch_messages(request: Any, job_id: UUID, payload: list[BatchMessageItemIn]) -> dict[str, Any]:
@@ -473,7 +498,9 @@ def save_batch_messages(request: Any, job_id: UUID, payload: list[BatchMessageIt
     )
     return {"success": True, "created_count": created_count}
 
+
 # ─── 批量分析增强 API ────────────────────────────────────────────────────────
+
 
 @router.get("/batch/{job_id}/stream")
 async def stream_batch_progress(request: Any, job_id: UUID) -> StreamingHttpResponse:
@@ -546,6 +573,7 @@ async def stream_batch_progress(request: Any, job_id: UUID) -> StreamingHttpResp
         },
     )
 
+
 @router.post("/batch/{job_id}/retry")
 def retry_failed_items(request: Any, job_id: UUID) -> dict[str, Any]:
     """重试批量分析中失败的文件"""
@@ -557,6 +585,7 @@ def retry_failed_items(request: Any, job_id: UUID) -> dict[str, Any]:
     session_service.get_user_session(ctx.user, job.session_id)
 
     return batch_service.retry_failed(job_id)  # type: ignore[no-any-return]
+
 
 @router.get("/sessions/{session_id}/batch-jobs")
 def list_batch_jobs(request: Any, session_id: int, page: int = 1) -> dict[str, Any]:
@@ -574,17 +603,21 @@ def list_batch_jobs(request: Any, session_id: int, page: int = 1) -> dict[str, A
         perm_open_access=ctx.perm_open_access,
     )
 
+
 # ─── Prompt 优化 API ─────────────────────────────────────────────────────────
+
 
 class OptimizePromptIn(Schema):
     """Prompt 优化请求体"""
 
     prompt: str
 
+
 class OptimizePromptOut(Schema):
     """Prompt 优化响应体"""
 
     optimized_prompt: str
+
 
 @router.post("/optimize-prompt", response=OptimizePromptOut)
 def optimize_prompt(request: Any, payload: OptimizePromptIn) -> dict[str, str]:
@@ -615,7 +648,9 @@ def optimize_prompt(request: Any, payload: OptimizePromptIn) -> dict[str, str]:
 
     return {"optimized_prompt": result.content.strip()}
 
+
 # ─── 模型列表 API ────────────────────────────────────────────────────────────
+
 
 @router.get("/models")
 def list_models(request: Any) -> dict[str, Any]:

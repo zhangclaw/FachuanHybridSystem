@@ -17,6 +17,7 @@ from apps.documents.models.choices import DocumentTemplateType, LegalStatusMatch
 
 logger = logging.getLogger(__name__)
 
+
 class DocumentTemplateAdminService:
     """文书模板Admin服务"""
 
@@ -243,7 +244,7 @@ class DocumentTemplateAdminService:
     def render_placeholders_table(self, placeholders: list[str], undefined: set[str]) -> str:
         """渲染占位符表格HTML"""
         if not placeholders:
-            return str("未找到占位符")
+            return "未找到占位符"
         rows = []
         for placeholder in placeholders:
             if placeholder in undefined:

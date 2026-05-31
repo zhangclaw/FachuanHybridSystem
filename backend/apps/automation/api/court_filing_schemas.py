@@ -130,6 +130,7 @@ _SLOT_RULES: dict[str, dict[str, dict[str, tuple[str, ...]]]] = {
     },
 }
 
+
 class CaseFilingInfoOut(Schema):
     """案件立案信息"""
 
@@ -147,12 +148,14 @@ class CaseFilingInfoOut(Schema):
     default_filing_engine: str = _FILING_ENGINE_API
     plugin_available: bool = True
 
+
 class ExecuteCourtFilingIn(Schema):
     """执行立案请求"""
 
     case_id: int
     filing_type: str | None = None
     filing_engine: str | None = None
+
 
 class ExecuteCourtFilingOut(Schema):
     """执行立案响应"""

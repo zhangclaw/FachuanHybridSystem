@@ -20,6 +20,7 @@ DEFAULT_ALERT_SUCCESS_RATE_THRESHOLD = 0.90
 DEFAULT_ALERT_FALLBACK_RATE_THRESHOLD = 0.35
 DEFAULT_ALERT_AVG_LATENCY_MS_THRESHOLD = 3000
 
+
 @dataclass(frozen=True)
 class ProviderConfig:
     name: str
@@ -35,6 +36,7 @@ class ProviderConfig:
     retry_max_attempts: int = DEFAULT_RETRY_MAX_ATTEMPTS
     retry_backoff_seconds: float = DEFAULT_RETRY_BACKOFF_SECONDS
 
+
 @dataclass(frozen=True)
 class ProviderDescriptor:
     name: str
@@ -43,6 +45,7 @@ class ProviderDescriptor:
     transport: str
     capabilities: list[str]
     note: str = ""
+
 
 @dataclass
 class ProviderResponse:

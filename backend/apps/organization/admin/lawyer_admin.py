@@ -12,8 +12,10 @@ from apps.organization.models import AccountCredential, Lawyer, Team
 from apps.organization.models.team import TeamType
 from apps.organization.services.lawyer_import_service import LawyerImportService
 
+
 def _get_lawyer_import_service() -> LawyerImportService:
     return LawyerImportService()
+
 
 class LawyerAdminForm(forms.ModelForm[Lawyer]):
     new_password = forms.CharField(
@@ -66,7 +68,7 @@ class LawyerAdminForm(forms.ModelForm[Lawyer]):
     def clean(self) -> dict[str, Any]:
         cleaned: dict[str, Any] = super().clean() or {}
         if not cleaned.get("lawyer_team"):
-            raise ValidationError({"lawyer_team": str("律师必须至少关联一个律师团队")})
+            raise ValidationError({"lawyer_team": "律师必须至少关联一个律师团队"})
         return cleaned
 
     def save(self, commit: bool = True) -> Lawyer:
@@ -87,6 +89,7 @@ class LawyerAdminForm(forms.ModelForm[Lawyer]):
         self._pending_biz_team = bt
         return user
 
+
 class AccountCredentialInlineForm(forms.ModelForm[AccountCredential]):
     class Meta:
         model = AccountCredential
@@ -95,6 +98,7 @@ class AccountCredentialInlineForm(forms.ModelForm[AccountCredential]):
             "password": forms.PasswordInput(render_value=True),
             "url": forms.TextInput(attrs={"class": "vTextField"}),
         }
+
 
 class AccountCredentialInline(admin.TabularInline[AccountCredential, AccountCredential]):
     model = AccountCredential
@@ -108,6 +112,7 @@ class AccountCredentialInline(admin.TabularInline[AccountCredential, AccountCred
 
     def get_extra(self, request: Any, obj: Any = None, **kwargs: Any) -> int:
         return 1 if not obj or not obj.credentials.exists() else 0
+
 
 @admin.register(Lawyer)
 class LawyerAdmin(AdminImportExportMixin, admin.ModelAdmin):

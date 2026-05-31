@@ -12,6 +12,7 @@ from apps.core.models.enums import ChatPlatform
 
 __all__ = ["ChatResult", "MessageContent", "ChatProvider"]
 
+
 class ChatProvider(ABC):
     """群聊提供者抽象接口
 

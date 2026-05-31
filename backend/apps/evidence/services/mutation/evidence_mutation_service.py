@@ -12,6 +12,7 @@ from apps.core.exceptions import ValidationException
 from apps.core.exceptions.error_catalog import case_not_found
 from apps.evidence.models import LIST_TYPE_ORDER, LIST_TYPE_PREVIOUS, EvidenceItem, EvidenceList, ListType
 
+
 class EvidenceMutationService:
     @transaction.atomic
     def create_evidence_list(

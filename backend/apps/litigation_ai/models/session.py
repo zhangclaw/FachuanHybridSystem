@@ -7,6 +7,7 @@ from django.db import models
 
 from .choices import DocumentType, SessionStatus, SessionType
 
+
 class LitigationSession(models.Model):
     case_id: int  # 外键ID字段
     user_id: int  # 外键ID字段

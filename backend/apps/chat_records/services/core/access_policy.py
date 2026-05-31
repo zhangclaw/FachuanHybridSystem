@@ -7,6 +7,7 @@ from typing import Any
 from apps.core.exceptions import PermissionDenied
 from apps.core.security.admin_access import is_admin_user
 
+
 def ensure_can_access_project(*, user: Any | None, project: Any) -> None:
     if is_admin_user(user):
         return

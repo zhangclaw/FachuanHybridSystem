@@ -10,6 +10,7 @@ import pytest
 from apps.document_recognition.services.case_binding_service import CaseBindingService
 from apps.document_recognition.services.data_classes import DocumentType
 
+
 class _CaseServiceSpy:
     def __init__(self, update_result: bool = True) -> None:
         self.update_result = update_result

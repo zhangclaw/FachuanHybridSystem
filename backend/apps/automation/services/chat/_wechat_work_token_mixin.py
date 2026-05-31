@@ -10,6 +10,7 @@ from apps.core.exceptions import ChatProviderException, ConfigurationException
 
 logger = logging.getLogger(__name__)
 
+
 class WeChatWorkTokenMixin:
     """负责企业微信配置加载和 access_token 获取"""
 

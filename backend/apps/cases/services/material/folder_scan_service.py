@@ -23,6 +23,7 @@ from apps.core.services.bound_folder_scan_service import BoundFolderScanService
 
 logger = logging.getLogger(__name__)
 
+
 class CaseFolderScanService:
     """案件自动捕获扫描、轮询、导入附件服务。"""
 
@@ -196,7 +197,7 @@ class CaseFolderScanService:
 
         log = self._case_log_service.create_log(
             case_id=case_id,
-            content=str("自动捕获材料"),
+            content="自动捕获材料",
             user=user,
             org_access=org_access,
             perm_open_access=perm_open_access,
@@ -573,6 +574,7 @@ class CaseFolderScanService:
     def _build_materials_url(*, case_id: int, session_id: UUID) -> str:
         base = reverse("admin:cases_case_materials", args=[case_id])
         return f"{base}?{urlencode({'scan_session': str(session_id), 'open_scan': '1'})}"
+
 
 def run_case_folder_scan_task(session_id: str) -> None:
     """Django-Q 任务入口。"""

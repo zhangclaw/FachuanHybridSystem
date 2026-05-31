@@ -16,6 +16,7 @@ from .hearing_mode import HearingModeAdminMixin
 
 logger = logging.getLogger(__name__)
 
+
 @admin.register(EvidenceList)
 class EvidenceListAdmin(
     HearingModeAdminMixin,

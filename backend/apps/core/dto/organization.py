@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from apps.organization.models import AccountCredential, LawFirm, Lawyer, Team
 
+
 @dataclass
 class AccountCredentialDTO:
     id: int
@@ -41,6 +42,7 @@ class AccountCredentialDTO:
             updated_at=(str(credential.updated_at) if credential.updated_at else None),
         )
 
+
 @dataclass
 class LawyerDTO:
     id: int
@@ -67,6 +69,7 @@ class LawyerDTO:
             law_firm_name=lawyer.law_firm.name if lawyer.law_firm else None,
         )
 
+
 @dataclass
 class LawFirmDTO:
     id: int
@@ -84,6 +87,7 @@ class LawFirmDTO:
             phone=lawfirm.phone,
             social_credit_code=lawfirm.social_credit_code,
         )
+
 
 @dataclass
 class TeamDTO:

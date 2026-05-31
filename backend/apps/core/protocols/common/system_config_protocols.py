@@ -2,6 +2,7 @@
 
 from typing import Any, Protocol
 
+
 class ISystemConfigService(Protocol):
     def get_value(self, key: str, default: str = "") -> str: ...
 
@@ -19,6 +20,7 @@ class ISystemConfigService(Protocol):
     def get_value_internal(self, key: str, default: str = "") -> str: ...
 
     def get_category_configs_internal(self, category: str) -> dict[str, str]: ...
+
 
 class IBusinessConfigService(Protocol):
     def get_stages_for_case_type(self, case_type: str | None) -> list[tuple[Any, ...]]: ...

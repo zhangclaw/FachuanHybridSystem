@@ -5,6 +5,7 @@ from typing import Any
 
 from apps.core.utils.path import Path
 
+
 class CookieService:
     def __init__(self, storage_path: str | None = None) -> None:
         self.storage_path = storage_path

@@ -12,20 +12,24 @@ from django.utils.html import format_html
 
 from apps.documents.models import Placeholder
 
+
 def _get_placeholder_usage_service() -> Any:
     from apps.documents.services.placeholders.placeholder_usage_service import PlaceholderUsageService
 
     return PlaceholderUsageService()
+
 
 def _get_code_placeholder_catalog_service() -> Any:
     from apps.documents.services.code_placeholders.catalog_service import CodePlaceholderCatalogService
 
     return CodePlaceholderCatalogService()
 
+
 def _get_placeholder_admin_service() -> Any:
     from ..services import PlaceholderAdminService
 
     return PlaceholderAdminService()
+
 
 class PlaceholderUsageFilter(admin.SimpleListFilter):
     title = "用途"
@@ -50,6 +54,7 @@ class PlaceholderUsageFilter(admin.SimpleListFilter):
             self._usage_map_cache = usage_map
 
         return _get_placeholder_admin_service().filter_by_usage(queryset, value, usage_map)
+
 
 class PlaceholderAdmin(admin.ModelAdmin):
     """
@@ -129,9 +134,9 @@ class PlaceholderAdmin(admin.ModelAdmin):
         types = usage_map.get(obj.key, set()) or set()
         parts: list[Any] = []
         if "contract" in types:
-            parts.append(str("合同文件"))
+            parts.append("合同文件")
         if "case" in types:
-            parts.append(str("案件文件"))
+            parts.append("案件文件")
         if not parts:
             return format_html('<span style="color: #999;">{}</span>', "-")
         return " / ".join(parts)

@@ -19,9 +19,11 @@ from apps.organization.models import Lawyer
 AUTO_REGISTER_BOOTSTRAP_USERNAME = "法穿"
 AUTO_REGISTER_BOOTSTRAP_PASSWORD = "1234qwer"  # pragma: allowlist secret
 
+
 @dataclass
 class RegisterResult:
     user: Lawyer
+
 
 class AuthService:
     def __init__(self) -> None:

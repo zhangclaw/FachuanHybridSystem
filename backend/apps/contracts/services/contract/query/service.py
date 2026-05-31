@@ -12,6 +12,7 @@ from apps.core.security.access_context import AccessContext
 
 from ..domain import ContractAccessPolicy
 
+
 class ContractQueryService:
     def __init__(self, access_policy: ContractAccessPolicy | None = None) -> None:
         self._access_policy = access_policy

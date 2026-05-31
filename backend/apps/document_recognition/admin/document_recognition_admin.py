@@ -15,6 +15,7 @@ from django.utils.safestring import SafeString
 
 from apps.document_recognition.models import DocumentRecognitionStatus, DocumentRecognitionTask, DocumentRecognitionTool
 
+
 @admin.register(DocumentRecognitionTool)
 class DocumentRecognitionToolAdmin(admin.ModelAdmin):
     """Admin entry page for the recognition workbench."""
@@ -43,6 +44,7 @@ class DocumentRecognitionToolAdmin(admin.ModelAdmin):
 
     def get_model_perms(self, request: HttpRequest) -> dict[str, bool]:
         return {"view": True}
+
 
 @admin.register(DocumentRecognitionTask)
 class DocumentRecognitionTaskAdmin(admin.ModelAdmin):

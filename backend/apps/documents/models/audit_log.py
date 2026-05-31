@@ -12,6 +12,7 @@ from django.db import models
 
 from .choices import TemplateAuditAction
 
+
 class TemplateAuditLog(models.Model):
     """
     模板审计日志

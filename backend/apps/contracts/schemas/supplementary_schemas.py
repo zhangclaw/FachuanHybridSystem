@@ -15,11 +15,13 @@ from apps.core.api.schemas import SchemaMixin
 
 from .client_schemas import ClientOut
 
+
 class SupplementaryAgreementPartyInput(Schema):
     """补充协议当事人输入(用于嵌套)"""
 
     client_id: int
     role: str = "PRINCIPAL"
+
 
 class SupplementaryAgreementInput(Schema):
     """补充协议输入(用于嵌套在合同创建/更新中)"""
@@ -27,6 +29,7 @@ class SupplementaryAgreementInput(Schema):
     name: str | None = None
     party_ids: list[int] | None = None  # 兼容旧接口
     parties: list[SupplementaryAgreementPartyInput] | None = None  # 新接口(含身份)
+
 
 class SupplementaryAgreementIn(Schema):
     """补充协议创建输入 Schema"""
@@ -36,6 +39,7 @@ class SupplementaryAgreementIn(Schema):
     party_ids: list[int] | None = None  # 兼容旧接口
     parties: list[SupplementaryAgreementPartyInput] | None = None  # 新接口(含身份)
 
+
 class SupplementaryAgreementUpdate(Schema):
     """补充协议更新输入 Schema"""
 
@@ -43,11 +47,13 @@ class SupplementaryAgreementUpdate(Schema):
     party_ids: list[int] | None = None  # 兼容旧接口
     parties: list[SupplementaryAgreementPartyInput] | None = None  # 新接口(含身份)
 
+
 class SupplementaryAgreementPartyIn(Schema):
     """补充协议当事人输入"""
 
     client_id: int
     role: str = PartyRole.PRINCIPAL
+
 
 class SupplementaryAgreementPartyOut(ModelSchema):
     """补充协议当事人输出 Schema"""
@@ -77,6 +83,7 @@ class SupplementaryAgreementPartyOut(ModelSchema):
     @staticmethod
     def resolve_role_label(obj: Any) -> str:
         return obj.get_role_display() if obj.role else ""
+
 
 class SupplementaryAgreementOut(ModelSchema, SchemaMixin):
     """补充协议输出 Schema"""

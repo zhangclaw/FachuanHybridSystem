@@ -41,6 +41,7 @@ EXTRACTION_PROMPT = """
 6. 只返回 JSON,不要其他内容
 """
 
+
 @dataclass
 class ExtractionResult:
     """LLM 提取结果"""
@@ -49,6 +50,7 @@ class ExtractionResult:
     amount: str | None = None  # 标准化金额 如 "65500元"
     raw_date: str | None = None  # 原始日期文本
     raw_amount: str | None = None  # 原始金额文本
+
 
 @dataclass
 class RenameSuggestion:
@@ -60,6 +62,7 @@ class RenameSuggestion:
     amount: str | None = None  # 提取的金额
     success: bool = True  # 是否成功
     error: str | None = None  # 错误信息
+
 
 class AutoRenameService:
     """自动重命名服务 - 使用 Ollama 本地模型"""
@@ -433,6 +436,7 @@ class AutoRenameService:
             suggestions.append(suggestion)
 
         return suggestions
+
 
 class RenameRequestItem(Protocol):
     filename: str

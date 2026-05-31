@@ -5,7 +5,6 @@ from __future__ import annotations
 from typing import Any
 
 from django.http import HttpRequest
-
 from ninja import Query, Router
 from ninja.errors import HttpError
 
@@ -31,6 +30,7 @@ from .sales_dispute_api_factories import _get_dashboard_service, _resolve_date_r
 
 router = Router()
 
+
 @router.get("/dashboard/summary", response=SummaryResponse)
 def get_dashboard_summary(
     request: HttpRequest,
@@ -50,6 +50,7 @@ def get_dashboard_summary(
         unrecovered_case_count=out.unrecovered_case_count,
         query_period=QueryPeriodSchema(start_date=out.query_start, end_date=out.query_end),
     )
+
 
 @router.get("/dashboard/trend", response=TrendResponse)
 def get_dashboard_trend(
@@ -78,6 +79,7 @@ def get_dashboard_trend(
         query_period=QueryPeriodSchema(start_date=s, end_date=e),
     )
 
+
 @router.get("/dashboard/breakdown", response=BreakdownResponse)
 def get_dashboard_breakdown(
     request: HttpRequest,
@@ -104,6 +106,7 @@ def get_dashboard_breakdown(
         ],
         query_period=QueryPeriodSchema(start_date=s, end_date=e),
     )
+
 
 @router.get("/dashboard/factors", response=FactorsResponse)
 def get_dashboard_factors(
@@ -136,6 +139,7 @@ def get_dashboard_factors(
         query_period=QueryPeriodSchema(start_date=s, end_date=e),
     )
 
+
 @router.get("/dashboard/lawyer-performance", response=LawyerPerformanceResponse)
 def get_dashboard_lawyer_performance(
     request: HttpRequest,
@@ -165,6 +169,7 @@ def get_dashboard_lawyer_performance(
         ],
         query_period=QueryPeriodSchema(start_date=s, end_date=e),
     )
+
 
 @router.get("/dashboard/case-stats", response=CaseStatsResponse)
 def get_dashboard_case_stats(

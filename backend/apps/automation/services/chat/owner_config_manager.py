@@ -27,6 +27,7 @@ from apps.core.exceptions import ConfigurationException, ValidationException
 
 logger = logging.getLogger(__name__)
 
+
 class OwnerConfigManager:
     """群主配置管理器
 

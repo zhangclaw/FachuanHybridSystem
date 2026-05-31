@@ -5,8 +5,8 @@ from __future__ import annotations
 from typing import Any, ClassVar
 
 from django.db import models
-
 from django_lifecycle import BEFORE_CREATE, BEFORE_UPDATE, LifecycleModel, hook
+
 
 class CourtToken(models.Model):
     """人民法院在线服务网（一张网）/保全系统 Token 存储"""
@@ -48,6 +48,7 @@ class CourtToken(models.Model):
         result: bool = self.expires_at <= timezone.now()
         return result
 
+
 class TokenAcquisitionStatus(models.TextChoices):
     """一张网/保全系统 Token 获取状态"""
 
@@ -57,6 +58,7 @@ class TokenAcquisitionStatus(models.TextChoices):
     NETWORK_ERROR = "network_error", "网络错误"
     CAPTCHA_ERROR = "captcha_error", "验证码错误"
     CREDENTIAL_ERROR = "credential_error", "账号密码错误"
+
 
 class TokenAcquisitionHistory(LifecycleModel):
     """一张网/保全系统 Token 获取历史记录"""

@@ -36,6 +36,7 @@ _SHORT_WAIT = 0.5
 _MEDIUM_WAIT = 1.5
 _AJAX_WAIT = 2.0
 
+
 @dataclass
 class OACustomerData:
     """OA客户数据。"""
@@ -48,6 +49,7 @@ class OACustomerData:
     legal_representative: str | None = None  # 法定代表人（企业）
     gender: str | None = None  # 性别（自然人）
 
+
 @dataclass
 class CustomerListItem:
     """客户列表项。"""
@@ -55,6 +57,7 @@ class CustomerListItem:
     name: str
     client_type: str  # natural=自然人 / legal=企业
     key_id: str  # 客户KeyID，用于构造详情页URL
+
 
 @dataclass
 class ClientListFormState:
@@ -64,6 +67,7 @@ class ClientListFormState:
     payload: dict[str, str]
     total_count: int = 0
     page_size: int = 20
+
 
 class JtnClientImportScript:
     """金诚同达 OA 客户导入自动化。"""

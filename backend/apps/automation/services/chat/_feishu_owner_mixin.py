@@ -26,6 +26,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+
 class FeishuOwnerMixin:
     """负责飞书群主验证、查询和重试逻辑"""
 
@@ -77,7 +78,7 @@ class FeishuOwnerMixin:
                 success=True,
                 chat_id=chat_id,
                 chat_name=chat_name,
-                message=str("获取群聊信息成功"),
+                message="获取群聊信息成功",
                 raw_response=data,
             )
 

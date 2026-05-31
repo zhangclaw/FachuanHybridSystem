@@ -18,6 +18,7 @@ from apps.automation.services.document_delivery.data_classes import DocumentDeli
 
 logger = logging.getLogger("apps.automation")
 
+
 @dataclass(frozen=True)
 class CourtSMSDedupIdentity:
     """文书送达事件身份。"""
@@ -27,6 +28,7 @@ class CourtSMSDedupIdentity:
     canonical_payload: str | None
     uses_fallback: bool = False
 
+
 @dataclass(frozen=True)
 class CourtSMSDedupResult:
     """CourtSMS 去重创建结果。"""
@@ -34,6 +36,7 @@ class CourtSMSDedupResult:
     sms: CourtSMS
     created: bool
     identity: CourtSMSDedupIdentity
+
 
 class CourtSMSDedupService:
     """统一处理文书送达 CourtSMS 的事件键生成与幂等创建。"""

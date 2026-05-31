@@ -11,6 +11,7 @@ from asgiref.sync import sync_to_async
 if TYPE_CHECKING:
     from apps.litigation_ai.models import LitigationSession
 
+
 class LitigationSessionRepository:
     def _model(self) -> type[LitigationSession]:
         from apps.litigation_ai.models import LitigationSession

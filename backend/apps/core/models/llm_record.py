@@ -8,6 +8,7 @@ from typing import ClassVar
 
 from django.db import models
 
+
 class LLMCallRecord(models.Model):
     """
     LLM 调用记录(用于成本追踪)

@@ -9,6 +9,7 @@ from django.db import models
 
 from .case import Case
 
+
 class CaseFolderScanStatus(models.TextChoices):
     PENDING = "pending", "待执行"
     RUNNING = "running", "扫描中"
@@ -17,6 +18,7 @@ class CaseFolderScanStatus(models.TextChoices):
     STAGED = "staged", "已导入附件"
     FAILED = "failed", "失败"
     CANCELLED = "cancelled", "已取消"
+
 
 class CaseFolderScanSession(models.Model):
     """案件自动捕获扫描会话。"""

@@ -27,6 +27,7 @@ logger = logging.getLogger(__name__)
 _DualReviewPolicy = DualReviewPolicy
 _AdaptiveThresholdPolicy = AdaptiveThresholdPolicy
 
+
 class LegalResearchExecutor(
     ExecutorTaskLifecycleMixin,
     ExecutorSourceGatewayMixin,

@@ -27,6 +27,7 @@ try:
 except ImportError:
     pass
 
+
 def reload_learned_code_rules() -> None:
     """重新加载代码文件中的学习规则（导出后调用）。"""
     global _LEARNED_CODE_RULES
@@ -43,6 +44,7 @@ def reload_learned_code_rules() -> None:
         )
     except (ImportError, OSError):
         _LEARNED_CODE_RULES = {}
+
 
 # ============================================================
 # 跳过规则 - 以下关键词命中的文件不导入
@@ -238,6 +240,7 @@ _LITIGATION_VERB_MAP: dict[str, str] = {
 # 日期前缀子目录名正则
 _DATE_FOLDER_PATTERN = re.compile(r"^(\d{4})[.\-](\d{2})[.\-](\d{2})\s*[-—\s]\s*(.+)$")
 
+
 def classify_archive_material(
     *,
     filename: str,
@@ -336,6 +339,7 @@ def classify_archive_material(
         "is_evidence_folder": False,
     }
 
+
 def parse_work_log_from_folder_name(
     folder_name: str,
     archive_category: str,
@@ -361,6 +365,7 @@ def parse_work_log_from_folder_name(
     content = _add_verb(subject, archive_category)
 
     return {"date": date_str, "content": content}
+
 
 def collect_work_log_suggestions(scan_folder: str, archive_category: str) -> list[dict[str, str]]:
     """扫描目录下所有日期前缀子目录，返回工作日志建议列表。
@@ -388,6 +393,7 @@ def collect_work_log_suggestions(scan_folder: str, archive_category: str) -> lis
     suggestions.sort(key=lambda x: x["date"])
     return suggestions
 
+
 def collect_archive_item_options(archive_category: str) -> list[dict[str, str]]:
     """获取归档清单项选项列表（source="case" 的条目）。
 
@@ -400,9 +406,11 @@ def collect_archive_item_options(archive_category: str) -> list[dict[str, str]]:
     checklist = ARCHIVE_CHECKLIST.get(archive_category, [])
     return [{"code": item["code"], "name": item["name"]} for item in checklist if item.get("source") == "case"]
 
+
 # ============================================================
 # 内部辅助函数
 # ============================================================
+
 
 def _match_by_learned_rules(
     normalized_filename: str,
@@ -430,6 +438,7 @@ def _match_by_learned_rules(
 
     return None
 
+
 def _match_by_db_learned_rules(
     normalized_filename: str,
     archive_category: str,
@@ -452,9 +461,11 @@ def _match_by_db_learned_rules(
 
     return None
 
+
 # DB 学习规则缓存：{(archive_category,): [(keyword, code), ...]}
 _DB_RULES_CACHE: dict[str, list[tuple[str, str]]] = {}
 _DB_RULES_CACHE_LOADED_AT: float = 0.0
+
 
 def _get_db_learned_rules(archive_category: str) -> list[tuple[str, str]]:
     """获取 DB 学习规则，5 分钟内使用缓存。"""
@@ -480,6 +491,7 @@ def _get_db_learned_rules(archive_category: str) -> list[tuple[str, str]]:
 
     return _DB_RULES_CACHE.get(archive_category, [])
 
+
 def _normalize_for_match(text: str) -> str:
     """标准化文本用于模糊匹配：去空格、转小写。"""
     value = str(text or "").strip().lower()
@@ -488,6 +500,7 @@ def _normalize_for_match(text: str) -> str:
     value = value.replace("\\", "/")
     value = re.sub(r"\s+", "", value)
     return value
+
 
 def _match_by_folder_keywords(
     normalized_path: str,
@@ -508,6 +521,7 @@ def _match_by_folder_keywords(
                 }
     return None
 
+
 def _match_by_filename_keywords(
     normalized_filename: str,
     archive_category: str,
@@ -527,6 +541,7 @@ def _match_by_filename_keywords(
                 }
     return None
 
+
 def _get_item_name(archive_category: str, code: str) -> str:
     """根据归档分类和编号获取清单项名称。"""
     checklist = ARCHIVE_CHECKLIST.get(archive_category, [])
@@ -534,6 +549,7 @@ def _get_item_name(archive_category: str, code: str) -> str:
         if item["code"] == code:
             return item["name"]
     return code
+
 
 def _get_evidence_code(archive_category: str) -> str:
     """获取证据材料对应的 archive_item_code。"""
@@ -543,6 +559,7 @@ def _get_evidence_code(archive_category: str) -> str:
         "criminal": "cr_8",
     }
     return mapping.get(archive_category, "lt_10")
+
 
 def _add_verb(subject: str, archive_category: str) -> str:
     """为工作日志事项补全动词。

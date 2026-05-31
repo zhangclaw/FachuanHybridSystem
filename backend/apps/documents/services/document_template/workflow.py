@@ -11,6 +11,7 @@ from apps.documents.models import DocumentTemplate
 from apps.documents.services.document_template.repo import DocumentTemplateRepo
 from apps.documents.services.document_template.validation_service import DocumentTemplateValidationService
 
+
 class DocumentTemplateWorkflow:
     def __init__(
         self, repo: DocumentTemplateRepo | None = None, validator: DocumentTemplateValidationService | None = None

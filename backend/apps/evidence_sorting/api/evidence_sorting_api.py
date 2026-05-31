@@ -16,8 +16,10 @@ logger = logging.getLogger("apps.evidence_sorting")
 
 router = Router(tags=["案件材料整理"], auth=JWTOrSessionAuth())
 
+
 def _body(request: HttpRequest) -> dict[str, Any]:
     return json.loads(request.body or b"{}")  # type: ignore[no-any-return]
+
 
 @router.post("/classify")
 def classify_images(request: HttpRequest) -> dict[str, Any]:
@@ -50,6 +52,7 @@ def classify_images(request: HttpRequest) -> dict[str, Any]:
         "errors": result.errors,
     }
 
+
 @router.post("/parse-statement")
 def parse_statement(request: HttpRequest) -> dict[str, Any]:
     """LLM 解析对账单"""
@@ -73,6 +76,7 @@ def parse_statement(request: HttpRequest) -> dict[str, Any]:
         "signed": info.signed,
         "line_items": [{"date": li.date, "amount": li.amount, "description": li.description} for li in info.line_items],
     }
+
 
 @router.post("/reconcile")
 def reconcile(request: HttpRequest) -> dict[str, Any]:
@@ -143,6 +147,7 @@ def reconcile(request: HttpRequest) -> dict[str, Any]:
         ],
     }
 
+
 @router.post("/export")
 @rate_limit_from_settings("EXPORT", by_user=True)
 def export_zip(request: HttpRequest) -> dict[str, Any]:
@@ -170,6 +175,7 @@ def export_zip(request: HttpRequest) -> dict[str, Any]:
 
     exporter = ExporterService()
     return exporter.export_zip(result)
+
 
 @router.get("/llm-options")
 @rate_limit_from_settings("LLM", by_user=True)

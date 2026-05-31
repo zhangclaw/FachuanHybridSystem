@@ -28,6 +28,7 @@ from apps.legal_research.services.task.state_sync import sync_failed_queue_state
 
 logger = logging.getLogger(__name__)
 
+
 @admin.register(LegalResearchTask)
 class LegalResearchTaskAdmin(admin.ModelAdmin):
     change_form_template = "admin/legal_research/legalresearchtask/change_form.html"

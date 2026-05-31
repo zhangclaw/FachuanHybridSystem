@@ -11,6 +11,7 @@ from apps.core.protocols import IDocumentTemplateBindingService
 
 logger = logging.getLogger("apps.contracts")
 
+
 @dataclass(frozen=True)
 class ContractSubdirPathResolver:
     template_binding_service: IDocumentTemplateBindingService | None

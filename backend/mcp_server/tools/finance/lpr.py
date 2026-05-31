@@ -6,6 +6,7 @@ from typing import Any
 
 from mcp_server.client import client
 
+
 def list_lpr_rates(
     start_date: str | None = None,
     end_date: str | None = None,

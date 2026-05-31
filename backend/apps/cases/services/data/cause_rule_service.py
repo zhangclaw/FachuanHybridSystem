@@ -8,6 +8,7 @@ from typing import Any, cast
 
 logger = logging.getLogger(__name__)
 
+
 class SpecialCaseType:
     """特殊案件类型枚举"""
 
@@ -17,6 +18,7 @@ class SpecialCaseType:
     REVOKE_ARBITRATION = "revoke_arbitration"  # 申请撤销仲裁裁决
     PUBLIC_NOTICE = "public_notice"  # 公示催告程序
     LABOR_DISPUTE = "labor_dispute"  # 劳动争议
+
 
 # ============================================================================
 # 特殊案由编码常量
@@ -112,6 +114,7 @@ DEFAULT_DISPLAY_CONFIG: dict[str, bool] = {
     "show_half_fee": True,
     "show_payment_order_fee": False,
 }
+
 
 class CauseRuleService:
     """

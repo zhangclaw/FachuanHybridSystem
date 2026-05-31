@@ -4,6 +4,7 @@ from dataclasses import dataclass
 
 from .invoice_parser import ParsedInvoice
 
+
 @dataclass
 class RecognitionResult:
     """发票识别结果数据类。"""

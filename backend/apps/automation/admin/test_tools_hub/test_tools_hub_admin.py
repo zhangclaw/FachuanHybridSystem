@@ -13,6 +13,7 @@ from apps.automation.models import TestToolsHub
 
 logger = logging.getLogger("apps.automation")
 
+
 @admin.register(TestToolsHub)
 class TestToolsHubAdmin(admin.ModelAdmin):
     """

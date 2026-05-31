@@ -38,6 +38,7 @@ from .owner_config_manager import OwnerConfigManager
 
 logger = logging.getLogger(__name__)
 
+
 class FeishuChatProvider(FeishuTokenMixin, FeishuFileMixin, FeishuOwnerMixin, ChatProvider):
     """飞书群聊提供者
 
@@ -185,7 +186,7 @@ class FeishuChatProvider(FeishuTokenMixin, FeishuFileMixin, FeishuOwnerMixin, Ch
             logger.info(f"成功创建飞书群聊: {chat_name} (ID: {chat_id}), 群主: {effective_owner_id}")
 
             result = ChatResult(
-                success=True, chat_id=chat_id, chat_name=chat_name, message=str("群聊创建成功"), raw_response=data
+                success=True, chat_id=chat_id, chat_name=chat_name, message="群聊创建成功", raw_response=data
             )
             if result.raw_response:
                 result.raw_response["owner_info"] = {
@@ -256,7 +257,7 @@ class FeishuChatProvider(FeishuTokenMixin, FeishuFileMixin, FeishuOwnerMixin, Ch
             message_id = message_data.get("message_id")
             logger.info(f"成功发送飞书消息到群聊: {chat_id} (消息ID: {message_id})")
 
-            return ChatResult(success=True, chat_id=chat_id, message=str("消息发送成功"), raw_response=data)
+            return ChatResult(success=True, chat_id=chat_id, message="消息发送成功", raw_response=data)
 
         except MessageSendException:
             raise

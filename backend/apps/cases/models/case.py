@@ -6,7 +6,6 @@ from datetime import date
 from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
-
 from simple_history.models import HistoricalRecords
 
 from apps.core.filesystem.upload_paths import DatedUUIDPath
@@ -22,6 +21,7 @@ if TYPE_CHECKING:
     from .material import CaseFolderBinding, CaseMaterial, CaseMaterialGroupOrder
     from .party import CaseAccessGrant, CaseAssignment, CaseParty
     from .template_binding import CaseTemplateBinding
+
 
 class Case(models.Model):
     id: int
@@ -50,9 +50,7 @@ class Case(models.Model):
     effective_date = models.DateField(blank=True, null=True, verbose_name="生效日期")
     specified_date = models.DateField(blank=True, null=True, verbose_name="指定日期")
     cause_of_action = models.CharField(max_length=128, blank=True, null=True, verbose_name="案由")
-    target_amount = models.DecimalField(
-        max_digits=14, decimal_places=2, blank=True, null=True, verbose_name="涉案金额"
-    )
+    target_amount = models.DecimalField(max_digits=14, decimal_places=2, blank=True, null=True, verbose_name="涉案金额")
     preservation_amount = models.DecimalField(
         max_digits=14, decimal_places=2, blank=True, null=True, verbose_name="财产保全金额"
     )
@@ -149,6 +147,7 @@ class Case(models.Model):
             if self.current_stage not in valid_stages:
                 raise ValidationError({"current_stage": "无效的案件阶段"})
 
+
 class CaseFilingNumberSequence(models.Model):
     id: int
     year = models.IntegerField(unique=True, verbose_name="年份")
@@ -159,6 +158,7 @@ class CaseFilingNumberSequence(models.Model):
         verbose_name = "案件建档编号序列"
         verbose_name_plural = "案件建档编号序列"
         indexes: ClassVar = [models.Index(fields=["year"])]
+
 
 class CaseNumber(models.Model):
     YEAR_DAYS_CHOICES: ClassVar = (
@@ -255,6 +255,7 @@ class CaseNumber(models.Model):
         if self.document_name:
             return f"{self.number}《{self.document_name}》"
         return self.number
+
 
 class SupervisingAuthority(models.Model):
     """主管机关"""

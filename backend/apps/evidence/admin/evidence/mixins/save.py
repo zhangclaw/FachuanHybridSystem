@@ -11,6 +11,7 @@ from .views import EvidenceListAdminServiceMixin
 
 logger = logging.getLogger(__name__)
 
+
 class EvidenceListAdminSaveMixin(EvidenceListAdminServiceMixin):
     def save_model(self, request: Any, obj: Any, form: Any, change: Any) -> None:
         from django.contrib import messages
@@ -207,5 +208,6 @@ class EvidenceListAdminSaveMixin(EvidenceListAdminServiceMixin):
         if evidence_list.total_pages != total_pages:
             evidence_list.total_pages = total_pages
             evidence_list.save(update_fields=["total_pages"])
+
 
 __all__: list[str] = ["EvidenceListAdminSaveMixin"]

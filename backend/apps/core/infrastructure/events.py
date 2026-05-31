@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+
 class Events:
     """Legacy event namespace."""
 

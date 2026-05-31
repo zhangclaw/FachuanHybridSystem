@@ -26,6 +26,7 @@ from apps.organization.services.dto_assemblers import LawFirmDtoAssembler
 
 logger = logging.getLogger("apps.organization")
 
+
 class LawFirmService:
     def __init__(self) -> None:
         self._access_policy = OrganizationAccessPolicy()
@@ -224,19 +225,20 @@ class LawFirmService:
         # 检查名称是否重复
         if LawFirm.objects.filter(name=data.name).exists():
             raise ValidationException(
-                message="律所名称已存在", code="DUPLICATE_NAME", errors={"name": str("该名称已被使用")}
+                message="律所名称已存在", code="DUPLICATE_NAME", errors={"name": "该名称已被使用"}
             )
 
     def _validate_update_data(self, lawfirm: LawFirm, data: LawFirmUpdateDTO) -> None:
         # 检查名称是否与其他律所重复
         if data.name and data.name != lawfirm.name and LawFirm.objects.filter(name=data.name).exists():
             raise ValidationException(
-                message="律所名称已存在", code="DUPLICATE_NAME", errors={"name": str("该名称已被使用")}
+                message="律所名称已存在", code="DUPLICATE_NAME", errors={"name": "该名称已被使用"}
             )
 
     def get_lawfirm_by_id(self, lawfirm_id: int) -> LawFirm | None:
         """根据ID获取律所（公共方法，供Adapter层调用）"""
         return self.get_lawfirm_queryset().filter(id=lawfirm_id).first()
+
 
 class LawFirmServiceAdapter(ILawFirmService):
     _assembler: ClassVar[LawFirmDtoAssembler] = LawFirmDtoAssembler()

@@ -30,6 +30,7 @@ GRADE_THRESHOLDS: list[tuple[int, str]] = [
     (0, "severely_insufficient"),
 ]
 
+
 @dataclass(frozen=True)
 class EvidenceItem:
     """证据条目输入"""
@@ -37,6 +38,7 @@ class EvidenceItem:
     evidence_type: str
     has_evidence: bool
     quality_score: int  # 0-100
+
 
 @dataclass(frozen=True)
 class EvidenceItemResult:
@@ -48,6 +50,7 @@ class EvidenceItemResult:
     weight: Decimal
     weighted_score: Decimal
 
+
 @dataclass(frozen=True)
 class EvidenceScoreResult:
     """证据评分结果"""
@@ -55,6 +58,7 @@ class EvidenceScoreResult:
     total_score: Decimal
     grade: str
     details: list[EvidenceItemResult]
+
 
 class EvidenceScorerService:
     """证据完整度评分服务"""

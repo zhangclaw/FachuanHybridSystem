@@ -6,6 +6,7 @@ from typing import Any
 
 from mcp_server.client import client
 
+
 def list_clients(
     search: str | None = None,
     client_type: str | None = None,

@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 _LANCZOS: Any = getattr(Image, "Resampling", Image).LANCZOS
 
+
 class FrameSelectionService:
     def calc_dhash_hex(self, image_bytes: bytes, *, hash_size: int = 8) -> str:
         if not image_bytes:

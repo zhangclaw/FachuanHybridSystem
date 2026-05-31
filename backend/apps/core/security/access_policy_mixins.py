@@ -10,6 +10,7 @@ from apps.core.exceptions import ForbiddenError
 
 _StrOrPromise = str | Promise
 
+
 class AuthzUserMixin:
     def is_authenticated(self, user: Any | None) -> bool:
         return bool(user and getattr(user, "is_authenticated", False))
@@ -24,6 +25,7 @@ class AuthzUserMixin:
     def get_user_id(self, user: Any | None) -> int | None:
         return getattr(user, "id", None) if user else None
 
+
 class OrgAllowedLawyersMixin(AuthzUserMixin):
     def get_allowed_lawyer_ids(self, user: Any | None, org_access: dict[str, Any] | None) -> set[int]:
         allowed_lawyers = set(org_access.get("lawyers", set())) if org_access else set()
@@ -31,6 +33,7 @@ class OrgAllowedLawyersMixin(AuthzUserMixin):
         if user_id:
             allowed_lawyers.add(user_id)
         return allowed_lawyers
+
 
 class DjangoPermsMixin(AuthzUserMixin):
     def ensure_authenticated(self, user: Any | None, message: _StrOrPromise = "用户未认证") -> None:

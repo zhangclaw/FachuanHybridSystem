@@ -9,6 +9,7 @@ from typing import Any, Protocol
 from apps.core.dto import ContractDTO, LawyerDTO, PartyRoleDTO, SupplementaryAgreementDTO
 from apps.core.security.access_context import AccessContext
 
+
 class IContractService(Protocol):
     """
     合同服务接口
@@ -223,8 +224,10 @@ class IContractService(Protocol):
         """
         ...
 
+
 class IContractAssignmentQueryService(Protocol):
     def list_lawyer_ids_by_contract_internal(self, contract_id: int) -> list[int]: ...
+
 
 class IContractPaymentService(Protocol):
     """
@@ -363,6 +366,7 @@ class IContractPaymentService(Protocol):
             NotFoundError: 收款不存在
         """
         ...
+
 
 class IContractFolderBindingService(Protocol):
     def save_file_to_bound_folder(

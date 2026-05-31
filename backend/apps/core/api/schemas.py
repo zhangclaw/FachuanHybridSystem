@@ -8,6 +8,7 @@ from typing import Any, cast
 
 from django.utils import timezone
 
+
 class TimestampMixin:
     """
     时间戳字段解析 Mixin
@@ -51,6 +52,7 @@ class TimestampMixin:
         except (TypeError, AttributeError, ValueError):
             return value.isoformat() if hasattr(value, "isoformat") else str(value)
 
+
 class DisplayLabelMixin:
     """
     显示标签解析 Mixin
@@ -76,6 +78,7 @@ class DisplayLabelMixin:
             return getattr(obj, field_name, None)
         except AttributeError:
             return None
+
 
 class FileFieldMixin:
     """
@@ -118,6 +121,7 @@ class FileFieldMixin:
             return cast(str | None, file_field.path)
         except (AttributeError, ValueError):
             return None
+
 
 # 组合所有 Mixin 的基类
 class SchemaMixin(TimestampMixin, DisplayLabelMixin, FileFieldMixin):

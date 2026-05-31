@@ -10,6 +10,7 @@ from apps.litigation_ai.placeholders.spec import LitigationPlaceholderKeys
 
 logger = logging.getLogger(__name__)
 
+
 @PlaceholderRegistry.register
 class EnforcementApplicantPropertyClueService(BasePlaceholderService):
     """强制执行申请书申请人财产线索服务"""

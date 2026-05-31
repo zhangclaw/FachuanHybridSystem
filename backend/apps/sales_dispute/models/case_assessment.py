@@ -13,15 +13,18 @@ if TYPE_CHECKING:
     from .jurisdiction_analysis import JurisdictionAnalysis
     from .litigation_strategy import LitigationStrategy
 
+
 class ContractBasisType(models.TextChoices):
     WRITTEN = "written", "书面合同"
     ORAL = "oral", "口头约定"
     TRADE_CUSTOM = "trade_custom", "交易习惯"
 
+
 class LimitationStatus(models.TextChoices):
     NORMAL = "normal", "正常"
     EXPIRING_SOON = "expiring_soon", "即将届满"
     EXPIRED = "expired", "已届满"
+
 
 class SolvencyRating(models.TextChoices):
     GOOD = "good", "良好"
@@ -29,12 +32,14 @@ class SolvencyRating(models.TextChoices):
     POOR = "poor", "较差"
     UNKNOWN = "unknown", "未知"
 
+
 class AssessmentGrade(models.TextChoices):
     SUFFICIENT = "sufficient", "充分"
     FAIRLY_SUFFICIENT = "fairly_sufficient", "较充分"
     AVERAGE = "average", "一般"
     WEAK = "weak", "薄弱"
     SEVERELY_INSUFFICIENT = "severely_insufficient", "严重不足"
+
 
 class CaseAssessment(models.Model):
     id: int

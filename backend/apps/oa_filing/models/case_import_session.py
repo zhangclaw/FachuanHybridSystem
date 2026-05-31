@@ -2,12 +2,14 @@
 
 from django.db import models
 
+
 class CaseImportStatus(models.TextChoices):
     PENDING = "pending", "待开始"
     IN_PROGRESS = "in_progress", "进行中"
     COMPLETED = "completed", "已完成"
     FAILED = "failed", "失败"
     CANCELLED = "cancelled", "已取消"
+
 
 class CaseImportPhase(models.TextChoices):
     PENDING = "pending", "待开始"
@@ -18,6 +20,7 @@ class CaseImportPhase(models.TextChoices):
     COMPLETED = "completed", "已完成"
     FAILED = "failed", "失败"
     CANCELLED = "cancelled", "已取消"
+
 
 class CaseImportSession(models.Model):
     """OA案件导入记录"""

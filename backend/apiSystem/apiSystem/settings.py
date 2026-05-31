@@ -170,12 +170,14 @@ WSGI_APPLICATION = "apiSystem.wsgi.application"
 DB_ENGINE = (os.environ.get("DB_ENGINE", "postgresql") or "postgresql").strip().lower()
 DATABASE_PATH = (os.environ.get("DATABASE_PATH", "") or "").strip()
 
+
 def _get_env_str(name: str, default: str = "", *, allow_empty: bool = False) -> str:
     raw_value = os.environ.get(name)
     value = (default if raw_value is None else raw_value).strip()
     if not value and not allow_empty:
         raise RuntimeError(f"DB_ENGINE={DB_ENGINE} 时必须设置环境变量 {name}")
     return value
+
 
 if DB_ENGINE in ("sqlite", "sqlite3", "django.db.backends.sqlite3"):
     db_name = DATABASE_PATH if DATABASE_PATH else BASE_DIR / "db.sqlite3"
@@ -230,6 +232,7 @@ from typing import Any
 # 启用 SQLite 外键约束
 from django.db.backends.signals import connection_created
 
+
 def activate_foreign_keys(sender: Any, connection: Any, **kwargs: Any) -> None:
     """启用 SQLite 外键约束和 WAL 模式"""
     if connection.vendor == "sqlite":
@@ -237,6 +240,7 @@ def activate_foreign_keys(sender: Any, connection: Any, **kwargs: Any) -> None:
         cursor.execute("PRAGMA foreign_keys = ON;")
         cursor.execute("PRAGMA journal_mode = WAL;")
         cursor.execute("PRAGMA busy_timeout = 30000;")
+
 
 connection_created.connect(activate_foreign_keys)
 

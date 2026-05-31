@@ -5,6 +5,7 @@ import pytest
 from apps.legal_research.services.executor_components.source_gateway import ExecutorSourceGatewayMixin
 from apps.legal_research.services.sources.weike.transport import WeikeTransportMixin
 
+
 def test_executor_source_gateway_retry_backoff_uses_exponential_jitter(monkeypatch: pytest.MonkeyPatch) -> None:
     slept: list[float] = []
     monkeypatch.setattr(

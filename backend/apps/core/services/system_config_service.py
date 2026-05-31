@@ -14,11 +14,14 @@ from apps.core.exceptions import NotFoundError, ValidationException
 from apps.core.models.system_config import SystemConfig
 from apps.core.repositories.system_config_repository import SystemConfigRepository
 
+
 class _MissingSentinel:
     pass
 
+
 _MISSING_SENTINEL = _MissingSentinel()
 _DEFAULT_CACHE_TIMEOUT_SECONDS = 300
+
 
 class SystemConfigService:
     """系统配置服务"""

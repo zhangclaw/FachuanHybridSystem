@@ -43,6 +43,7 @@ from .base import ChatProvider, ChatResult, MessageContent
 
 logger = logging.getLogger(__name__)
 
+
 class TelegramProvider(TelegramTokenMixin, TelegramFileMixin, ChatProvider):
     """Telegram 群聊提供者
 
@@ -142,7 +143,7 @@ class TelegramProvider(TelegramTokenMixin, TelegramFileMixin, ChatProvider):
                 success=True,
                 chat_id=combined_chat_id,
                 chat_name=chat_name,
-                message=str("话题创建成功"),
+                message="话题创建成功",
                 raw_response=data,
             )
             if result.raw_response:
@@ -222,7 +223,7 @@ class TelegramProvider(TelegramTokenMixin, TelegramFileMixin, ChatProvider):
             message_id = message_data.get("message_id")
             logger.info(f"成功发送 Telegram 消息到群聊: {chat_id} (消息ID: {message_id})")
 
-            return ChatResult(success=True, chat_id=chat_id, message=str("消息发送成功"), raw_response=data)
+            return ChatResult(success=True, chat_id=chat_id, message="消息发送成功", raw_response=data)
 
         except MessageSendException:
             raise
@@ -299,7 +300,7 @@ class TelegramProvider(TelegramTokenMixin, TelegramFileMixin, ChatProvider):
                 success=True,
                 chat_id=chat_id,
                 chat_name=chat_name,
-                message=str("获取群聊信息成功"),
+                message="获取群聊信息成功",
                 raw_response=result_data,
             )
 

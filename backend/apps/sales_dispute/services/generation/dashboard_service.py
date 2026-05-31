@@ -32,6 +32,7 @@ from .dashboard_models import (
 
 logger = logging.getLogger(__name__)
 
+
 class DashboardService:
     """回款统计看板服务"""
 

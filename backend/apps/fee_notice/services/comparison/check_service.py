@@ -23,6 +23,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("apps.fee_notice")
 
+
 @dataclass
 class FeeCheckItem:
     """单个费用检查项"""
@@ -47,6 +48,7 @@ class FeeCheckItem:
     can_compare: bool = True
     compare_message: str | None = None  # 无法比对的原因
 
+
 @dataclass
 class FeeCheckResult:
     """费用检查结果"""
@@ -57,6 +59,7 @@ class FeeCheckResult:
     case_number: str | None = None
     cause_of_action: str | None = None
     target_amount: Decimal | None = None
+
 
 class FeeNoticeCheckService:
     """

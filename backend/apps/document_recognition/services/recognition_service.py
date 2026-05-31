@@ -17,6 +17,7 @@ from .data_classes import BindingResult, DocumentType, RecognitionResponse, Reco
 
 logger = logging.getLogger("apps.document_recognition")
 
+
 class CourtDocumentRecognitionService:
     """
     法院文书智能识别服务（协调器）

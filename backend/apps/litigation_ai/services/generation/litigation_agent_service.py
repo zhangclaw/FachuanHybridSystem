@@ -16,6 +16,7 @@ from apps.litigation_ai.agent.interfaces import ILitigationAgentService
 
 logger = logging.getLogger("apps.litigation_ai")
 
+
 class LitigationAgentService(ILitigationAgentService):
     """
     诉讼文书生成 Agent 服务

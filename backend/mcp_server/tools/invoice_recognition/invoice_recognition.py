@@ -7,6 +7,7 @@ from typing import Any
 
 from mcp_server.client import client
 
+
 def _build_invoice_files(files: list[dict[str, str]]) -> dict[str, Any]:
     """将 [{base64, filename}] 转为 httpx files 格式（多文件同字段名）。"""
     result = []

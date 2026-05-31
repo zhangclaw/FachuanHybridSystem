@@ -23,6 +23,7 @@ logger = logging.getLogger(__name__)
 JSONDict = dict[str, object]
 ImportData = dict[str, object]
 
+
 class MaterialViewPayload(TypedDict):
     party_types: list[JSONDict]
     non_party_types: list[JSONDict]
@@ -30,9 +31,11 @@ class MaterialViewPayload(TypedDict):
     opponent_parties: list[MaterialPartyPayload]
     authorities: list[AuthorityPayload]
 
+
 class SimplePartyPayload(TypedDict):
     id: int
     name: str
+
 
 class DetailPartyPayload(TypedDict):
     id: int
@@ -41,17 +44,20 @@ class DetailPartyPayload(TypedDict):
     legal_status: str | None
     legal_status_display: str
 
+
 class MaterialPartyPayload(TypedDict):
     id: int
     name: str
     legal_status: str | None
     legal_status_display: str
 
+
 class AuthorityPayload(TypedDict):
     id: int
     name: str
     authority_type: str
     authority_type_display: str
+
 
 class CaseMaterialServiceProtocol(Protocol):
     def get_used_type_ids(self, *, case_id: int) -> list[int]: ...
@@ -64,8 +70,10 @@ class CaseMaterialServiceProtocol(Protocol):
         used_type_ids: list[int],
     ) -> list[JSONDict]: ...
 
+
 class CaseImportServiceProtocol(Protocol):
     def import_one(self, data: CaseImportPayload) -> Case: ...
+
 
 class CaseAdminService:
     """案件 Admin 服务"""
@@ -131,7 +139,7 @@ class CaseAdminService:
             logger.exception(
                 "get_matched_folder_templates_failed", extra={"case_type": case_type, "legal_statuses": legal_statuses}
             )
-            return str("查询失败")
+            return "查询失败"
 
     def get_matched_folder_templates_list(
         self, case_type: str, legal_statuses: list[str] | None = None
@@ -183,9 +191,9 @@ class CaseAdminService:
     def get_case_file_templates_for_detail(self, case: Case) -> tuple[list[JSONDict], str]:
         """获取详情页案件文件模板与缺失原因。"""
         if not case.case_type:
-            return [], str("未设置案件类型")
+            return [], "未设置案件类型"
         if not case.current_stage:
-            return [], str("未设置案件阶段")
+            return [], "未设置案件阶段"
         applicable_institutions = self._get_case_applicable_institutions(case)
         return (
             self.get_matched_case_file_templates(

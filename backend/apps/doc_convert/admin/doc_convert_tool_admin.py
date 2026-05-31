@@ -10,6 +10,7 @@ from django.template.response import TemplateResponse
 
 from apps.doc_convert.models import DocConvertTool
 
+
 @admin.register(DocConvertTool)
 class DocConvertToolAdmin(admin.ModelAdmin):
     """要素式转换工作台 Admin。"""

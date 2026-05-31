@@ -5,6 +5,7 @@ from typing import ClassVar
 
 from pydantic import BaseModel, Field, field_validator
 
+
 class CaptchaRecognizeIn(BaseModel):
     """验证码识别请求"""
 
@@ -30,6 +31,7 @@ class CaptchaRecognizeIn(BaseModel):
             raise ValueError("无效的 Base64 编码") from None
 
         return v
+
 
 class CaptchaRecognizeOut(BaseModel):
     """验证码识别响应"""

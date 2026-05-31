@@ -6,7 +6,6 @@ import io
 from typing import TYPE_CHECKING, Any
 
 from django.utils import timezone
-
 from docx import Document
 from docx.document import Document as DocumentType
 from docx.enum.table import WD_TABLE_ALIGNMENT
@@ -20,6 +19,7 @@ from apps.documents.services.placeholders.fallback import build_docx_render_cont
 
 if TYPE_CHECKING:
     from apps.core.interfaces import IEvidenceListPlaceholderService
+
 
 class EvidenceExportService:
     """

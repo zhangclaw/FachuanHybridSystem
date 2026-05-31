@@ -25,6 +25,7 @@ DEFAULT_RATES: dict[str, Decimal] = {
     "lawyer_fee_transfer_rate": Decimal("0.60"),
 }
 
+
 @dataclass
 class CostBenefitParams:
     """成本收益分析参数"""
@@ -42,6 +43,7 @@ class CostBenefitParams:
     fee_transfer_rate: Decimal = field(default_factory=lambda: DEFAULT_RATES["litigation_fee_transfer_rate"])
     lawyer_transfer_rate: Decimal = field(default_factory=lambda: DEFAULT_RATES["lawyer_fee_transfer_rate"])
 
+
 @dataclass
 class CostBenefitResult:
     """成本收益分析结果"""
@@ -54,10 +56,12 @@ class CostBenefitResult:
     revenue_details: dict[str, Decimal]
     risk_warning: str | None = None
 
+
 class LitigationFeeCalculatorPort(Protocol):
     def calculate_property_case_fee(self, claim_amount: Decimal) -> Decimal: ...
 
     def calculate_preservation_fee(self, amount: Decimal) -> Decimal: ...
+
 
 class CostBenefitService:
     """成本收益分析服务"""
@@ -144,7 +148,7 @@ class CostBenefitService:
         # --- 风险提示 ---
         risk_warning: str | None = None
         if net_profit < _ZERO:
-            risk_warning = str("净收益为负，诉讼经济效益较低，建议谨慎评估")
+            risk_warning = "净收益为负，诉讼经济效益较低，建议谨慎评估"
 
         logger.info(
             "成本收益分析: cost=%s revenue=%s net=%s roi=%s",

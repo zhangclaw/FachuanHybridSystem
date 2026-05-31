@@ -33,8 +33,10 @@ admin.site.index_title = getattr(settings, "ADMIN_INDEX_TITLE", "欢迎来到法
 # 覆盖 admin login 视图，注入注册上下文
 _admin_login_view = AuthLoginView.as_view()
 
+
 def _admin_login(request: HttpRequest, **kwargs: object) -> HttpResponse:
     return _admin_login_view(request, **kwargs)
+
 
 admin.site.login = _admin_login
 
@@ -176,6 +178,7 @@ _CASE_HANDLING_APPS = [
 
 _original_get_app_list = admin.site.__class__.get_app_list
 
+
 def _sorted_get_app_list(self: admin.AdminSite, request: HttpRequest, app_label: str | None = None) -> list:
     # 一次性获取完整 app 列表并缓存，避免构建虚拟菜单时递归调用
     if app_label is None:
@@ -304,11 +307,13 @@ def _sorted_get_app_list(self: admin.AdminSite, request: HttpRequest, app_label:
 
     return app_list
 
+
 admin.site.__class__.get_app_list = _sorted_get_app_list  # type: ignore[method-assign]
 
 # ============================================================
 # Admin Hub 视图
 # ============================================================
+
 
 def lpr_calculator_view(request: HttpRequest) -> HttpResponse:
     """LPR利息计算器独立视图."""
@@ -334,6 +339,7 @@ def lpr_calculator_view(request: HttpRequest) -> HttpResponse:
         "sync_url": "/admin/finance/lprrate/sync/",
     }
     return render(request, "admin/finance/lpr/calculator.html", context)
+
 
 def case_handling_hub_view(request: HttpRequest) -> TemplateResponse:
     """办案聚合页。"""
@@ -370,6 +376,7 @@ def case_handling_hub_view(request: HttpRequest) -> TemplateResponse:
         "sections": sections,
     }
     return TemplateResponse(request, "admin/core/case_handling_hub.html", context)
+
 
 def other_tools_hub_view(request: HttpRequest) -> TemplateResponse:
     """其他工具聚合页。"""
@@ -408,9 +415,7 @@ def other_tools_hub_view(request: HttpRequest) -> TemplateResponse:
         )
 
     # 获取当前用户的收藏 URL 集合（默认收藏已在 context_processors 中初始化）
-    fav_urls: set[str] = set(
-        ToolFavorite.objects.filter(user=request.user).values_list("tool_url", flat=True)
-    )
+    fav_urls: set[str] = set(ToolFavorite.objects.filter(user=request.user).values_list("tool_url", flat=True))
 
     context: dict[str, Any] = {
         **admin.site.each_context(request),
@@ -420,9 +425,11 @@ def other_tools_hub_view(request: HttpRequest) -> TemplateResponse:
     }
     return TemplateResponse(request, "admin/automation/other_tools_hub.html", context)
 
+
 def reminders_calendar_redirect(_: HttpRequest) -> HttpResponseRedirect:
     """提醒 app 下的日历入口，重定向到 ReminderAdmin 日历页。"""
     return HttpResponseRedirect(reverse("admin:reminders_reminder_calendar"))
+
 
 def tool_favorite_toggle_view(request: HttpRequest) -> HttpResponse:
     """切换工具收藏状态（POST only）。"""
@@ -454,11 +461,13 @@ def tool_favorite_toggle_view(request: HttpRequest) -> HttpResponse:
         content_type="application/json",
     )
 
+
 # ============================================================
 # 自定义 Admin URL 注册
 # ============================================================
 
 _original_get_urls = admin.site.get_urls
+
 
 def _get_urls_with_calculator() -> list[URLResolver | URLPattern]:
     urls = _original_get_urls()
@@ -491,10 +500,13 @@ def _get_urls_with_calculator() -> list[URLResolver | URLPattern]:
     ]
     return custom_urls + urls
 
+
 admin.site.get_urls = _get_urls_with_calculator  # type: ignore[method-assign]
+
 
 def _admin_index_redirect(request: HttpRequest) -> HttpResponseRedirect:
     """Admin 首页自动重定向到提醒日历页。"""
     return HttpResponseRedirect(reverse("admin:reminders_reminder_calendar"))
+
 
 admin.site.index = admin.site.admin_view(_admin_index_redirect)  # type: ignore[method-assign]

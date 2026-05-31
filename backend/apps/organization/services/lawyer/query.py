@@ -9,6 +9,7 @@ from apps.organization.dtos import LawyerListFiltersDTO
 from apps.organization.models import Lawyer
 from apps.organization.services.access.organization_access_policy import OrganizationAccessPolicy
 
+
 class LawyerQueryService:
     def __init__(self, access_policy: OrganizationAccessPolicy) -> None:
         self.access_policy = access_policy

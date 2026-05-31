@@ -4,6 +4,7 @@ from django.db import models
 
 from .article import ReviewStatus
 
+
 class DiscussionScript(models.Model):
     """多人讨论脚本。"""
 
@@ -43,6 +44,7 @@ class DiscussionScript(models.Model):
 
     def __str__(self) -> str:
         return self.title
+
 
 class DiscussionTurn(models.Model):
     """讨论脚本中的单轮对话。"""

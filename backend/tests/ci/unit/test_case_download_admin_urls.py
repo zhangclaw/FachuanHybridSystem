@@ -6,6 +6,7 @@ from django.urls import reverse
 
 from apps.legal_research.admin.case_download_admin import CaseDownloadResultInline
 
+
 def test_case_download_result_admin_reverse_registered() -> None:
     url = reverse("admin:legal_research_casedownloadresult_download", args=[7])
     assert url.endswith("/admin/legal_research/casedownloadtask/result/7/download/")

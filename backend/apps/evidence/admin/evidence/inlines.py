@@ -10,6 +10,7 @@ from django.http import HttpRequest
 
 from apps.evidence.models import EvidenceItem
 
+
 class EvidenceItemInline(admin.TabularInline[EvidenceItem, EvidenceItem]):
     model = EvidenceItem
     extra: int = 1
@@ -46,5 +47,6 @@ class EvidenceItemInline(admin.TabularInline[EvidenceItem, EvidenceItem]):
     class Media:
         css: ClassVar[dict[str, tuple[str, ...]]] = {"all": ("evidence/css/evidence_inline.css",)}
         js: ClassVar[tuple[str, ...]] = ("evidence/js/evidence_sortable.js",)
+
 
 __all__: list[str] = ["EvidenceItemInline"]

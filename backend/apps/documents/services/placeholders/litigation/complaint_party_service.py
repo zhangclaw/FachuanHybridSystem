@@ -14,6 +14,7 @@ from apps.litigation_ai.placeholders.spec import LitigationPlaceholderKeys
 
 logger = logging.getLogger(__name__)
 
+
 @PlaceholderRegistry.register
 class ComplaintPartyService(BasePlaceholderService):
     """起诉状当事人信息服务"""

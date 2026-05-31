@@ -14,6 +14,7 @@ from apps.core.security import DjangoPermsMixin
 
 logger = logging.getLogger("apps.contacts")
 
+
 class CaseContactService(DjangoPermsMixin):
     """案件工作人员联系方式服务"""
 

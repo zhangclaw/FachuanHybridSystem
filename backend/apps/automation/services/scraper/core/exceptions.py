@@ -6,10 +6,12 @@
 
 from typing import Any
 
+
 class ScraperException(Exception):
     """爬虫服务基础异常"""
 
     pass
+
 
 class BrowserCreationError(ScraperException):
     """
@@ -42,6 +44,7 @@ class BrowserCreationError(ScraperException):
 
         super().__init__(detailed_message)
 
+
 class BrowserConfigurationError(ScraperException):
     """
     浏览器配置错误异常
@@ -64,6 +67,7 @@ class BrowserConfigurationError(ScraperException):
 
         message = f"配置字段 '{field}' 无效: {reason} (值: {value})"
         super().__init__(message)
+
 
 class CaptchaRecognitionError(ScraperException):
     """
@@ -94,6 +98,7 @@ class CaptchaRecognitionError(ScraperException):
 
         super().__init__(detailed_message)
 
+
 class CookieLoadError(ScraperException):
     """
     Cookie 加载失败异常
@@ -122,6 +127,7 @@ class CookieLoadError(ScraperException):
             detailed_message += f" (账号: {account})"
 
         super().__init__(detailed_message)
+
 
 class LoginError(ScraperException):
     """

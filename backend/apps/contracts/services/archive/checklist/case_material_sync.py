@@ -15,6 +15,7 @@ from .material_mapping import match_type_name_to_code
 
 logger = logging.getLogger("apps.contracts.archive")
 
+
 def get_case_material_match_map(
     contract: Contract,
 ) -> dict[str, Any]:
@@ -117,6 +118,7 @@ def get_case_material_match_map(
         "synced_count": synced_count,
         "matchable_count": matchable_count,
     }
+
 
 def sync_case_materials_to_archive(
     contract: Contract,
@@ -227,6 +229,7 @@ def sync_case_materials_to_archive(
 
     return {"synced": synced, "skipped": skipped, "errors": errors}
 
+
 def reset_and_resync_case_materials(
     contract: Contract,
     archive_item_codes: list[str] | None = None,
@@ -305,6 +308,7 @@ def reset_and_resync_case_materials(
         "sync_result": sync_result,
     }
 
+
 def upload_material_to_archive_item(
     contract: Contract,
     archive_item_code: str,
@@ -355,6 +359,7 @@ def upload_material_to_archive_item(
     )
 
     return material
+
 
 def _copy_case_material_to_finalized(
     contract: Contract,
@@ -412,6 +417,7 @@ def _copy_case_material_to_finalized(
     )
 
     return material
+
 
 def _apply_initial_order_for_synced(synced: list[dict[str, Any]]) -> None:
     """同步完成后，按排序规则为每个 archive_item_code 的材料设置初始 order。"""

@@ -16,16 +16,19 @@ from apps.core.exceptions import BusinessException
 
 logger = logging.getLogger("apps.contracts")
 
+
 def _get_contract_admin_service() -> Any:
     """工厂函数获取合同 Admin 服务"""
     from apps.contracts.admin.wiring_admin import get_contract_admin_service
 
     return get_contract_admin_service()
 
+
 def _get_contract_admin_action_service() -> Any:
     from apps.contracts.services.admin_actions.wiring import build_contract_admin_action_service
 
     return build_contract_admin_action_service()
+
 
 class ContractSaveMixin:
     """合同 Admin 保存/删除钩子的 Mixin"""

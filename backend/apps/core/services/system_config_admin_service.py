@@ -11,6 +11,7 @@ from typing import Any
 
 from apps.core.admin._system_config_data import get_default_configs
 
+
 class SystemConfigAdminService:
     """Service facade used by tests/admin callers for default config payloads."""
 

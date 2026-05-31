@@ -10,6 +10,7 @@ from apps.pdf_splitting.services.storage import PdfSplitStorage
 
 logger = logging.getLogger("apps.pdf_splitting")
 
+
 def execute_pdf_split_job(job_id: str) -> None:
     job_service = PdfSplitJobService()
     split_service = PdfSplitService()
@@ -43,6 +44,7 @@ def execute_pdf_split_job(job_id: str) -> None:
     except Exception as exc:
         logger.exception("pdf_split_job_failed", extra={"job_id": job_id})
         job_service.mark_failed(job_id=job_uuid, error_message=str(exc))
+
 
 def export_pdf_split_job(job_id: str) -> None:
     job_service = PdfSplitJobService()

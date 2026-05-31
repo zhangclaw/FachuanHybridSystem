@@ -10,6 +10,7 @@ from django.db.models import Sum
 from apps.contracts.models import Contract, ContractPayment, FeeMode
 from apps.core.exceptions import NotFoundError
 
+
 class ContractProgressService:
     """计算收款进度和开票汇总。"""
 

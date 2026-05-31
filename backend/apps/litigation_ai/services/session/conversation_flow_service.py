@@ -13,6 +13,7 @@ from ..flow.types import ConversationStep, FlowContext
 
 logger = logging.getLogger("apps.litigation_ai")
 
+
 class ConversationFlowService:
     def __init__(self) -> None:
         self._conversation_service: Any | None = None

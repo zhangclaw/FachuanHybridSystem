@@ -19,6 +19,7 @@ from apps.core.security.secret_codec import SecretCodec
 from ._system_config_data import get_default_configs, get_env_mappings
 from .forms import SystemConfigAdminForm
 
+
 @admin.register(SystemConfig)
 class SystemConfigAdmin(admin.ModelAdmin):
     """系统配置 Admin"""

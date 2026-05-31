@@ -13,6 +13,7 @@ from ..models import Reminder, ReminderType
 
 logger = logging.getLogger(__name__)
 
+
 class CalendarExportService:
     """Export Reminder records to .ics file format."""
 

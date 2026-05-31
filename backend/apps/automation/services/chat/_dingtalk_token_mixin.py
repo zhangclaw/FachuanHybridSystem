@@ -22,6 +22,7 @@ from apps.core.exceptions import ChatProviderException, ConfigurationException
 
 logger = logging.getLogger(__name__)
 
+
 class DingtalkTokenMixin:
     """负责钉钉配置加载和 access_token 获取"""
 

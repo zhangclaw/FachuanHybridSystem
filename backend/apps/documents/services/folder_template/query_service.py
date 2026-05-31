@@ -11,6 +11,7 @@ from apps.documents.models import FolderTemplate
 from .id_service import FolderTemplateIdService
 from .repo import FolderTemplateRepo
 
+
 @dataclass(frozen=True)
 class FolderTemplateQueryService:
     repo: FolderTemplateRepo

@@ -17,11 +17,14 @@ from apps.organization.services import LawyerService
 
 router = Router(auth=JWTOrSessionAuth())
 
+
 def _get_lawyer_service() -> LawyerService:
     """工厂函数：获取律师服务实例"""
     return LawyerService()
 
+
 _lawyer_service = _get_lawyer_service()
+
 
 @router.get("/lawyers", response=list[LawyerOut])
 def list_lawyers(
@@ -32,9 +35,11 @@ def list_lawyers(
     filters = LawyerListFiltersDTO(search=search, law_firm_id=law_firm_id)
     return list(_lawyer_service.list_lawyers(filters=filters, user=get_request_user(request)))
 
+
 @router.get("/lawyers/{lawyer_id}", response=LawyerOut)
 def get_lawyer(request: HttpRequest, lawyer_id: int) -> LawyerOut:
     return _lawyer_service.get_lawyer(lawyer_id, get_request_user(request))
+
 
 @router.post("/lawyers", response=LawyerOut)
 def create_lawyer(
@@ -58,6 +63,7 @@ def create_lawyer(
     return _lawyer_service.create_lawyer(
         data=dto, user=get_request_user(request), license_pdf=license_pdf, avatar=avatar
     )
+
 
 @router.put("/lawyers/{lawyer_id}", response=LawyerOut)
 def update_lawyer(
@@ -85,6 +91,7 @@ def update_lawyer(
         license_pdf=license_pdf,
         avatar=avatar,
     )
+
 
 @router.delete("/lawyers/{lawyer_id}")
 def delete_lawyer(request: HttpRequest, lawyer_id: int) -> dict[str, bool]:

@@ -24,6 +24,7 @@ try:
 except ImportError:
     RESOURCE_MONITOR_AVAILABLE = False
 
+
 def check_system_resources() -> ComponentHealth:
     """
     检查系统资源使用情况
@@ -55,6 +56,7 @@ def check_system_resources() -> ComponentHealth:
             message=f"System resources check error: {e!s}",
             diagnostic_info=diagnostic_info,
         )
+
 
 def _check_via_resource_monitor(diagnostic_info: dict[str, Any]) -> ComponentHealth | None:
     """使用资源监控模块检查，返回 None 表示数据不可用"""
@@ -104,6 +106,7 @@ def _check_via_resource_monitor(diagnostic_info: dict[str, Any]) -> ComponentHea
         diagnostic_info=diagnostic_info,
     )
 
+
 def _check_via_psutil(diagnostic_info: dict[str, Any]) -> ComponentHealth:
     """使用 psutil 检查系统资源"""
     diagnostic_info["resource_monitor_enabled"] = False
@@ -151,6 +154,7 @@ def _check_via_psutil(diagnostic_info: dict[str, Any]) -> ComponentHealth:
         },
         diagnostic_info=diagnostic_info,
     )
+
 
 def _evaluate_resource_status(
     cpu_percent: float,

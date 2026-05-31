@@ -7,6 +7,7 @@ from typing import TypedDict
 
 from apps.core.interfaces import ServiceLocator
 
+
 class _IntentSlots(TypedDict):
     relation_high: list[str]
     relation_low: list[str]
@@ -18,6 +19,7 @@ class _IntentSlots(TypedDict):
     remedy_low: list[str]
     low_conf_limit: int
 
+
 class _IntentRuleOverrides(TypedDict):
     relation_regex_extra: list[str]
     relation_term_extra: list[str]
@@ -25,6 +27,7 @@ class _IntentRuleOverrides(TypedDict):
     damage_hint_extra: list[str]
     remedy_hint_extra: list[str]
     low_conf_limit: int
+
 
 class ExecutorIntentMixin:
     INTENT_RELATION_REGEX: tuple[str, ...] = (

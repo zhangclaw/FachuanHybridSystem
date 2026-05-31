@@ -8,6 +8,7 @@ import httpx
 
 from apps.core.llm.exceptions import LLMNetworkError, LLMTimeoutError
 
+
 class HttpxErrorMixin:
     def raise_connect_error(
         self,

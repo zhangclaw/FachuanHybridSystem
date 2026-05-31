@@ -10,15 +10,18 @@ from django.db import models
 
 from apps.core.filesystem.upload_paths import DatedUUIDPath
 
+
 def _waybill_upload_to(_instance: ExpressQueryTask, filename: str) -> str:
     """Deprecated: 保留用于旧 migration 兼容，新代码请使用 DatedUUIDPath。"""
     extension = Path(filename).suffix.lower()
     return f"express_query/waybills/{uuid.uuid4().hex}{extension}"
 
+
 def _result_pdf_upload_to(_instance: ExpressQueryTask, filename: str) -> str:
     """Deprecated: 保留用于旧 migration 兼容，新代码请使用 DatedUUIDPath。"""
     extension = Path(filename).suffix.lower() or ".pdf"
     return f"express_query/results/{uuid.uuid4().hex}{extension}"
+
 
 class ExpressQueryTool(models.Model):
     id: int
@@ -29,10 +32,12 @@ class ExpressQueryTool(models.Model):
         verbose_name = "查询EMS/顺丰"
         verbose_name_plural = "查询EMS/顺丰"
 
+
 class ExpressCarrierType(models.TextChoices):
     UNKNOWN = "unknown", "未知"
     EMS = "ems", "EMS"
     SF = "sf", "顺丰"
+
 
 class ExpressQueryTaskStatus(models.TextChoices):
     PENDING = "pending", "待处理"
@@ -41,6 +46,7 @@ class ExpressQueryTaskStatus(models.TextChoices):
     QUERYING = "querying", "查询中"
     SUCCESS = "success", "成功"
     FAILED = "failed", "失败"
+
 
 class ExpressQueryTask(models.Model):
     id: int

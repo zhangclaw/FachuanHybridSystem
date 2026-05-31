@@ -15,6 +15,7 @@ from apps.story_viz.services.svg_layout_renderer_service import SvgLayoutRendere
 
 logger = logging.getLogger("apps.story_viz")
 
+
 class StoryAnimationWorkflowService:
     def __init__(
         self,

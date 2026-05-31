@@ -2,19 +2,23 @@ from __future__ import annotations
 
 from pydantic import BaseModel, Field
 
+
 class GraphNode(BaseModel):
     id: str = Field(default="")
     label: str = Field(default="")
     category: str = Field(default="person")
+
 
 class GraphEdge(BaseModel):
     source: str = Field(default="")
     target: str = Field(default="")
     relation: str = Field(default="")
 
+
 class MotionPlan(BaseModel):
     duration_ms: int = Field(default=1200)
     easing: str = Field(default="ease-in-out")
+
 
 class ComparisonItem(BaseModel):
     claim: str = Field(default="")
@@ -22,6 +26,7 @@ class ComparisonItem(BaseModel):
     amount_claim: str = Field(default="")
     amount_judgment: str = Field(default="")
     supported: bool = Field(default=False)
+
 
 class AnimationScript(BaseModel):
     title: str = Field(default="")

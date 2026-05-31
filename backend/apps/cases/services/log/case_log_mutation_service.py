@@ -12,6 +12,7 @@ from apps.core.exceptions import ForbiddenError, NotFoundError, ValidationExcept
 
 from .case_log_query_service import CaseLogQueryService
 
+
 class CaseLogMutationService:
     def __init__(self, query_service: CaseLogQueryService | None = None) -> None:
         self.query_service = query_service or CaseLogQueryService()

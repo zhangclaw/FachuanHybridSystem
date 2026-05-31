@@ -22,6 +22,7 @@ from apps.automation.models import DocumentQueryHistory
 
 logger = logging.getLogger("apps.automation")
 
+
 @admin.register(DocumentQueryHistory)
 class DocumentQueryHistoryAdmin(admin.ModelAdmin):
     """文书查询历史管理"""

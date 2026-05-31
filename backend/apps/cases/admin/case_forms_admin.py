@@ -10,6 +10,7 @@ from django import forms
 from apps.cases.domain.validators import normalize_stages
 from apps.cases.models import Case, CaseParty, CaseStage, SupervisingAuthority
 
+
 class CaseAdminForm(forms.ModelForm[Case]):
     current_stage = forms.ChoiceField(
         choices=[("", "---------")] + list(CaseStage.choices), required=False, label="当前阶段"
@@ -55,10 +56,12 @@ class CaseAdminForm(forms.ModelForm[Case]):
 
         return cleaned
 
+
 class CasePartyInlineForm(forms.ModelForm[CaseParty]):
     class Meta:
         model = CaseParty
         fields: str = "__all__"
+
 
 class CasePartyInlineFormSet(forms.BaseInlineFormSet):
     def clean(self) -> None:
@@ -73,6 +76,7 @@ class CasePartyInlineFormSet(forms.BaseInlineFormSet):
             if client.pk in seen_clients:
                 raise forms.ValidationError("同一案件中不能出现相同的当事人。")
             seen_clients.add(client.pk)
+
 
 class SupervisingAuthorityInlineForm(forms.ModelForm[SupervisingAuthority]):
     class Meta:

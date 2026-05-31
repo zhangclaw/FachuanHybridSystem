@@ -7,6 +7,7 @@ from typing import Any
 
 from mcp_server.client import client
 
+
 def upload_contract_for_review(
     file_content_base64: str,
     filename: str,

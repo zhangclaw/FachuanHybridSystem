@@ -2,6 +2,7 @@
 
 from typing import Any
 
+
 class PipelineContextBuilder:
     def build_contract_context(self, contract: Any, split_fee: bool = True) -> dict[str, Any]:
         from apps.documents.services.placeholders import EnhancedContextBuilder

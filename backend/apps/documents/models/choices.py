@@ -12,6 +12,7 @@ from django.db import models
 # 案件类型和阶段选项(与 core.enums 保持一致)
 # ============================================================
 
+
 class DocumentCaseType(models.TextChoices):
     """文书适用的案件类型"""
 
@@ -21,6 +22,7 @@ class DocumentCaseType(models.TextChoices):
     EXECUTION = "execution", "申请执行"
     BANKRUPTCY = "bankruptcy", "破产"
     ALL = "all", "通用"
+
 
 class DocumentCaseStage(models.TextChoices):
     """文书适用的案件阶段"""
@@ -32,6 +34,7 @@ class DocumentCaseStage(models.TextChoices):
     ADMIN_REVIEW = "administrative_review", "行政复议"
     RETRIAL = "retrial", "再审"
     ALL = "all", "通用"
+
 
 class DocumentContractType(models.TextChoices):
     """文书适用的合同类型(与 CaseType 保持一致)"""
@@ -45,9 +48,11 @@ class DocumentContractType(models.TextChoices):
     ADVISOR = "advisor", "常法顾问"
     ALL = "all", "通用"
 
+
 # ============================================================
 # 文件夹模板选项
 # ============================================================
+
 
 class FolderTemplateType(models.TextChoices):
     """文件夹模板类型"""
@@ -55,9 +60,11 @@ class FolderTemplateType(models.TextChoices):
     CONTRACT = "contract", "合同文件夹模板"
     CASE = "case", "案件文件夹模板"
 
+
 # ============================================================
 # 文件模板选项
 # ============================================================
+
 
 class DocumentTemplateType(models.TextChoices):
     """文件模板类型(第一级分类)"""
@@ -66,11 +73,13 @@ class DocumentTemplateType(models.TextChoices):
     CASE = "case", "案件文件模板"
     ARCHIVE = "archive", "归档文件模板"
 
+
 class DocumentContractSubType(models.TextChoices):
     """合同文书子类型(第二级分类)"""
 
     CONTRACT = "contract", "合同模板"
     SUPPLEMENTARY_AGREEMENT = "supplementary_agreement", "补充协议模板"
+
 
 class DocumentCaseFileSubType(models.TextChoices):
     """案件文件子类型(第二级分类)"""
@@ -84,6 +93,7 @@ class DocumentCaseFileSubType(models.TextChoices):
     APPLICATION_MATERIALS = "application_materials", "申请材料"
     OTHER_MATERIALS = "other_materials", "其他材料"
 
+
 class DocumentArchiveSubType(models.TextChoices):
     """归档文件子类型(第二级分类)"""
 
@@ -94,9 +104,11 @@ class DocumentArchiveSubType(models.TextChoices):
     SERVICE_QUALITY_CARD = "service_quality_card", "律师办案服务质量监督卡模板"
     CASE_SUMMARY = "case_summary", "办案小结模板"
 
+
 # ============================================================
 # 占位符选项
 # ============================================================
+
 
 class PlaceholderCategory(models.TextChoices):
     """替换词分类"""
@@ -108,6 +120,7 @@ class PlaceholderCategory(models.TextChoices):
     COURT = "court", "法院信息"
     OTHER = "other", "其他"
 
+
 class PlaceholderFormatType(models.TextChoices):
     """替换词格式类型"""
 
@@ -118,9 +131,11 @@ class PlaceholderFormatType(models.TextChoices):
     NUMBER = "number", "数字"
     PERCENTAGE = "percentage", "百分比"
 
+
 # ============================================================
 # 审计日志选项
 # ============================================================
+
 
 class TemplateAuditAction(models.TextChoices):
     """审计日志操作类型"""
@@ -133,9 +148,11 @@ class TemplateAuditAction(models.TextChoices):
     DUPLICATE = "duplicate", "复制"
     SET_DEFAULT = "set_default", "设为默认"
 
+
 # ============================================================
 # 诉讼地位匹配模式
 # ============================================================
+
 
 class LegalStatusMatchMode(models.TextChoices):
     """诉讼地位匹配模式"""
@@ -144,9 +161,11 @@ class LegalStatusMatchMode(models.TextChoices):
     ALL = "all", "全部包含"
     EXACT = "exact", "完全一致"
 
+
 # ============================================================
 # 外部模板选项
 # ============================================================
+
 
 class TemplateCategory(models.TextChoices):
     """外部模板类别"""
@@ -160,6 +179,7 @@ class TemplateCategory(models.TextChoices):
     PRESERVATION_APPLICATION = "preservation_application", "财产保全申请书"
     OTHER = "other", "其他"
 
+
 class SourceType(models.TextChoices):
     """模板来源类型"""
 
@@ -169,12 +189,14 @@ class SourceType(models.TextChoices):
     ADMINISTRATIVE = "administrative", "行政机关"
     OTHER = "other", "其他"
 
+
 class FillType(models.TextChoices):
     """字段填充类型"""
 
     TEXT = "text", "文本替换"
     CHECKBOX = "checkbox", "勾选复选框"
     DELETE_INAPPLICABLE = "delete_inapplicable", "删除不适用项"
+
 
 class TemplateStatus(models.TextChoices):
     """外部模板状态"""

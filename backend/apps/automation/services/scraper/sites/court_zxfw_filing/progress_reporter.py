@@ -12,6 +12,7 @@ from .form_utils import FormUtilsMixin
 
 logger = logging.getLogger("apps.automation")
 
+
 class ProgressReporterMixin(FormUtilsMixin):
     """进度上报 Mixin，需要子类提供 self.page 和 self.save_debug。"""
 
@@ -86,6 +87,6 @@ class ProgressReporterMixin(FormUtilsMixin):
     def _step6_preview_submit(self) -> None:
         """预览提交页 - 仅查看，不点提交"""
 
-        logger.info(str("步骤6: 预览（不提交）"))
+        logger.info("步骤6: 预览（不提交）")
         self._random_wait(2, 3)
-        logger.info(str("步骤6完成: 已到达预览页，未提交"))
+        logger.info("步骤6完成: 已到达预览页，未提交")

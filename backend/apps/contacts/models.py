@@ -3,10 +3,10 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
-
 from simple_history.models import HistoricalRecords
 
 from apps.core.models.enums import CaseStage, ContactRole
+
 
 class CaseContact(models.Model):
     """案件工作人员联系方式"""

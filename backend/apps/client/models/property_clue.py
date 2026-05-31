@@ -14,6 +14,7 @@ from .client import Client
 if TYPE_CHECKING:
     from django.db.models.fields.related_descriptors import RelatedManager
 
+
 class PropertyClue(models.Model):
     """财产线索模型"""
 
@@ -32,9 +33,7 @@ class PropertyClue(models.Model):
         (OTHER, "其他"),
     ]
 
-    client = models.ForeignKey(
-        Client, on_delete=models.CASCADE, related_name="property_clues", verbose_name="当事人"
-    )
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name="property_clues", verbose_name="当事人")
     clue_type = models.CharField(max_length=16, choices=CLUE_TYPE_CHOICES, default=BANK, verbose_name="线索类型")
     content = models.TextField(blank=True, default="", verbose_name="线索内容")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
@@ -54,6 +53,7 @@ class PropertyClue(models.Model):
         indexes: ClassVar = [
             models.Index(fields=["client"], name="idx_propclue_client"),
         ]
+
 
 class PropertyClueAttachment(models.Model):
     """财产线索附件模型"""

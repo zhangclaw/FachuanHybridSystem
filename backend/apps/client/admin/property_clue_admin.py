@@ -9,11 +9,13 @@ from django.utils.html import format_html
 
 from apps.client.models import PropertyClue, PropertyClueAttachment
 
+
 def _get_property_clue_service() -> Any:
     """工厂函数：获取财产线索服务"""
     from apps.client.services.property_clue_service import PropertyClueService
 
     return PropertyClueService()
+
 
 class PropertyClueAttachmentInlineForm(forms.ModelForm[PropertyClueAttachment]):
     """财产线索附件内联表单"""
@@ -23,6 +25,7 @@ class PropertyClueAttachmentInlineForm(forms.ModelForm[PropertyClueAttachment]):
     class Meta:
         model = PropertyClueAttachment
         fields = ("file_name", "file_path")
+
 
 class PropertyClueAttachmentInline(admin.TabularInline[PropertyClueAttachment, PropertyClueAttachment]):
     """财产线索附件内联编辑"""
@@ -42,6 +45,7 @@ class PropertyClueAttachmentInline(admin.TabularInline[PropertyClueAttachment, P
         return obj.file_name if obj.file_name else ""
 
     file_link.short_description = "文件"  # type: ignore[attr-defined]
+
 
 @admin.register(PropertyClue)
 class PropertyClueAdmin(admin.ModelAdmin):
@@ -93,7 +97,7 @@ class PropertyClueAdmin(admin.ModelAdmin):
         count = len(prefetched) if prefetched is not None else obj.attachments.count()
         if count > 0:
             return format_html('<span style="color: green;">{}</span>', "%(count)d 个附件" % {"count": count})
-        return str("无附件")
+        return "无附件"
 
     attachment_count.short_description = "附件"  # type: ignore[attr-defined]
 

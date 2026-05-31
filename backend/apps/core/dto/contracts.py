@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from apps.contracts.models import Contract, SupplementaryAgreement
 
+
 @dataclass
 class ContractDTO:
     id: int
@@ -55,6 +56,7 @@ class ContractDTO:
             end_date=str(contract.end_date) if contract.end_date else None,
         )
 
+
 @dataclass
 class PartyRoleDTO:
     id: int
@@ -63,6 +65,7 @@ class PartyRoleDTO:
     client_name: str
     role_type: str
     is_our_client: bool = False
+
 
 @dataclass
 class SupplementaryAgreementDTO:

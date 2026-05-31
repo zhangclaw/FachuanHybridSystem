@@ -23,6 +23,7 @@ from apps.core.services.storage_service import (
 
 logger = logging.getLogger("apps.client")
 
+
 class ClientIdentityDocService:
     """当事人证件服务"""
 

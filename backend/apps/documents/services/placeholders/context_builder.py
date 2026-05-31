@@ -18,6 +18,7 @@ from .types import PlaceholderContextData
 
 logger = logging.getLogger(__name__)
 
+
 class EnhancedContextBuilder:
     """增强的上下文构建器"""
 

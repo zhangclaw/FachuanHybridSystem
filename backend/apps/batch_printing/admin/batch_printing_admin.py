@@ -18,6 +18,7 @@ from apps.batch_printing.models import (
 )
 from apps.batch_printing.services.wiring import get_rule_service
 
+
 class PrintKeywordRuleAdminForm(forms.ModelForm):
     class Meta:
         model = PrintKeywordRule
@@ -29,6 +30,7 @@ class PrintKeywordRuleAdminForm(forms.ModelForm):
         if preset_field is not None:
             preset_field.queryset = PrintPresetSnapshot.objects.order_by("printer_name", "preset_name")
             preset_field.help_text = "只需选择打印预置，实际打印机会自动取该预置所属打印机，无需单独选择。"
+
 
 @admin.register(BatchPrintingTool)
 class BatchPrintingToolAdmin(admin.ModelAdmin):
@@ -57,6 +59,7 @@ class BatchPrintingToolAdmin(admin.ModelAdmin):
     def get_model_perms(self, request: HttpRequest) -> dict[str, bool]:
         return {"view": True}
 
+
 @admin.register(PrintPresetSnapshot)
 class PrintPresetSnapshotAdmin(admin.ModelAdmin):
     list_display = ["printer_name", "preset_name", "last_synced_at", "updated_at"]
@@ -78,6 +81,7 @@ class PrintPresetSnapshotAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request: HttpRequest) -> bool:
         return False
+
 
 @admin.register(PrintKeywordRule)
 class PrintKeywordRuleAdmin(admin.ModelAdmin):
@@ -101,6 +105,7 @@ class PrintKeywordRuleAdmin(admin.ModelAdmin):
             get_rule_service().sync_printer_name_from_preset(rule=obj)
         super().save_model(request, obj, form, change)
 
+
 class BatchPrintItemInline(admin.TabularInline[BatchPrintItem]):
     model = BatchPrintItem
     extra = 0
@@ -118,6 +123,7 @@ class BatchPrintItemInline(admin.TabularInline[BatchPrintItem]):
         "started_at",
         "finished_at",
     ]
+
 
 @admin.register(BatchPrintJob)
 class BatchPrintJobAdmin(admin.ModelAdmin):

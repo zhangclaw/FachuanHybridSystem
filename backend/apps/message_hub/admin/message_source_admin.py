@@ -12,6 +12,7 @@ from django.utils.safestring import SafeString
 
 from apps.message_hub.models import MessageSource, SyncStatus
 
+
 @admin.register(MessageSource)
 class MessageSourceAdmin(admin.ModelAdmin):
     list_display = [

@@ -16,6 +16,7 @@ from .choices import FillType, TemplateStatus
 
 logger: logging.Logger = logging.getLogger(__name__)
 
+
 class ExternalTemplate(models.Model):
     """
     外部模板
@@ -127,6 +128,7 @@ class ExternalTemplate(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
 
 class ExternalTemplateFieldMapping(models.Model):
     """

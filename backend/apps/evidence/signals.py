@@ -11,6 +11,7 @@ from django.dispatch import receiver
 
 logger = logging.getLogger(__name__)
 
+
 def _delete_file(field_file: Any) -> None:
     """删除 FileField 对应的物理文件"""
     if field_file:
@@ -20,6 +21,7 @@ def _delete_file(field_file: Any) -> None:
         except Exception:
             logger.exception("清理证据附件失败")
 
+
 @receiver(post_delete, dispatch_uid="cleanup_evidence_item_file")
 def cleanup_evidence_item_file(sender: type, **kwargs: Any) -> None:
     from .models import EvidenceItem  # 防止循环导入
@@ -27,6 +29,7 @@ def cleanup_evidence_item_file(sender: type, **kwargs: Any) -> None:
     if sender is EvidenceItem:
         instance = kwargs["instance"]
         _delete_file(instance.file)
+
 
 @receiver(post_delete, dispatch_uid="cleanup_evidence_list_merged_pdf")
 def cleanup_evidence_list_merged_pdf(sender: type, **kwargs: Any) -> None:

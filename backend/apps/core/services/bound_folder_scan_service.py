@@ -18,11 +18,13 @@ logger = logging.getLogger(__name__)
 
 ProgressCallback = Callable[[str, int, str | None], None]
 
+
 @dataclass(frozen=True)
 class _VersionInfo:
     base_name: str
     version_token: str
     version_rank: int
+
 
 class BoundFolderScanService:
     """扫描绑定目录中的 PDF，并生成分类建议。"""
@@ -214,9 +216,7 @@ class BoundFolderScanService:
             )
             return candidate
 
-        raise ValidationException(
-            message="不支持的扫描领域", code="UNSUPPORTED_SCAN_DOMAIN", errors={"domain": domain}
-        )
+        raise ValidationException(message="不支持的扫描领域", code="UNSUPPORTED_SCAN_DOMAIN", errors={"domain": domain})
 
     @staticmethod
     def _extract_parent_folder_hint(file_path: Path, scan_root: Path) -> str:

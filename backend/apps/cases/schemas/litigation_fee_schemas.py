@@ -6,6 +6,7 @@ from typing import ClassVar
 
 from ninja import Schema
 
+
 class FeeCalculationRequest(Schema):
     """费用计算请求"""
 
@@ -14,6 +15,7 @@ class FeeCalculationRequest(Schema):
     case_type: str | None = None
     cause_of_action: str | None = None
     cause_of_action_id: int | None = None  # 新增:案由ID,用于自动识别特殊案件类型
+
 
 class FeeCalculationResponse(Schema):
     """费用计算响应"""

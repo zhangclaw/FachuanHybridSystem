@@ -3,6 +3,7 @@ from __future__ import annotations
 from apps.automation.services.document import document_processing
 from apps.document_recognition.services.text_extraction_service import TextExtractionService
 
+
 def test_text_extraction_service_prefers_constructor_max_pages(tmp_path, monkeypatch):
     pdf_path = tmp_path / "sample.pdf"
     pdf_path.write_bytes(b"%PDF-1.4")

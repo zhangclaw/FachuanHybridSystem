@@ -6,15 +6,16 @@ from typing import ClassVar
 
 from django.db import models
 from django.utils import timezone
-
 from simple_history.models import HistoricalRecords
 
 from .contract import Contract
+
 
 class InvoiceStatus(models.TextChoices):
     UNINVOICED = "UNINVOICED", "未开票"
     INVOICED_PARTIAL = "INVOICED_PARTIAL", "部分开票"
     INVOICED_FULL = "INVOICED_FULL", "已开票"
+
 
 class ContractPayment(models.Model):
     id: int

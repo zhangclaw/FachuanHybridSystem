@@ -16,10 +16,12 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+
 def _get_system_config_service() -> ISystemConfigService:
     from apps.core.interfaces import ServiceLocator
 
     return ServiceLocator.get_system_config_service()
+
 
 # 法院文书模板
 COURT_DOC_KEY = "FILENAME_TEMPLATE_COURT_DOC"
@@ -30,6 +32,7 @@ COURT_DOC_PLACEHOLDERS: set[str] = {"title", "case_name", "date"}
 GENERATED_DOC_KEY = "FILENAME_TEMPLATE_GENERATED_DOC"
 GENERATED_DOC_DEFAULT = "{doc_type}（{case_name}）V{version}_{date}"
 GENERATED_DOC_PLACEHOLDERS: set[str] = {"doc_type", "case_name", "version", "date"}
+
 
 class FilenameTemplateService:
     """文件名模板服务

@@ -6,8 +6,8 @@ from typing import Any, ClassVar
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
-
 from simple_history.models import HistoricalRecords
+
 
 class ReminderType(models.TextChoices):
     HEARING = ("hearing", "开庭")
@@ -18,6 +18,7 @@ class ReminderType(models.TextChoices):
     PAYMENT_DEADLINE = ("payment_deadline", "缴费期限")
     SUBMISSION_DEADLINE = ("submission_deadline", "补正/材料提交期限")
     OTHER = ("other", "其他")
+
 
 class Reminder(models.Model):
     id: int

@@ -37,6 +37,7 @@ from apps.core.security.auth import JWTOrSessionAuth
 # API 版本号
 API_VERSION = "1.0.0"
 
+
 class UTF8JSONRenderer(BaseRenderer):
     """支持中文的 JSON 渲染器"""
 
@@ -44,6 +45,7 @@ class UTF8JSONRenderer(BaseRenderer):
 
     def render(self, request: Any, data: Any, *, response_status: int) -> str:
         return json.dumps(data, ensure_ascii=False, default=str)
+
 
 # ============================================================
 # API v1 实例
@@ -141,6 +143,7 @@ register_exception_handlers(api_v1)
 # ============================================================
 # 注册应用路由
 # ============================================================
+
 
 def _register_app_routers() -> None:
     from apps.automation.api import router as automation_router
@@ -284,12 +287,14 @@ def _register_app_routers() -> None:
     api_v1.add_router("/court-guarantee", court_guarantee_router, auth=JWTOrSessionAuth(), tags=["一张网担保"])
     api_v1.add_router("/court", court_status_router, auth=JWTOrSessionAuth(), tags=["法院自动化状态"])
 
+
 # 防止 uvicorn reload 导致重复注册 - 在 api_v1 对象上设置标志
 def _ensure_routers_registered() -> None:
     if getattr(api_v1, "_routers_registered", False):
         return
     api_v1._routers_registered = True  # type: ignore[attr-defined]
     _register_app_routers()
+
 
 _ensure_routers_registered()
 
@@ -301,6 +306,7 @@ api_v1.add_router("/token", router=verify_router, tags=["JWT认证"])
 # 系统端点
 # ============================================================
 
+
 @api_v1.get("/", tags=["系统"])
 def api_root(request: HttpRequest) -> dict[str, str]:
     """API 根路径，返回基本信息"""
@@ -310,6 +316,7 @@ def api_root(request: HttpRequest) -> dict[str, str]:
         "docs": "/api/v1/docs",
     }
 
+
 @api_v1.get("/health", tags=["系统"])
 def health_check(request: HttpRequest) -> dict[str, Any]:
     """
@@ -318,6 +325,7 @@ def health_check(request: HttpRequest) -> dict[str, Any]:
     """
     health = HealthChecker.get_system_health(include_details=False)
     return health.to_dict()
+
 
 @api_v1.get("/health/detail", tags=["系统"], auth=JWTOrSessionAuth())
 def health_check_detail(request: HttpRequest) -> dict[str, Any]:
@@ -330,6 +338,7 @@ def health_check_detail(request: HttpRequest) -> dict[str, Any]:
     health = HealthChecker.get_system_health(include_details=True)
     return health.to_dict()
 
+
 @api_v1.get("/health/live", tags=["系统"])
 def liveness_probe(request: HttpRequest) -> dict[str, Any]:
     """
@@ -337,6 +346,7 @@ def liveness_probe(request: HttpRequest) -> dict[str, Any]:
     仅检查应用是否运行
     """
     return HealthChecker.liveness_check()
+
 
 @api_v1.get("/health/ready", tags=["系统"])
 def readiness_probe(request: HttpRequest) -> dict[str, Any]:
@@ -346,14 +356,17 @@ def readiness_probe(request: HttpRequest) -> dict[str, Any]:
     """
     return HealthChecker.readiness_check()
 
+
 # ============================================================
 # 资源监控端点
 # Requirements: 4.1, 4.2, 4.3, 4.4
 # ============================================================
 
+
 def _require_admin(request: HttpRequest) -> None:
     """检查当前用户是否为管理员，非管理员抛出 PermissionDenied"""
     ensure_admin_request(request, message="无权限访问资源监控", code="PERMISSION_DENIED")
+
 
 @api_v1.get("/resource/status", tags=["资源监控"], auth=JWTOrSessionAuth())
 def resource_status(request: HttpRequest) -> dict[str, Any]:
@@ -363,6 +376,7 @@ def resource_status(request: HttpRequest) -> dict[str, Any]:
     """
     _require_admin(request)
     return get_resource_status()
+
 
 @api_v1.get("/resource/usage", tags=["资源监控"], auth=JWTOrSessionAuth())
 def resource_usage(request: HttpRequest) -> dict[str, Any]:
@@ -385,6 +399,7 @@ def resource_usage(request: HttpRequest) -> dict[str, Any]:
         }
     return {"error": "Resource monitoring not available"}
 
+
 @api_v1.get("/resource/recommendations", tags=["资源监控"], auth=JWTOrSessionAuth())
 def resource_recommendations(request: HttpRequest) -> dict[str, Any]:
     """
@@ -393,6 +408,7 @@ def resource_recommendations(request: HttpRequest) -> dict[str, Any]:
     """
     _require_admin(request)
     return resource_monitor.get_resource_recommendations()
+
 
 @api_v1.get("/resource/health", tags=["资源监控"], auth=JWTOrSessionAuth())
 def resource_health(request: HttpRequest) -> dict[str, Any]:
@@ -403,6 +419,7 @@ def resource_health(request: HttpRequest) -> dict[str, Any]:
     _require_admin(request)
     return resource_monitor.check_resource_health()
 
+
 @api_v1.get("/resource/metrics", tags=["资源监控"], auth=JWTOrSessionAuth())
 @rate_limit_from_settings("EXPORT", by_user=True)
 def resource_metrics(request: HttpRequest, window_minutes: int = 10, top: int = 10) -> dict[str, Any]:
@@ -410,6 +427,7 @@ def resource_metrics(request: HttpRequest, window_minutes: int = 10, top: int = 
     from apps.core.telemetry.metrics import snapshot
 
     return snapshot(window_minutes=int(window_minutes or 10), top=int(top or 10))
+
 
 @api_v1.get("/resource/metrics/prometheus", tags=["资源监控"], auth=JWTOrSessionAuth())
 @rate_limit_from_settings("EXPORT", by_user=True)
@@ -419,6 +437,7 @@ def resource_metrics_prometheus(request: HttpRequest, window_minutes: int = 10) 
 
     payload = snapshot_prometheus(window_minutes=int(window_minutes or 10))
     return HttpResponse(payload, content_type="text/plain; version=0.0.4; charset=utf-8")
+
 
 # 兼容性别名
 api = api_v1

@@ -15,6 +15,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("apps.client")
 
+
 class ClientAdminFileMixin:
     identity_doc_service: ClientIdentityDocService
 

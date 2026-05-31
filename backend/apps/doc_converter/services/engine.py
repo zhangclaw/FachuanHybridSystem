@@ -16,6 +16,7 @@ logger = logging.getLogger("apps.doc_converter")
 
 BATCH_CONVERT_SIZE = 25
 
+
 def find_libreoffice() -> str | None:
     """查找 LibreOffice 可执行路径"""
     path = shutil.which("soffice") or shutil.which("libreoffice")
@@ -43,6 +44,7 @@ def find_libreoffice() -> str | None:
                 return p
 
     return None
+
 
 def convert_single(doc_path: str, output_dir: str, timeout: int = 30) -> str:
     """单个 .doc 转 .docx
@@ -72,6 +74,7 @@ def convert_single(doc_path: str, output_dir: str, timeout: int = 30) -> str:
         raise FileNotFoundError(f"转换后文件未找到: {docx_path}")
 
     return str(docx_path)
+
 
 def batch_convert(
     doc_paths: list[str],

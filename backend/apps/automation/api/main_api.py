@@ -15,20 +15,24 @@ from .performance_monitor_api import router as performance_router
 
 router = Router(tags=["AI工具"])
 
+
 def _get_ai_service() -> Any:
     from apps.core.dependencies.automation_adapters import build_ai_service
 
     return build_ai_service()
+
 
 def _get_document_processor_service() -> Any:
     from apps.core.dependencies.automation_adapters import build_document_processing_service
 
     return build_document_processing_service()
 
+
 def _get_config_service() -> Any:
     from apps.core.dependencies.automation_adapters import build_automation_config_service
 
     return build_automation_config_service()
+
 
 # 添加性能监控子路由
 router.add_router("/performance", performance_router)
@@ -36,6 +40,7 @@ router.add_router("/performance", performance_router)
 # ============================================================================
 # AI集成API
 # ============================================================================
+
 
 @router.post("/ai/ollama", response=OllamaChatOut)
 def ai_ollama(request: Any, payload: OllamaChatIn) -> OllamaChatOut:
@@ -48,9 +53,11 @@ def ai_ollama(request: Any, payload: OllamaChatIn) -> OllamaChatOut:
 
     return OllamaChatOut(data=result)
 
+
 # ============================================================================
 # 通用工具API
 # ============================================================================
+
 
 @router.post("/file/upload", response=dict)
 @rate_limit_from_settings("UPLOAD")
@@ -75,9 +82,11 @@ def upload_file(
         "error": result.error,
     }
 
+
 # ============================================================================
 # 配置和状态API
 # ============================================================================
+
 
 @router.get("/config")
 @rate_limit_from_settings("ADMIN")
@@ -93,6 +102,7 @@ def get_config(request: Any) -> Any:
     config = service.get_automation_config()
 
     return config
+
 
 @router.get("/status")
 def get_status(request: Any) -> Any:

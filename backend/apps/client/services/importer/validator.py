@@ -5,6 +5,7 @@ from typing import Any
 from apps.client.models import Client
 from apps.core.exceptions import ValidationException
 
+
 class ClientJsonImportValidator:
     def validate(self, json_data: dict[str, Any]) -> None:
         errors: dict[str, Any] = {}

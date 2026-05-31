@@ -22,6 +22,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+
 class BaseGenerator(ABC):
     """
     文书生成器基类

@@ -26,6 +26,7 @@ from .invoice_parser import InvoiceParser, ParsedInvoice
 
 logger = logging.getLogger(__name__)
 
+
 class InvoiceRecognitionService:
     """发票识别核心服务：任务管理、文件处理、OCR 调用、解析、去重、统计。"""
 

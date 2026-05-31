@@ -9,6 +9,7 @@ import pytest
 
 from apps.contracts.services.contract.admin.workflows.clone_workflow import ContractCloneWorkflow, plus_one_year_due_at
 
+
 def _make_workflow() -> tuple[ContractCloneWorkflow, MagicMock]:
     reminder_service = MagicMock()
     reminder_service.export_contract_reminders_internal.return_value = []

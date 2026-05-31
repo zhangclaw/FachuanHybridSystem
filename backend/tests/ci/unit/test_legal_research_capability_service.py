@@ -16,6 +16,7 @@ from apps.legal_research.schemas import AgentSearchRequestV1
 from apps.legal_research.services.capability.service import LegalResearchCapabilityService
 from apps.organization.models import AccountCredential
 
+
 def _build_credential(*, lawyer) -> AccountCredential:
     return AccountCredential.objects.create(
         lawyer=lawyer,

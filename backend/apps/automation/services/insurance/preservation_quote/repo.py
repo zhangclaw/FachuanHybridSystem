@@ -17,10 +17,12 @@ from apps.core.exceptions import NotFoundError
 
 logger = logging.getLogger("apps.automation")
 
+
 def _configure_db_settings() -> None:
     raw_settings = getattr(connections, "_settings", None)
     configured_settings = connections.configure_settings(raw_settings)
     connections._settings = configured_settings  # type: ignore
+
 
 async def _db_sync(func: Any, *args: Any, **kwargs: Any) -> Any:
     def _wrapped() -> Any:
@@ -28,6 +30,7 @@ async def _db_sync(func: Any, *args: Any, **kwargs: Any) -> Any:
         return func(*args, **kwargs)
 
     return await sync_to_async(_wrapped, thread_sensitive=True)()
+
 
 class PreservationQuoteRepository:
     def validate_create_params(

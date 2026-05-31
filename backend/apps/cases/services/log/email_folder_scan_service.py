@@ -26,6 +26,7 @@ logger = logging.getLogger("apps.cases")
 # 子文件夹名中的日期提取模式，如 "2026.04.16-收到判决书" → (2026, 4, 16)
 _DATE_PATTERN = re.compile(r"^(\d{4})[.\-](\d{1,2})[.\-](\d{1,2})")
 
+
 class EmailFolderScanService:
     """扫描案件绑定文件夹下子文件夹，将每个子目录的内容分别导入为独立日志+附件."""
 

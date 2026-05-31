@@ -6,10 +6,10 @@ import json
 from typing import Any, ClassVar
 
 from django.db import models
-
 from django_lifecycle import BEFORE_CREATE, BEFORE_UPDATE, LifecycleModel, hook
 
 from apps.core.security.scrub import scrub_for_storage, scrub_text
+
 
 class McpWorkbench(models.Model):
     id: int
@@ -19,6 +19,7 @@ class McpWorkbench(models.Model):
         managed = False
         verbose_name = "MCP 调试工作台"
         verbose_name_plural = "MCP 调试工作台"
+
 
 class McpWorkbenchExecution(LifecycleModel):
     """MCP 调试执行历史。"""

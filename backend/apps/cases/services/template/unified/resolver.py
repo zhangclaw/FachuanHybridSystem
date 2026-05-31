@@ -13,11 +13,13 @@ from .wiring import get_document_service
 
 logger = logging.getLogger("apps.cases.services")
 
+
 @dataclass(frozen=True)
 class ResolvedTemplate:
     template: Any
     template_path: Path
     effective_function_code: str | None
+
 
 class TemplateResolver:
     def __init__(self, *, document_service: Any | None = None) -> None:
@@ -39,7 +41,7 @@ class TemplateResolver:
             raise ValidationException(
                 message="必须提供 template_id 或 function_code",
                 code="INVALID_PARAMS",
-                errors={"params": str("必须提供 template_id 或 function_code")},
+                errors={"params": "必须提供 template_id 或 function_code"},
             )
 
         if template_id is not None:

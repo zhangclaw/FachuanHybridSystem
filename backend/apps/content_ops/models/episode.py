@@ -8,9 +8,11 @@ from .article import ReviewStatus
 
 _audio_upload_path = DatedUUIDPath("content_ops/audio")
 
+
 class EpisodeContentSource(models.TextChoices):
     ARTICLE = "article", "文章"
     DISCUSSION = "discussion", "讨论稿"
+
 
 class PodcastEpisode(models.Model):
     article = models.ForeignKey(

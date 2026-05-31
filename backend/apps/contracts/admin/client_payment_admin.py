@@ -9,7 +9,6 @@ from django.contrib import admin
 from django.db.models import QuerySet
 from django.http import HttpRequest
 from django.utils.html import format_html
-
 from simple_history.admin import SimpleHistoryAdmin
 
 from apps.contracts.models import ClientPaymentRecord
@@ -23,6 +22,7 @@ else:
         BaseTabularInline = nested_admin.NestedTabularInline
     except ImportError:
         BaseTabularInline = admin.TabularInline  # type: ignore[assignment,misc]
+
 
 class ClientPaymentRecordAdminForm(forms.ModelForm[ClientPaymentRecord]):
     """客户回款记录表单"""
@@ -104,6 +104,7 @@ class ClientPaymentRecordAdminForm(forms.ModelForm[ClientPaymentRecord]):
 
         return instance
 
+
 class ClientPaymentRecordInline(BaseTabularInline[ClientPaymentRecord, ClientPaymentRecord]):
     model = ClientPaymentRecord
     extra = 0
@@ -136,6 +137,7 @@ class ClientPaymentRecordInline(BaseTabularInline[ClientPaymentRecord, ClientPay
 
     class Media:
         css = {"all": ("contracts/css/client_payment_inline.css",)}
+
 
 @admin.register(ClientPaymentRecord)
 class ClientPaymentRecordAdmin(admin.ModelAdmin):

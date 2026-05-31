@@ -18,6 +18,7 @@ from .wiring import get_case_service
 
 logger = logging.getLogger("apps.cases.services")
 
+
 class UnifiedTemplateGenerationService:
     """
     统一模板生成服务
@@ -92,7 +93,7 @@ class UnifiedTemplateGenerationService:
             raise ValidationException(
                 message="必须提供 template_id 或 function_code",
                 code="INVALID_PARAMS",
-                errors={"params": str("必须提供 template_id 或 function_code")},
+                errors={"params": "必须提供 template_id 或 function_code"},
             )
 
         # 获取案件
@@ -156,7 +157,7 @@ class UnifiedTemplateGenerationService:
             raise ValidationException(
                 message="必须提供 template_id 或 function_code",
                 code="INVALID_PARAMS",
-                errors={"params": str("必须提供 template_id 或 function_code")},
+                errors={"params": "必须提供 template_id 或 function_code"},
             )
 
         return self._resolver.get_template_info(template_id=template_id, function_code=function_code)

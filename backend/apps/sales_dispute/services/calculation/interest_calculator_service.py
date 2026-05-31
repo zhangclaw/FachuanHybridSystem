@@ -31,12 +31,14 @@ _BASIS_POINTS = Decimal("10000")
 _HUNDRED = Decimal("100")
 _TWO_PLACES = Decimal("0.01")
 
+
 class InterestStartType(str, Enum):
     """计息起算日类型"""
 
     AGREED_DATE = "agreed_date"
     DEMAND_NOTICE = "demand_notice"
     BATCH_DELIVERY = "batch_delivery"
+
 
 class RateType(str, Enum):
     """利率类型"""
@@ -46,6 +48,7 @@ class RateType(str, Enum):
     PENALTY_FIXED = "penalty_fixed"
     PENALTY_DAILY = "penalty_daily"
 
+
 @dataclass
 class BatchDelivery:
     """分批交货记录"""
@@ -53,6 +56,7 @@ class BatchDelivery:
     delivery_date: date
     amount: Decimal
     payment_date: date | None = None
+
 
 @dataclass
 class SegmentDetail:
@@ -63,6 +67,7 @@ class SegmentDetail:
     days: int
     rate: Decimal
     interest: Decimal
+
 
 @dataclass
 class InterestCalcParams:
@@ -82,6 +87,7 @@ class InterestCalcParams:
     reasonable_period_days: int = 30
     batch_deliveries: list[BatchDelivery] | None = None
 
+
 @dataclass
 class InterestCalcResult:
     """利息计算结果"""
@@ -89,6 +95,7 @@ class InterestCalcResult:
     total_interest: Decimal = _ZERO
     segments: list[SegmentDetail] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
+
 
 class InterestCalculatorService:
     """利息分段计算引擎"""
@@ -109,11 +116,11 @@ class InterestCalculatorService:
         warnings: list[str] = []
 
         # 买卖合同不适用4倍LPR上限提示
-        warnings.append(str("买卖合同不适用民间借贷4倍LPR利率上限"))
+        warnings.append("买卖合同不适用民间借贷4倍LPR利率上限")
 
         # 违约金与利息不能同时全额主张提示
         if params.rate_type in (RateType.PENALTY_FIXED, RateType.PENALTY_DAILY):
-            warnings.append(str("违约金与利息不能同时全额主张，建议择一主张或由法院酌定"))
+            warnings.append("违约金与利息不能同时全额主张，建议择一主张或由法院酌定")
 
         # 分批交货：每批独立计算
         if params.interest_start_type == InterestStartType.BATCH_DELIVERY:

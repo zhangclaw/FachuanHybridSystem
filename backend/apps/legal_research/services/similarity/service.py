@@ -21,6 +21,7 @@ from .tuning_config import LegalResearchTuningConfig
 
 logger = logging.getLogger(__name__)
 
+
 class _LLMEmbeddingClientAdapter:
     """
     将统一 llm_service.embed_texts 适配为历史 embeddings.create 形态。
@@ -47,12 +48,14 @@ class _LLMEmbeddingClientAdapter:
         data = [SimpleNamespace(embedding=vector) for vector in vectors]
         return SimpleNamespace(data=data)
 
+
 @dataclass
 class SimilarityResult:
     score: float
     reason: str
     model: str
     metadata: dict[str, Any] = field(default_factory=dict)
+
 
 class CaseSimilarityService:
     """用硅基流动模型计算案例相似度。"""
@@ -725,6 +728,7 @@ class CaseSimilarityService:
                 if normalized_conflicts:
                     extra_payload["conflict_count"] = len(normalized_conflicts)
         logger.info("案例相似度评分", extra=extra_payload)
+
 
 from .cache import (
     SemanticVectorCacheManager,

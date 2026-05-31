@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from django.db import models
 
+
 class ImageRotationTool(models.Model):
     """Admin entry model for image rotation."""
 

@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 
 TEMPLATE_DIR: Path = Path(str(get_docx_templates_root() / "2-案件材料" / "3-催收材料"))
 
+
 class ExecutionDocType(str, Enum):
     """执行文书类型枚举"""
 
@@ -27,6 +28,7 @@ class ExecutionDocType(str, Enum):
     PROPERTY_INVESTIGATION = "property_investigation"
     SPENDING_RESTRICTION = "spending_restriction"
     ADD_EXECUTEE = "add_executee"
+
 
 DOC_TYPE_TEMPLATE_MAP: dict[ExecutionDocType, str] = {
     ExecutionDocType.ENFORCEMENT: "强制执行申请书.docx",
@@ -59,6 +61,7 @@ _ADD_REASON_DISPLAY: dict[str, str] = {
 
 # ── 各文书参数 dataclass ──
 
+
 @dataclass(frozen=True)
 class EnforcementParams:
     """强制执行申请书参数"""
@@ -74,6 +77,7 @@ class EnforcementParams:
     execution_amount: Decimal
     execution_requests: str
 
+
 @dataclass(frozen=True)
 class PropertyInvestigationParams:
     """财产调查申请书参数"""
@@ -85,6 +89,7 @@ class PropertyInvestigationParams:
     respondent_address: str
     execution_case_number: str
     property_types: list[str]
+
 
 @dataclass(frozen=True)
 class SpendingRestrictionParams:
@@ -98,6 +103,7 @@ class SpendingRestrictionParams:
     legal_representative: str
     execution_case_number: str
     outstanding_amount: Decimal
+
 
 @dataclass(frozen=True)
 class AddExecuteeParams:
@@ -113,6 +119,7 @@ class AddExecuteeParams:
     added_respondent_id_number: str
     add_reason: str
     legal_basis: str
+
 
 class ExecutionDocGeneratorService:
     """执行阶段文书生成服务"""

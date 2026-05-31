@@ -7,6 +7,7 @@ from typing import Any
 
 from mcp_server.client import client
 
+
 def create_research_task(
     credential_id: int,
     keyword: str,

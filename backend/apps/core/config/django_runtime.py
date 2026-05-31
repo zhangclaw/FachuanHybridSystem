@@ -12,6 +12,7 @@ from cryptography.fernet import Fernet
 
 _TRUE_VALUES = ("true", "1", "yes", "y", "on")
 
+
 def _env_bool(name: str, default: bool = False) -> bool:
     value = os.environ.get(name)
     if value is None:
@@ -21,8 +22,10 @@ def _env_bool(name: str, default: bool = False) -> bool:
         return default
     return value.lower() in _TRUE_VALUES
 
+
 def _split_csv(value: str) -> list[str]:
     return [v.strip() for v in (value or "").split(",") if v.strip()]
+
 
 @dataclass(frozen=True)
 class DjangoSecurityConfig:
@@ -33,6 +36,7 @@ class DjangoSecurityConfig:
     allowed_hosts: list[str]
     credential_encryption_key: str
     scraper_encryption_key: str
+
 
 def _resolve_secret_key(is_production: bool, dev_secret_key: str) -> str:
     """解析 SECRET_KEY"""
@@ -48,12 +52,14 @@ def _resolve_secret_key(is_production: bool, dev_secret_key: str) -> str:
         raise RuntimeError("生产环境必须设置安全的 DJANGO_SECRET_KEY")
     return env_secret_key
 
+
 def _validate_fernet_key(key: str, env_name: str) -> None:
     """验证 Fernet 密钥有效性"""
     try:
         Fernet(key.encode())
     except Exception as e:
         raise RuntimeError(f"{env_name} 无效(必须是 Fernet key)") from e
+
 
 def _resolve_encryption_keys(is_production: bool) -> tuple[str, str]:
     """解析加密密钥"""
@@ -75,6 +81,7 @@ def _resolve_encryption_keys(is_production: bool) -> tuple[str, str]:
         credential_key = env_credential_key if env_credential_key else _dev_fallback_key
         scraper_key = env_scraper_key if env_scraper_key else credential_key
     return credential_key, scraper_key
+
 
 def resolve_security_config(
     *,
@@ -115,6 +122,7 @@ def resolve_security_config(
         scraper_encryption_key=scraper_key,
     )
 
+
 def resolve_cors_and_csrf(
     *,
     debug: bool,
@@ -147,6 +155,7 @@ def resolve_cors_and_csrf(
         "CSRF_TRUSTED_ORIGINS": _split_csv(csrf_origins),
     }
 
+
 def resolve_perm_open_access(*, is_production: bool) -> bool:
     env_value = os.environ.get("PERM_OPEN_ACCESS", "").strip()
     enabled = env_value.lower() in _TRUE_VALUES
@@ -155,6 +164,7 @@ def resolve_perm_open_access(*, is_production: bool) -> bool:
             raise RuntimeError("生产环境禁止启用 PERM_OPEN_ACCESS")
         return False
     return enabled if env_value else False
+
 
 def resolve_rate_limit() -> dict[str, int]:
     return {
@@ -178,6 +188,7 @@ def resolve_rate_limit() -> dict[str, int]:
         "ADMIN_WINDOW": 60,
     }
 
+
 def resolve_redis_url() -> str:
     """
     统一解析 Redis URL。
@@ -195,6 +206,7 @@ def resolve_redis_url() -> str:
     base_url = (os.environ.get("REDIS_URL", "") or "").strip()
     return base_url
 
+
 def resolve_cache_redis_url() -> str:
     """解析 cache 专用 Redis URL（DJANGO_CACHE_REDIS_URL 优先于 REDIS_URL）"""
     dedicated = (os.environ.get("DJANGO_CACHE_REDIS_URL", "") or "").strip()
@@ -202,12 +214,14 @@ def resolve_cache_redis_url() -> str:
         return dedicated
     return resolve_redis_url()
 
+
 def resolve_channel_redis_url() -> str:
     """解析 channel layer 专用 Redis URL（DJANGO_CHANNEL_REDIS_URL 优先于 REDIS_URL）"""
     dedicated = (os.environ.get("DJANGO_CHANNEL_REDIS_URL", "") or "").strip()
     if dedicated:
         return dedicated
     return resolve_redis_url()
+
 
 def resolve_channel_layers() -> dict[str, object]:
     redis_url = resolve_channel_redis_url()
@@ -219,6 +233,7 @@ def resolve_channel_layers() -> dict[str, object]:
             }
         }
     return {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
+
 
 def resolve_q_cluster() -> dict[str, object]:
     """
@@ -248,6 +263,7 @@ def resolve_q_cluster() -> dict[str, object]:
         base["poll"] = float(os.environ.get("DJANGO_Q_POLL", "0.5") or "0.5")
 
     return base
+
 
 def resolve_contract_folder_browse_roots() -> list[str]:
     env_value = os.environ.get("CONTRACT_FOLDER_BROWSE_ROOTS", "").strip()

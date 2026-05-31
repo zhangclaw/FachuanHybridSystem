@@ -7,7 +7,6 @@ from django.contrib import admin
 from django.db.models import QuerySet
 from django.http import HttpRequest
 from django.utils.html import format_html
-
 from simple_history.admin import SimpleHistoryAdmin
 
 from apps.contracts.models import ContractPayment, Invoice, InvoiceStatus
@@ -24,6 +23,7 @@ else:
     except ImportError:
         BaseModelAdmin = admin.ModelAdmin
         BaseTabularInline = admin.TabularInline
+
 
 class InvoiceAdminForm(forms.ModelForm[Invoice]):
     file = forms.FileField(
@@ -66,6 +66,7 @@ class InvoiceAdminForm(forms.ModelForm[Invoice]):
             instance.save()
         return instance
 
+
 class InvoiceInline(BaseTabularInline):
     model = Invoice
     form = InvoiceAdminForm
@@ -104,6 +105,7 @@ class InvoiceInline(BaseTabularInline):
             # 即使 service 抛出，也确保 Admin 不崩溃
             obj.delete()
 
+
 class ContractPaymentInline(BaseTabularInline[ContractPayment, ContractPayment]):
     model = ContractPayment
     extra = 0
@@ -134,6 +136,7 @@ class ContractPaymentInline(BaseTabularInline[ContractPayment, ContractPayment])
 
         FormSet.clean = clean_fs  # type: ignore[method-assign]
         return FormSet
+
 
 @admin.register(ContractPayment)
 class ContractPaymentAdmin(BaseModelAdmin):

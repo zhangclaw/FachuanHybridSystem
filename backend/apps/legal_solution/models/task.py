@@ -6,6 +6,7 @@ from django.db import models
 
 from apps.core.filesystem.upload_paths import DatedUUIDPath
 
+
 class SolutionTaskStatus(models.TextChoices):
     PENDING = "pending", "待执行"
     RESEARCHING = "researching", "检索中"
@@ -13,6 +14,7 @@ class SolutionTaskStatus(models.TextChoices):
     COMPLETED = "completed", "已完成"
     PARTIAL = "partial", "部分完成"
     FAILED = "failed", "失败"
+
 
 class SolutionTask(models.Model):
     case_summary = models.TextField(verbose_name="案情简述")

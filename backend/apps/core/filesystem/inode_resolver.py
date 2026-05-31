@@ -11,6 +11,7 @@ from typing import Any, Sequence
 
 logger = logging.getLogger("apps.core.filesystem")
 
+
 class InodeResolver:
     """通过 inode + device 追踪文件夹路径.
 

@@ -13,8 +13,10 @@ logger = logging.getLogger(__name__)
 
 _QUALITY_CARD_KEYWORD = "律师办案服务质量监督卡"
 
+
 def _normalize_for_match(text: str) -> str:
     return re.sub(r"\s+", "", str(text or "")).lower()
+
 
 def _extract_last_page_text_direct(file_path: Path) -> str:
     try:
@@ -26,6 +28,7 @@ def _extract_last_page_text_direct(file_path: Path) -> str:
     except (OSError, RuntimeError):
         logger.exception("quality_card_check_direct_failed", extra={"path": file_path.as_posix()})
         return ""
+
 
 def _extract_last_page_text_with_ocr(file_path: Path) -> str:
     try:
@@ -48,6 +51,7 @@ def _extract_last_page_text_with_ocr(file_path: Path) -> str:
     except (OSError, RuntimeError):
         logger.exception("quality_card_check_ocr_failed", extra={"path": file_path.as_posix()})
         return ""
+
 
 def has_quality_card_on_last_page(file_path: Path) -> bool:
     """检测 PDF 最一页是否包含监督卡。"""

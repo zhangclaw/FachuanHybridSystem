@@ -9,7 +9,6 @@ from pathlib import Path
 from typing import Any
 
 from django.http import HttpResponse
-
 from ninja import File, Router
 from ninja.errors import HttpError
 from ninja.files import UploadedFile
@@ -19,6 +18,7 @@ from apps.core.infrastructure.throttling import rate_limit_from_settings
 logger = logging.getLogger("apps.invoice_recognition")
 
 router = Router(tags=["发票识别"])
+
 
 @router.post("/quick-recognize")
 def quick_recognize(
@@ -74,20 +74,24 @@ def quick_recognize(
 
     return {"results": results_data}
 
+
 def _get_recognition_service() -> Any:
     from apps.invoice_recognition.services.wiring import get_invoice_recognition_service
 
     return get_invoice_recognition_service()
+
 
 def _get_download_service() -> Any:
     from apps.invoice_recognition.services.wiring import get_invoice_download_service
 
     return get_invoice_download_service()
 
+
 def _get_quick_recognition_service() -> Any:
     from apps.invoice_recognition.services.wiring import get_quick_recognition_service
 
     return get_quick_recognition_service()
+
 
 @router.post("/{task_id}/upload")
 @rate_limit_from_settings("UPLOAD", by_user=True)
@@ -121,6 +125,7 @@ def upload_invoices(
     ]
     return {"success": True, "count": len(records), "records": record_list}
 
+
 @router.get("/{task_id}/status")
 def get_task_status(
     request: Any,
@@ -152,6 +157,7 @@ def get_task_status(
     serialized = _serialize(data)
     assert isinstance(serialized, dict)
     return serialized
+
 
 @router.get("/{task_id}/download")
 @rate_limit_from_settings("EXPORT", by_user=True)

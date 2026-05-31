@@ -9,6 +9,7 @@ from apps.core.services.django_q_tasks import get_q_task_status, submit_q_task
 
 logger = logging.getLogger(__name__)
 
+
 class TaskServiceAdapter:
     """任务服务适配器。
 

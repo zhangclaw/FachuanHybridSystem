@@ -9,6 +9,7 @@ import pytest
 
 from apps.core.services.browser.profiles import BrowserProfile, get_profile, register_profile
 
+
 class TestBrowserProfile:
     """BrowserProfile 配置测试。"""
 

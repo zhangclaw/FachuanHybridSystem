@@ -12,10 +12,12 @@ from apps.core.protocols import (
     ISupplementaryAgreementGenerationService,
 )
 
+
 def build_generation_task_service() -> IGenerationTaskService:
     from apps.documents.services.generation.generation_task_service import GenerationTaskService
 
     return cast(IGenerationTaskService, GenerationTaskService())
+
 
 def build_contract_generation_service_with_deps(
     *,
@@ -32,6 +34,7 @@ def build_contract_generation_service_with_deps(
         ),
     )
 
+
 def build_contract_generation_service() -> IContractGenerationService:
     from apps.core.interfaces import ServiceLocator
 
@@ -39,6 +42,7 @@ def build_contract_generation_service() -> IContractGenerationService:
         contract_service=ServiceLocator.get_contract_service(),
         folder_binding_service=ServiceLocator.get_contract_folder_binding_service(),
     )
+
 
 def build_supplementary_agreement_generation_service_with_deps(
     *,
@@ -56,6 +60,7 @@ def build_supplementary_agreement_generation_service_with_deps(
             folder_binding_service=folder_binding_service,
         ),
     )
+
 
 def build_supplementary_agreement_generation_service() -> ISupplementaryAgreementGenerationService:
     from apps.core.interfaces import ServiceLocator

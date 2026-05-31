@@ -42,8 +42,10 @@ from apps.legal_research.services.task.service import LegalResearchTaskService
 
 logger = logging.getLogger(__name__)
 
+
 def _get_account_credential_model() -> Any:
     return django_apps.get_model("organization", "AccountCredential")
+
 
 class LegalResearchCapabilityService:
     IDEMPOTENCY_TTL_SECONDS = 1800

@@ -15,6 +15,7 @@ from .case_access_policy import CaseAccessPolicy
 from .case_queryset import get_case_queryset
 from .case_search_service import CaseSearchService
 
+
 class CaseQueryService(PermissionMixin):
     """案件查询服务，封装所有案件读取业务逻辑。"""
 

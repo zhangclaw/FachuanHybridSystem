@@ -9,6 +9,7 @@ from apps.story_viz.services.job_service import StoryAnimationJobService
 from apps.story_viz.services.preprocess_service import JudgmentPreprocessService
 from apps.story_viz.services.svg_fragment_generator_service import SvgFragmentGeneratorService
 
+
 class _FakeResp:
     def __init__(self, content: str) -> None:
         self.content = content

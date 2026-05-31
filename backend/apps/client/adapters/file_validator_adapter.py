@@ -6,6 +6,7 @@ from typing import Any
 
 from apps.core.exceptions import ValidationException
 
+
 class FileValidatorAdapter:
     """文件验证器适配器。
 

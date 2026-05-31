@@ -46,13 +46,16 @@ _rsa_key = serialization.load_pem_public_key(RSA_PUBLIC_KEY_PEM.encode())
 
 # ── RSA 加密 ─────────────────────────────────────────
 
+
 def rsa_encrypt(plain: str) -> str:
     """用 RSA 公钥加密字符串，返回 Base64 编码结果（与 JSEncrypt 兼容）。"""
     assert isinstance(_rsa_key, RSAPublicKey), "公钥加载失败，不是 RSA 公钥"
     ct = _rsa_key.encrypt(plain.encode(), asym_padding.PKCS1v15())
     return b64encode(ct).decode()
 
+
 # ── 打码平台抽象接口 ─────────────────────────────────
+
 
 class CaptchaSolver(abc.ABC):
     """验证码求解器抽象基类。实现此接口即可接入任意打码平台。"""
@@ -75,6 +78,7 @@ class CaptchaSolver(abc.ABC):
         """
         ...
 
+
 class NotImplementedSolver(CaptchaSolver):
     """占位求解器，提示用户需要接入打码平台。"""
 
@@ -84,16 +88,20 @@ class NotImplementedSolver(CaptchaSolver):
             "参考: gsxt_reverse_login.py 中的 CaptchaSolver 抽象类。"
         )
 
+
 # ── 全局求解器（可替换） ─────────────────────────────
 
 _solver: CaptchaSolver = NotImplementedSolver()
+
 
 def set_captcha_solver(solver: CaptchaSolver) -> None:
     """注册自定义验证码求解器。"""
     global _solver
     _solver = solver
 
+
 # ── HTTP 逆向登录 ────────────────────────────────────
+
 
 def reverse_login(account: str, password: str) -> dict[str, Any]:
     """

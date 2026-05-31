@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from django.db import models
 
+
 class DocConvertTool(models.Model):
     """虚拟模型，不创建数据库表，仅作为 Admin 入口。"""
 

@@ -15,7 +15,6 @@ import math
 from typing import Any
 
 from django.http import HttpRequest
-
 from ninja import Router
 from ninja_jwt.authentication import JWTAuth
 
@@ -32,10 +31,12 @@ logger = logging.getLogger("apps.automation")
 # 创建路由器，使用 JWT 认证
 router = Router(tags=["财产保全询价"], auth=JWTAuth())
 
+
 def _get_preservation_quote_service() -> Any:
     from apps.core.dependencies import build_preservation_quote_service
 
     return build_preservation_quote_service()
+
 
 @router.post("/preservation-quotes", response=PreservationQuoteSchema)
 def create_preservation_quote(request: HttpRequest, data: PreservationQuoteCreateSchema) -> PreservationQuoteSchema:
@@ -70,6 +71,7 @@ def create_preservation_quote(request: HttpRequest, data: PreservationQuoteCreat
 
     # 返回响应
     return PreservationQuoteSchema.from_model(quote)
+
 
 @router.get("/preservation-quotes", response=QuoteListSchema)
 def list_preservation_quotes(
@@ -126,6 +128,7 @@ def list_preservation_quotes(
         items=items,
     )
 
+
 @router.get("/preservation-quotes/{quote_id}", response=PreservationQuoteSchema)
 def get_preservation_quote(request: HttpRequest, quote_id: int) -> PreservationQuoteSchema:
     """
@@ -150,6 +153,7 @@ def get_preservation_quote(request: HttpRequest, quote_id: int) -> PreservationQ
 
     # 返回响应
     return PreservationQuoteSchema.from_model(quote)
+
 
 @router.post("/preservation-quotes/{quote_id}/execute", response=QuoteExecuteResponseSchema)
 async def execute_preservation_quote(request: HttpRequest, quote_id: int) -> QuoteExecuteResponseSchema:
@@ -194,6 +198,7 @@ async def execute_preservation_quote(request: HttpRequest, quote_id: int) -> Quo
         % {"success": result["success_count"], "failed": result["failed_count"]},
         data=PreservationQuoteSchema.from_model(quote),
     )
+
 
 @router.post("/preservation-quotes/{quote_id}/retry", response=QuoteExecuteResponseSchema)
 async def retry_preservation_quote(request: HttpRequest, quote_id: int) -> QuoteExecuteResponseSchema:

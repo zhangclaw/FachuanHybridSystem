@@ -9,6 +9,7 @@ from apps.documents.models import FolderTemplate
 
 from .id_service import FolderTemplateIdService
 
+
 @dataclass(frozen=True)
 class FolderTemplateStructureIdRepairService:
     id_service: FolderTemplateIdService

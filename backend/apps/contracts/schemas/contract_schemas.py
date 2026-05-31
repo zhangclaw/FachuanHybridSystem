@@ -21,6 +21,7 @@ from .party_schemas import ContractPartyIn, ContractPartyOut
 from .payment_schemas import ContractPaymentOut
 from .supplementary_schemas import SupplementaryAgreementInput, SupplementaryAgreementOut
 
+
 class FinalizedMaterialOut(Schema):
     """归档材料输出 Schema"""
 
@@ -73,6 +74,7 @@ class FinalizedMaterialOut(Schema):
             return str(obj.created_at.isoformat())
         return None
 
+
 class ClientPaymentRecordOut(Schema):
     """客户回款记录输出 Schema"""
 
@@ -97,7 +99,9 @@ class ClientPaymentRecordOut(Schema):
             return str(obj.created_at.isoformat())
         return None
 
+
 logger = logging.getLogger(__name__)
+
 
 class UpdateLawyersIn(Schema):
     """更新合同律师指派输入 Schema"""
@@ -111,6 +115,7 @@ class UpdateLawyersIn(Schema):
         if not v:
             raise ValueError("至少需要指派一个律师")
         return v
+
 
 class ContractIn(ModelSchema):
     specified_date: str | None = None
@@ -171,6 +176,7 @@ class ContractIn(ModelSchema):
             raise ValueError("自定义收费需填写条款文本")
         return self
 
+
 class ContractAssignmentOut(Schema):
     """合同律师指派输出 Schema"""
 
@@ -194,6 +200,7 @@ class ContractAssignmentOut(Schema):
             is_primary=obj.is_primary,
             order=obj.order,
         )
+
 
 class ContractOut(ModelSchema):
     cases: list[CaseOut]
@@ -394,6 +401,7 @@ class ContractOut(ModelSchema):
             logger.exception("操作失败")
             return False
 
+
 class ContractUpdate(Schema):
     name: str | None = None
     case_type: str | None = None
@@ -410,6 +418,7 @@ class ContractUpdate(Schema):
     representation_stages: list[Any] | None = None
     parties: list[ContractPartyIn] | None = None  # 当事人列表(含身份)
     supplementary_agreements: list[SupplementaryAgreementInput] | None = None  # 补充协议列表
+
 
 class ContractPaginatedOut(Schema):
     """合同分页输出 Schema"""

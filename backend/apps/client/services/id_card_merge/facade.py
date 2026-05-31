@@ -9,7 +9,6 @@ from typing import Any, ClassVar
 import cv2
 import numpy as np
 from django.core.files.uploadedfile import UploadedFile
-
 from numpy.typing import NDArray
 
 from apps.core.exceptions import ValidationException
@@ -19,6 +18,7 @@ from .paths import ensure_output_dir, ensure_temp_dir, get_media_root
 from .transform import perspective_transform
 
 logger = logging.getLogger("apps.client")
+
 
 class IdCardMergeService:
     ID_CARD_WIDTH = 85.6

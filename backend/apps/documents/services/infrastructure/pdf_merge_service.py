@@ -16,6 +16,7 @@ from apps.documents.models import EvidenceList
 from apps.documents.services.infrastructure.pdf_merge_utils import add_page_numbers as add_page_numbers_util
 from apps.documents.services.infrastructure.pdf_merge_utils import convert_docx_to_pdf, convert_image_to_pdf
 
+
 class PDFMergeValidator:
     SUPPORTED_FORMATS: ClassVar = [".pdf", ".doc", ".docx", ".jpg", ".jpeg", ".png", ".gif", ".bmp"]
     IMAGE_FORMATS: ClassVar = [".jpg", ".jpeg", ".png", ".gif", ".bmp"]
@@ -38,6 +39,7 @@ class PDFMergeValidator:
                 code="UNSUPPORTED_FILE_FORMAT",
                 errors={"file_path": file_path, "extension": ext},
             )
+
 
 class PDFMergeWorkflow:
     def __init__(self, validator: PDFMergeValidator | None = None) -> None:
@@ -146,6 +148,7 @@ class PDFMergeWorkflow:
         from apps.documents.services.infrastructure.pdf_utils import get_pdf_page_count
 
         return get_pdf_page_count(pdf_input, default=0)
+
 
 class PDFMergeService:
     def __init__(self, workflow: PDFMergeWorkflow | None = None) -> None:

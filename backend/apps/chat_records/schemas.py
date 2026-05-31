@@ -20,9 +20,11 @@ from .models import (
 
 logger = logging.getLogger("apps.chat_records")
 
+
 class ProjectIn(Schema):
     name: str
     description: str | None = ""
+
 
 class ProjectOut(ModelSchema, SchemaMixin):
     created_at: str | None
@@ -39,6 +41,7 @@ class ProjectOut(ModelSchema, SchemaMixin):
     @staticmethod
     def resolve_updated_at(obj: ChatRecordProject) -> str | None:
         return SchemaMixin._resolve_datetime_iso(getattr(obj, "updated_at", None))
+
 
 class ScreenshotOut(ModelSchema, SchemaMixin):
     image_url: str
@@ -76,15 +79,19 @@ class ScreenshotOut(ModelSchema, SchemaMixin):
     def resolve_created_at(obj: ChatRecordScreenshot) -> str | None:
         return SchemaMixin._resolve_datetime_iso(getattr(obj, "created_at", None))
 
+
 class ScreenshotUpdate(Schema):
     title: str | None = None
     note: str | None = None
 
+
 class ScreenshotReorderIn(Schema):
     screenshot_ids: list[str]
 
+
 class RecordingUpdate(Schema):
     duration_seconds: float | None = None
+
 
 class RecordingOut(ModelSchema, SchemaMixin):
     video_url: str
@@ -153,9 +160,11 @@ class RecordingOut(ModelSchema, SchemaMixin):
     def resolve_extract_finished_at(obj: ChatRecordRecording) -> str | None:
         return SchemaMixin._resolve_datetime_iso(getattr(obj, "extract_finished_at", None))
 
+
 class ExportCreateIn(Schema):
     export_type: str
     layout: dict[str, Any] | None = None
+
 
 class ExportTaskOut(ModelSchema, SchemaMixin):
     status_label: str
@@ -215,16 +224,20 @@ class ExportTaskOut(ModelSchema, SchemaMixin):
             return None
         return f"/api/v1/chat-records/exports/{obj.id}/download"
 
+
 class ExportTypeItem(Schema):
     value: str
     label: str
+
 
 class ExportStatusItem(Schema):
     value: str
     label: str
 
+
 def list_export_types() -> list[ExportTypeItem]:
     return [ExportTypeItem(value=value, label=str(label)) for value, label in ExportType.choices]
+
 
 def list_export_statuses() -> list[ExportStatusItem]:
     return [ExportStatusItem(value=value, label=str(label)) for value, label in ExportStatus.choices]

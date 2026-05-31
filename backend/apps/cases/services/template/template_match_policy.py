@@ -5,11 +5,13 @@ from __future__ import annotations
 from collections.abc import Iterable
 from dataclasses import dataclass
 
+
 @dataclass(frozen=True)
 class CaseTemplateMatchInput:
     case_type: str | None
     case_stage: str | None
     legal_statuses: set[str]
+
 
 class CaseTemplateMatchPolicy:
     def is_match(self, template: object, match_input: CaseTemplateMatchInput) -> bool:

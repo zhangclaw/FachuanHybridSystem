@@ -9,6 +9,7 @@ from apps.core.utils.path import Path
 
 from .path_validator import FolderPathValidator
 
+
 class FolderBrowsePolicy:
     def __init__(
         self,

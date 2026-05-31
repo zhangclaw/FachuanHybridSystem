@@ -10,6 +10,7 @@ from typing import Any, ClassVar, cast
 
 from pydantic import BaseModel, Field, field_validator
 
+
 class PreservationQuoteCreateSchema(BaseModel):
     """创建询价任务的输入 Schema"""
 
@@ -40,6 +41,7 @@ class PreservationQuoteCreateSchema(BaseModel):
             raise ValueError("字段不能为空")
         return v.strip()
 
+
 class InsuranceQuoteSchema(BaseModel):
     """保险公司报价输出 Schema"""
 
@@ -62,6 +64,7 @@ class InsuranceQuoteSchema(BaseModel):
             Decimal: lambda v: float(v) if v is not None else None,
             datetime: lambda v: v.isoformat() if v is not None else None,
         }
+
 
 class PreservationQuoteSchema(BaseModel):
     """询价任务输出 Schema"""
@@ -111,6 +114,7 @@ class PreservationQuoteSchema(BaseModel):
             datetime: lambda v: v.isoformat() if v is not None else None,
         }
 
+
 class QuoteListItemSchema(BaseModel):
     """询价任务列表项 Schema(不包含详细报价)"""
 
@@ -152,6 +156,7 @@ class QuoteListItemSchema(BaseModel):
             datetime: lambda v: v.isoformat() if v is not None else None,
         }
 
+
 class QuoteListSchema(BaseModel):
     """询价任务分页列表响应 Schema"""
 
@@ -166,6 +171,7 @@ class QuoteListSchema(BaseModel):
             Decimal: lambda v: float(v) if v is not None else None,
             datetime: lambda v: v.isoformat() if v is not None else None,
         }
+
 
 class QuoteExecuteResponseSchema(BaseModel):
     """执行询价任务响应 Schema"""

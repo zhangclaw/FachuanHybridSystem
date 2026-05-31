@@ -13,6 +13,7 @@ from .base import ChatResult
 
 logger = logging.getLogger(__name__)
 
+
 class WeChatWorkFileMixin:
     """负责企业微信文件上传和文件消息发送"""
 

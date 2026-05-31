@@ -11,6 +11,7 @@ from apps.documents.models import GenerationMethod, GenerationStatus, Generation
 
 logger = logging.getLogger(__name__)
 
+
 class GenerationTaskService:
     def create_ai_task_internal(
         self,

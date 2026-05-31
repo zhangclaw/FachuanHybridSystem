@@ -4,6 +4,7 @@ from typing import ClassVar
 
 from django.db import models
 
+
 class LegalResearchTaskEvent(models.Model):
     class Stage(models.TextChoices):
         SEARCH = "search", "检索"

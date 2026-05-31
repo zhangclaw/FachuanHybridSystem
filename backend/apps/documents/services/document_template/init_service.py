@@ -12,6 +12,7 @@ from .complete_defaults import get_complete_default_data
 
 logger = logging.getLogger(__name__)
 
+
 class DocumentTemplateInitService:
     """文件模板初始化服务"""
 

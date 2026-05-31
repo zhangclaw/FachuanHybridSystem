@@ -5,6 +5,7 @@ from __future__ import annotations
 import re
 from typing import Any
 
+
 class GuaranteeDataMixin:
     """当事人数据归一化与 case number 解析。"""
 

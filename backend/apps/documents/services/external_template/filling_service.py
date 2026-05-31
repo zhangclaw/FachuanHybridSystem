@@ -22,7 +22,6 @@ from django.apps import apps
 from django.conf import settings
 from django.db.models import QuerySet
 from django.utils import timezone
-
 from docx.document import Document as DocumentType
 
 from apps.documents.services.placeholders.fallback import (
@@ -36,6 +35,7 @@ if TYPE_CHECKING:
 
 logger: logging.Logger = logging.getLogger(__name__)
 
+
 @dataclass(frozen=True)
 class FillPreviewItem:
     """填充预览项"""
@@ -47,6 +47,7 @@ class FillPreviewItem:
     fill_type: str
     mapping_id: int
 
+
 @dataclass(frozen=True)
 class FillReport:
     """填充报告"""
@@ -56,6 +57,7 @@ class FillReport:
     skipped_count: int
     manual_needed: list[str]
     errors: list[str]
+
 
 class FillingService:
     """模板填充服务：占位符取值 + 填充预览 + 自定义字段"""

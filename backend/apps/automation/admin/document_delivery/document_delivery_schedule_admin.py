@@ -24,6 +24,7 @@ from apps.automation.models import DocumentDeliverySchedule
 
 logger = logging.getLogger("apps.automation")
 
+
 def _get_document_delivery_schedule_service() -> Any:
     """获取文书送达定时任务服务实例（工厂函数）"""
     from apps.automation.services.document_delivery.document_delivery_schedule_service import (
@@ -31,6 +32,7 @@ def _get_document_delivery_schedule_service() -> Any:
     )
 
     return DocumentDeliveryScheduleService()
+
 
 @admin.register(DocumentDeliverySchedule)
 class DocumentDeliveryScheduleAdmin(admin.ModelAdmin):

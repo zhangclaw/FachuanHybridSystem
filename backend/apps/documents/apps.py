@@ -10,6 +10,7 @@ from django.apps import AppConfig
 
 logger = logging.getLogger(__name__)
 
+
 class DocumentsConfig(AppConfig):
     """法律文书生成系统应用配置"""
 

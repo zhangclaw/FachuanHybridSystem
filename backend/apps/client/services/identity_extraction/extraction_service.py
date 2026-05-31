@@ -26,6 +26,7 @@ logger = logging.getLogger(__name__)
 _MAX_LLM_OCR_CHARS = 1800
 _MAX_LLM_OCR_LINES = 80
 
+
 class IdentityExtractionService:
     """证件信息提取服务 - 使用 RapidOCR (PP-OCRv5) + LLM"""
 
@@ -791,10 +792,10 @@ class IdentityExtractionService:
             result["error"] = str(e)
         except ServiceUnavailableError as e:
             logger.warning("证件识别服务不可用: %s", e)
-            result["error"] = str("智能识别服务暂时不可用，请稍后重试")
+            result["error"] = "智能识别服务暂时不可用，请稍后重试"
         except ValidationException as e:
             result["error"] = str(e)
         except Exception as e:
             logger.exception("证件识别未知错误: %s", e)
-            result["error"] = str("识别过程中发生未知错误，请稍后重试")
+            result["error"] = "识别过程中发生未知错误，请稍后重试"
         return result

@@ -16,6 +16,7 @@ logger = logging.getLogger("apps.fee_notice")
 
 router = Router(tags=["交费通知书识别"])
 
+
 class FeeCompareIn(Schema):
     """Fee comparison request payload."""
 
@@ -23,8 +24,10 @@ class FeeCompareIn(Schema):
     extracted_acceptance_fee: Decimal | None = None
     extracted_preservation_fee: Decimal | None = None
 
+
 def _to_number(value: Decimal | None) -> float | None:
     return float(value) if value is not None else None
+
 
 def _serialize_notice(notice: Any, debug: bool) -> dict[str, Any]:
     amounts = notice.amounts
@@ -45,10 +48,12 @@ def _serialize_notice(notice: Any, debug: bool) -> dict[str, Any]:
         "debug_info": amounts.debug_info if debug else {},
     }
 
+
 def _normalize_error_file(raw_file: str | None) -> str:
     if not raw_file:
         return "未知文件"
     return Path(raw_file).name or raw_file
+
 
 @router.post("/extract")
 @rate_limit_from_settings("UPLOAD", by_user=True)
@@ -105,6 +110,7 @@ def extract_fee_notice(
     finally:
         service.cleanup_temp_files(saved_files)
 
+
 @router.get("/cases/search")
 def search_cases(request: HttpRequest, keyword: str, limit: int = 20) -> dict[str, Any]:
     """Search cases for fee comparison."""
@@ -126,6 +132,7 @@ def search_cases(request: HttpRequest, keyword: str, limit: int = 20) -> dict[st
             for case in cases
         ]
     }
+
 
 @router.post("/compare")
 def compare_fee(request: HttpRequest, payload: FeeCompareIn) -> dict[str, Any]:

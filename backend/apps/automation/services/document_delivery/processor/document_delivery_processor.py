@@ -27,6 +27,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("apps.automation")
 
+
 class DocumentDeliveryProcessor:
     """文书处理服务 - 负责文书下载后的处理流程"""
 
@@ -207,7 +208,7 @@ class DocumentDeliveryProcessor:
                         sms.status = CourtSMSStatus.COMPLETED
                     else:
                         sms.status = CourtSMSStatus.FAILED
-                        sms.error_message = str("通知发送失败")
+                        sms.error_message = "通知发送失败"
                     sms.save()
                     result["success"] = True
                 else:

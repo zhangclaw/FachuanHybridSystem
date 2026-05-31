@@ -4,9 +4,11 @@ from django.db import models
 
 from .law_firm import LawFirm
 
+
 class TeamType(models.TextChoices):
     LAWYER = "lawyer", "律师团队"
     BIZ = "biz", "业务团队"
+
 
 class Team(models.Model):
     """团队模型，律所下的分组单元，分为律师团队和业务团队。"""

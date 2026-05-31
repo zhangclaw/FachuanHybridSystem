@@ -18,6 +18,7 @@ from apps.documents.models.choices import DocumentCaseFileSubType, DocumentTempl
 from .enums import EvidenceDirection, EvidenceType, OriginalStatus
 from .evidence_storage import evidence_file_storage
 
+
 class MergeStatus(models.TextChoices):
     """合并状态"""
 
@@ -25,6 +26,7 @@ class MergeStatus(models.TextChoices):
     PROCESSING = "processing", "合并中"
     COMPLETED = "completed", "已完成"
     FAILED = "failed", "失败"
+
 
 class ListType(models.TextChoices):
     """证据清单类型"""
@@ -35,6 +37,7 @@ class ListType(models.TextChoices):
     LIST_4 = "list_4", "证据清单四"
     LIST_5 = "list_5", "证据清单五"
     LIST_6 = "list_6", "证据清单六"
+
 
 # 清单类型的顺序和前置关系
 LIST_TYPE_ORDER = {
@@ -59,17 +62,20 @@ LIST_TYPE_PREVIOUS = {
 if TYPE_CHECKING:
     from django.db.models.fields.related_descriptors import RelatedManager
 
+
 def _get_evidence_service() -> Any:
     """工厂函数: 获取 EvidenceService 实例"""
     from apps.evidence.services.core.evidence_service import EvidenceService
 
     return EvidenceService()
 
+
 def _get_evidence_storage() -> Any:
     """工厂函数: 获取证据文件存储实例"""
     from apps.evidence.services.core.evidence_storage import evidence_file_storage
 
     return evidence_file_storage
+
 
 class EvidenceList(models.Model):
     """
@@ -264,6 +270,7 @@ class EvidenceList(models.Model):
         if self.start_order == end_order:
             return str(self.start_order)
         return f"{self.start_order}-{end_order}"
+
 
 class EvidenceItem(models.Model):
     """

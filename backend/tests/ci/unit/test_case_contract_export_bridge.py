@@ -11,6 +11,7 @@ from apps.cases.services.case.case_contract_export_bridge import (
     serialize_contract_for_case_export,
 )
 
+
 def test_get_case_admin_contract_export_prefetches_returns_nonempty_tuple() -> None:
     result = get_case_admin_contract_export_prefetches()
     assert isinstance(result, tuple)

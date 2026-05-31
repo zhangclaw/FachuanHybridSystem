@@ -25,6 +25,7 @@ from .base_court_scraper import BaseCourtDocumentScraper
 
 logger = logging.getLogger("apps.automation")
 
+
 class HbfyCourtScraper(BaseCourtDocumentScraper):
     """湖北电子送达爬虫"""
 

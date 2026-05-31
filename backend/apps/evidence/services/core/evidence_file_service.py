@@ -13,6 +13,7 @@ from apps.core.exceptions import ValidationException
 if TYPE_CHECKING:
     from apps.evidence.models import EvidenceItem
 
+
 class EvidenceFileService:
     SUPPORTED_FORMATS: ClassVar = [".pdf", ".doc", ".docx", ".jpg", ".jpeg", ".png", ".gif", ".bmp"]
     MAX_FILE_SIZE = 50 * 1024 * 1024

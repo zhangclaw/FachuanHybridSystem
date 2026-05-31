@@ -7,11 +7,13 @@ from typing import Any
 
 from django.db.models import Q, QuerySet
 
+
 @dataclass
 class SearchResultItem:
     id: int
     title: str
     subtitle: str = ""
+
 
 def search_clients(q: str, limit: int) -> list[SearchResultItem]:
     from apps.client.models import Client
@@ -20,6 +22,7 @@ def search_clients(q: str, limit: int) -> list[SearchResultItem]:
         Q(name__icontains=q) | Q(phone__icontains=q) | Q(id_number__icontains=q)
     ).distinct()[:limit]
     return [SearchResultItem(id=c.id, title=c.name, subtitle=c.phone or "") for c in qs]
+
 
 def search_cases(q: str, limit: int) -> list[SearchResultItem]:
     from apps.cases.models import Case
@@ -40,6 +43,7 @@ def search_cases(q: str, limit: int) -> list[SearchResultItem]:
         results.append(SearchResultItem(id=c.id, title=c.name or "", subtitle=case_number))
     return results
 
+
 def search_contracts(q: str, limit: int) -> list[SearchResultItem]:
     from apps.contracts.models import Contract
 
@@ -47,6 +51,7 @@ def search_contracts(q: str, limit: int) -> list[SearchResultItem]:
         Q(name__icontains=q) | Q(contract_parties__client__name__icontains=q)
     ).distinct()[:limit]
     return [SearchResultItem(id=c.id, title=c.name or "", subtitle="") for c in qs]
+
 
 def search_inbox(q: str, limit: int) -> list[SearchResultItem]:
     from apps.message_hub.models import InboxMessage
@@ -63,6 +68,7 @@ def search_inbox(q: str, limit: int) -> list[SearchResultItem]:
         for m in qs
     ]
 
+
 def search_court_sms(q: str, limit: int) -> list[SearchResultItem]:
     from apps.automation.models import CourtSMS
 
@@ -77,6 +83,7 @@ def search_court_sms(q: str, limit: int) -> list[SearchResultItem]:
         case_name = sms.case.name if sms.case else ""
         results.append(SearchResultItem(id=sms.id, title=preview, subtitle=case_name))
     return results
+
 
 def search_contacts(q: str, limit: int) -> list[SearchResultItem]:
     from apps.contacts.models import CaseContact

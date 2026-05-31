@@ -9,13 +9,16 @@ from pydantic import model_validator
 
 from .base import CaseLog, CaseLogAttachment, ModelSchema, ReminderOut, Schema, SchemaMixin
 
+
 class LawyerLike(Protocol):
     id: int
     username: str
     real_name: str | None
     phone: str | None
 
+
 ReminderPayload = dict[str, object]
+
 
 def _validate_reminder_type(value: str | None) -> str | None:
     if value is None:
@@ -28,6 +31,7 @@ def _validate_reminder_type(value: str | None) -> str | None:
     if normalized not in ReminderType.values:
         raise ValueError("无效的提醒类型")
     return normalized
+
 
 class _CaseLogReminderMixin(Schema):
     reminder_type: str | None = None
@@ -46,13 +50,16 @@ class _CaseLogReminderMixin(Schema):
         self.reminder_type = _validate_reminder_type(self.reminder_type)
         return self
 
+
 class CaseLogIn(_CaseLogReminderMixin):
     case_id: int
     content: str
 
+
 class CaseLogUpdate(_CaseLogReminderMixin):
     case_id: int | None = None
     content: str | None = None
+
 
 class CaseLogAttachmentOut(ModelSchema, SchemaMixin):
     file_path: str | None
@@ -74,6 +81,7 @@ class CaseLogAttachmentOut(ModelSchema, SchemaMixin):
     def resolve_uploaded_at(obj: CaseLogAttachment) -> datetime | None:
         return SchemaMixin._resolve_datetime(getattr(obj, "uploaded_at", None))
 
+
 class CaseLogActorOut(Schema):
     id: int
     username: str
@@ -88,6 +96,7 @@ class CaseLogActorOut(Schema):
             real_name=getattr(lawyer, "real_name", None) or None,
             phone=getattr(lawyer, "phone", None) or None,
         )
+
 
 class CaseLogOut(ModelSchema, SchemaMixin):
     attachments: list[CaseLogAttachmentOut]
@@ -159,11 +168,14 @@ class CaseLogOut(ModelSchema, SchemaMixin):
     def resolve_updated_at(obj: CaseLog) -> datetime | None:
         return SchemaMixin._resolve_datetime(getattr(obj, "updated_at", None))
 
+
 class CaseLogAttachmentIn(Schema):
     log_id: int
 
+
 class CaseLogAttachmentUpdate(Schema):
     log_id: int | None = None
+
 
 class CaseLogVersionOut(Schema):
     id: int
@@ -171,11 +183,14 @@ class CaseLogVersionOut(Schema):
     version_at: str
     actor_id: int
 
+
 class CaseLogAttachmentCreate(Schema):
     pass
 
+
 class CaseLogCreate(_CaseLogReminderMixin):
     content: str
+
 
 __all__: list[str] = [
     "CaseLogActorOut",

@@ -6,6 +6,7 @@ from typing import Any
 
 logger = logging.getLogger(__name__)
 
+
 class DocumentLoggingMixin:
     """文档、AI、音频相关日志方法"""
 

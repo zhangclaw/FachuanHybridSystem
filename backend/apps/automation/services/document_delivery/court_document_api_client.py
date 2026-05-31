@@ -27,6 +27,7 @@ logger = logging.getLogger("apps.automation")
 
 # ==================== 异常类 ====================
 
+
 class CourtApiError(ExternalServiceError):
     """法院 API 调用错误"""
 
@@ -35,11 +36,13 @@ class CourtApiError(ExternalServiceError):
     ):
         super().__init__(message=message, code=code or "COURT_API_ERROR", errors=errors or {})
 
+
 class TokenExpiredError(TokenError):
     """Token 过期错误"""
 
     def __init__(self, message: str = "Token 已过期", code: str | None = None, errors: dict[str, Any] | None = None):
         super().__init__(message=message, code=code or "TOKEN_EXPIRED", errors=errors or {})
+
 
 class ApiResponseError(CourtApiError):
     """API 响应错误"""
@@ -54,7 +57,9 @@ class ApiResponseError(CourtApiError):
         super().__init__(message=message, code=code or "API_RESPONSE_ERROR", errors=errors or {})
         self.response_code = response_code
 
+
 # ==================== 数据类 ====================
+
 
 @dataclass
 class DocumentRecord:
@@ -115,6 +120,7 @@ class DocumentRecord:
             zhxgsj=data.get("zhxgsj", ""),
         )
 
+
 @dataclass
 class DocumentDetail:
     """
@@ -148,6 +154,7 @@ class DocumentDetail:
             dt_cjsj=data.get("dt_cjsj", ""),
         )
 
+
 @dataclass
 class DocumentListResponse:
     """
@@ -159,7 +166,9 @@ class DocumentListResponse:
     total: int  # data.total - 总数量，用于分页计算
     documents: list[DocumentRecord]  # data.data - 文书记录列表
 
+
 # ==================== API 客户端 ====================
+
 
 class CourtDocumentApiClient:
     """

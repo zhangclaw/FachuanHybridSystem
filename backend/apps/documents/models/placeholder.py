@@ -10,10 +10,10 @@ import logging
 from typing import ClassVar
 
 from django.db import models
-
 from django_lifecycle import AFTER_CREATE, AFTER_UPDATE, LifecycleModel, hook
 
 logger = logging.getLogger(__name__)
+
 
 class Placeholder(LifecycleModel):
     """

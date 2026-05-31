@@ -21,6 +21,7 @@ from .performance_monitor import performance_monitor
 
 logger = logging.getLogger(__name__)
 
+
 class TokenCacheManager:
     """
     Token缓存管理器
@@ -452,6 +453,7 @@ class TokenCacheManager:
     def _get_account_stats_cache_key(self, account: str, site_name: str) -> str:
         """生成账号统计缓存键"""
         return f"{self.cache_prefix}:account_stats:{account}:{site_name}"
+
 
 # 全局缓存管理器实例
 cache_manager = TokenCacheManager()

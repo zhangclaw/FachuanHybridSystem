@@ -9,6 +9,7 @@ from django.db import models
 
 from .contract import Contract
 
+
 class ContractFolderScanStatus(models.TextChoices):
     PENDING = "pending", "待执行"
     RUNNING = "running", "扫描中"
@@ -17,6 +18,7 @@ class ContractFolderScanStatus(models.TextChoices):
     FAILED = "failed", "失败"
     IMPORTED = "imported", "已导入"
     CANCELLED = "cancelled", "已取消"
+
 
 class ContractFolderScanSession(models.Model):
     """合同自动捕获扫描会话。"""

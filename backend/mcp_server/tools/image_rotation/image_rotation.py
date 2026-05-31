@@ -6,6 +6,7 @@ from typing import Any
 
 from mcp_server.client import client
 
+
 def extract_pdf_pages(
     filename: str,
     data_base64: str,

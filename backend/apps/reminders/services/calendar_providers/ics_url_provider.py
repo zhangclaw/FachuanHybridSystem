@@ -19,6 +19,7 @@ MAX_ICS_SIZE = 5 * 1024 * 1024
 #: Download timeout in seconds
 DOWNLOAD_TIMEOUT = 10
 
+
 class IcsUrlProvider:
     """Download .ics content from a URL and parse events."""
 

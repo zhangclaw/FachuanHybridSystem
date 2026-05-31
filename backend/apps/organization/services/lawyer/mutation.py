@@ -3,7 +3,6 @@ from __future__ import annotations
 import logging
 
 from django.db import transaction
-
 from ninja.files import UploadedFile
 
 from apps.core.exceptions import ConflictError, PermissionDenied, ValidationException
@@ -15,6 +14,7 @@ from apps.organization.services.access.organization_access_policy import Organiz
 from .upload import LawyerUploadService
 
 logger = logging.getLogger("apps.organization")
+
 
 class LawyerMutationService:
     def __init__(
@@ -46,7 +46,7 @@ class LawyerMutationService:
             law_firm = LawFirm.objects.filter(id=data.law_firm_id).first()
             if law_firm is None:
                 raise ValidationException(
-                    message="律所不存在", code="LAWFIRM_NOT_FOUND", errors={"law_firm_id": str("无效的律所 ID")}
+                    message="律所不存在", code="LAWFIRM_NOT_FOUND", errors={"law_firm_id": "无效的律所 ID"}
                 )
 
         lawyer = Lawyer(
@@ -139,7 +139,7 @@ class LawyerMutationService:
             law_firm = LawFirm.objects.filter(id=data.law_firm_id).first()
             if law_firm is None:
                 raise ValidationException(
-                    message="律所不存在", code="LAWFIRM_NOT_FOUND", errors={"law_firm_id": str("无效的律所 ID")}
+                    message="律所不存在", code="LAWFIRM_NOT_FOUND", errors={"law_firm_id": "无效的律所 ID"}
                 )
             lawyer.law_firm = law_firm
             updated.append("law_firm_id")
@@ -181,18 +181,18 @@ class LawyerMutationService:
     def _validate_create_data(self, data: LawyerCreateDTO) -> None:
         if Lawyer.objects.filter(username=data.username).exists():
             raise ValidationException(
-                message="用户名已存在", code="DUPLICATE_USERNAME", errors={"username": str("该用户名已被使用")}
+                message="用户名已存在", code="DUPLICATE_USERNAME", errors={"username": "该用户名已被使用"}
             )
 
         if data.phone and Lawyer.objects.filter(phone=data.phone).exists():
             raise ValidationException(
-                message="手机号已存在", code="DUPLICATE_PHONE", errors={"phone": str("该手机号已被使用")}
+                message="手机号已存在", code="DUPLICATE_PHONE", errors={"phone": "该手机号已被使用"}
             )
 
     def _validate_update_data(self, lawyer: Lawyer, data: LawyerUpdateDTO) -> None:
         if data.phone and data.phone != lawyer.phone and Lawyer.objects.filter(phone=data.phone).exists():
             raise ValidationException(
-                message="手机号已存在", code="DUPLICATE_PHONE", errors={"phone": str("该手机号已被使用")}
+                message="手机号已存在", code="DUPLICATE_PHONE", errors={"phone": "该手机号已被使用"}
             )
 
     def _set_lawyer_teams(self, lawyer: Lawyer, team_ids: list[int], law_firm: LawFirm | None) -> None:
@@ -202,14 +202,14 @@ class LawyerMutationService:
             raise ValidationException(
                 message="律师必须至少关联一个律师团队",
                 code="NO_LAWYER_TEAMS",
-                errors={"lawyer_team_ids": str("至少需要一个律师团队")},
+                errors={"lawyer_team_ids": "至少需要一个律师团队"},
             )
 
         if law_firm and any(t.law_firm_id != law_firm.pk for t in teams):
             raise ValidationException(
                 message="团队所属律所必须与律师所属律所一致",
                 code="TEAM_LAWFIRM_MISMATCH",
-                errors={"lawyer_team_ids": str("团队律所不匹配")},
+                errors={"lawyer_team_ids": "团队律所不匹配"},
             )
 
         old_team_ids = set(lawyer.lawyer_teams.values_list("id", flat=True))
@@ -229,7 +229,7 @@ class LawyerMutationService:
             raise ValidationException(
                 message="团队所属律所必须与律师所属律所一致",
                 code="TEAM_LAWFIRM_MISMATCH",
-                errors={"biz_team_ids": str("团队律所不匹配")},
+                errors={"biz_team_ids": "团队律所不匹配"},
             )
 
         lawyer.biz_teams.set(teams)

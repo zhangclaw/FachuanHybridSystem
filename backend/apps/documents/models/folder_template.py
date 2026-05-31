@@ -10,7 +10,6 @@ import logging
 from typing import TYPE_CHECKING, Any, ClassVar
 
 from django.db import models
-
 from django_lifecycle import AFTER_CREATE, AFTER_UPDATE, LifecycleModel, hook
 
 from .choices import DocumentCaseStage, DocumentCaseType, DocumentContractType, FolderTemplateType, LegalStatusMatchMode
@@ -21,6 +20,7 @@ if TYPE_CHECKING:
     from .document_template import DocumentTemplateFolderBinding
 
 logger = logging.getLogger(__name__)
+
 
 class FolderTemplate(LifecycleModel):
     """
@@ -62,9 +62,7 @@ class FolderTemplate(LifecycleModel):
         default=LegalStatusMatchMode.ANY,
         verbose_name="诉讼地位匹配模式",
     )
-    structure: Any = models.JSONField(
-        default=dict, verbose_name="文件夹结构", help_text="JSON 格式的文件夹层级结构"
-    )
+    structure: Any = models.JSONField(default=dict, verbose_name="文件夹结构", help_text="JSON 格式的文件夹层级结构")
     is_default = models.BooleanField(default=False, verbose_name="是否默认模板")
     is_active = models.BooleanField(default=True, verbose_name="是否启用")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")

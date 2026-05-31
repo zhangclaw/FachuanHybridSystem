@@ -17,6 +17,7 @@ if TYPE_CHECKING:
     from ..query import ContractQueryService
     from .service import ContractMutationService
 
+
 class ContractMutationFacade:
     def __init__(
         self,

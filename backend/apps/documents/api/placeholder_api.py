@@ -20,9 +20,11 @@ from apps.documents.services.placeholders.placeholder_service import Placeholder
 logger = logging.getLogger("apps.documents.api")
 router = Router(auth=JWTOrSessionAuth())
 
+
 def _get_placeholder_service() -> PlaceholderService:
     """工厂函数:创建 PlaceholderService 实例"""
     return PlaceholderService()
+
 
 def _safe_value(value: Any) -> Any:
     if value is None:
@@ -37,6 +39,7 @@ def _safe_value(value: Any) -> Any:
         return [_safe_value(v) for v in value]
     return str(value)
 
+
 @router.get("/placeholders", response=list[PlaceholderOut])
 def list_placeholders(request: Any, is_active: bool | None = None) -> Any:
     """
@@ -48,17 +51,20 @@ def list_placeholders(request: Any, is_active: bool | None = None) -> Any:
     service = _get_placeholder_service()
     return service.list_placeholders(is_active=is_active)
 
+
 @router.get("/placeholders/{placeholder_id}", response=PlaceholderOut)
 def get_placeholder(request: Any, placeholder_id: int) -> Any:
     """获取替换词详情"""
     service = _get_placeholder_service()
     return service.get_placeholder_by_id(placeholder_id)
 
+
 @router.get("/placeholders/by-key/{key}", response=PlaceholderOut)
 def get_placeholder_by_key(request: Any, key: str) -> Any:
     """根据键获取替换词"""
     service = _get_placeholder_service()
     return service.get_placeholder_by_key(key)
+
 
 @router.post("/placeholders", response=PlaceholderOut)
 def create_placeholder(request: Any, payload: PlaceholderIn) -> Any:
@@ -71,6 +77,7 @@ def create_placeholder(request: Any, payload: PlaceholderIn) -> Any:
         description=payload.description,
         is_active=payload.is_active,
     )
+
 
 @router.put("/placeholders/{placeholder_id}", response=PlaceholderOut)
 def update_placeholder(request: Any, placeholder_id: int, payload: PlaceholderUpdate) -> Any:
@@ -85,12 +92,14 @@ def update_placeholder(request: Any, placeholder_id: int, payload: PlaceholderUp
         is_active=payload.is_active,
     )
 
+
 @router.delete("/placeholders/{placeholder_id}", response=dict[str, Any])
 def delete_placeholder(request: Any, placeholder_id: int) -> Any:
     """删除替换词(软删除)"""
     service = _get_placeholder_service()
     service.delete_placeholder(placeholder_id)
     return {"success": True, "message": "替换词已删除"}
+
 
 @router.get("/placeholders/preview/{contract_id}", response=PlaceholderPreviewOut)
 def preview_placeholders(request: Any, contract_id: int) -> Any:

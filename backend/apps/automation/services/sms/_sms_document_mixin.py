@@ -15,6 +15,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("apps.automation")
 
+
 class SMSDocumentMixin:
     """负责文书信息提取和重命名流程"""
 

@@ -11,6 +11,7 @@ from apps.litigation_ai.placeholders.spec import LitigationPlaceholderKeys
 
 logger = logging.getLogger(__name__)
 
+
 @PlaceholderRegistry.register
 class EnforcementExitRestrictionRequestService(BasePlaceholderService):
     """生成强制执行申请书中的“限制出境申请事项”占位符."""

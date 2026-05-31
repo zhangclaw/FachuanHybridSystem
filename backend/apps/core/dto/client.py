@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from apps.client.models import Client, ClientIdentityDoc
 
+
 @dataclass
 class ClientDTO:
     id: int
@@ -30,6 +31,7 @@ class ClientDTO:
             is_our_client=client.is_our_client,
         )
 
+
 @dataclass
 class PropertyClueDTO:
     id: int
@@ -37,6 +39,7 @@ class PropertyClueDTO:
     clue_type: str
     content: str
     description: str | None = None
+
 
 @dataclass
 class ClientIdentityDocDTO:

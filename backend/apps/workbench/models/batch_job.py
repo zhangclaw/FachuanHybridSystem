@@ -15,12 +15,14 @@ from django.dispatch import receiver
 
 from apps.core.filesystem.upload_paths import DatedUUIDPath
 
+
 class BatchJobStatus(models.TextChoices):
     PENDING = "pending", "待处理"
     RUNNING = "running", "运行中"
     COMPLETED = "completed", "已完成"
     FAILED = "failed", "失败"
     CANCELLED = "cancelled", "已取消"
+
 
 class BatchJob(models.Model):
     """通用批量任务"""
@@ -78,6 +80,7 @@ class BatchJob(models.Model):
     def __str__(self) -> str:
         return f"BatchJob {self.id} ({self.get_status_display()})"
 
+
 class BatchJobItem(models.Model):
     """批量任务的单个子项"""
 
@@ -111,11 +114,13 @@ class BatchJobItem(models.Model):
     def __str__(self) -> str:
         return f"{self.file_name} ({self.get_status_display()})"
 
+
 @receiver(post_delete, sender=BatchJobItem)
 def delete_item_file(sender: type, instance: BatchJobItem, **kwargs: object) -> None:
     """删除子项时清理上传的文件"""
     if instance.file:
         instance.file.delete(save=False)
+
 
 @receiver(post_delete, sender=BatchJob)
 def delete_job_summary_file(sender: type, instance: BatchJob, **kwargs: object) -> None:

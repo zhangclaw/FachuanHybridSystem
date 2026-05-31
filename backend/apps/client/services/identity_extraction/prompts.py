@@ -200,6 +200,7 @@ PROMPT_MAPPING: dict[str, str] = {
     ClientIdentityDoc.LEGAL_REP_ID_CARD: LEGAL_REP_ID_CARD_PROMPT,
 }
 
+
 def get_prompt_for_doc_type(doc_type: str, raw_text: str = "") -> str:
     """
     根据证件类型获取对应的提示词模板

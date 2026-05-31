@@ -22,6 +22,7 @@ if TYPE_CHECKING:
     from apps.contracts.services.payment.contract_payment_service import ContractPaymentService
     from apps.contracts.services.supplementary.supplementary_agreement_service import SupplementaryAgreementService
 
+
 class ContractFinanceMutationService(DjangoPermsMixin):
     def __init__(
         self,

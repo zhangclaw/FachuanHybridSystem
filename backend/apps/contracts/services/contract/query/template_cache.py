@@ -9,14 +9,17 @@ from django.core.cache import cache
 
 from apps.core.infrastructure import CacheKeys
 
+
 def _get_cache_version(version_key: str) -> int:
     return int(cache.get(version_key) or 1)
+
 
 logger = logging.getLogger("apps.contracts")
 
 # 缓存配置
 TEMPLATE_CACHE_TIMEOUT = 3600  # 1小时
 TEMPLATE_CACHE_PREFIX = "contract_template"
+
 
 class ContractTemplateCache:
     """

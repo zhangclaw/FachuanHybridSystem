@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from cryptography.fernet import Fernet, InvalidToken
 from django.conf import settings
 
+
 @dataclass(frozen=True)
 class SecretCodec:
     prefix: str = "enc:v1:"

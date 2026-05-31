@@ -24,6 +24,7 @@ WEIKE_FILTER = (
     | Q(url__icontains="wkinfo.com.cn")
 )
 
+
 class SolutionSectionInline(admin.TabularInline):
     model = SolutionSection
     extra = 0
@@ -46,6 +47,7 @@ class SolutionSectionInline(admin.TabularInline):
             '<a class="button" href="{}" style="font-size:12px;padding:3px 10px;">调整</a>',
             url,
         )
+
 
 @admin.register(SolutionTask)
 class SolutionTaskAdmin(admin.ModelAdmin):

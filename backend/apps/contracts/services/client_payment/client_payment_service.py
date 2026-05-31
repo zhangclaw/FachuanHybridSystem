@@ -17,6 +17,7 @@ from apps.core.exceptions import NotFoundError, ValidationException
 
 logger = logging.getLogger("apps.contracts")
 
+
 class ClientPaymentRecordService:
     """
     客户回款记录服务

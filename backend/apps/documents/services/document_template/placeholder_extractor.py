@@ -7,6 +7,7 @@ logger = logging.getLogger(__name__)
 
 PLACEHOLDER_PATTERN = re.compile(r"\{\{\s*([\w\u4e00-\u9fff][\w\u4e00-\u9fff\.\(\)]*)\s*\}\}")
 
+
 def extract_placeholders(file_path: str) -> list[str]:
     placeholders: set[str] = set()
 

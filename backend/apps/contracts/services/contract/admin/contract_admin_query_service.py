@@ -10,6 +10,7 @@ from apps.core.models.enums import CaseType
 
 from ..wiring import get_case_service
 
+
 class ContractAdminQueryService:
     CASE_ALLOWED_TYPES: ClassVar = {
         CaseType.CIVIL,

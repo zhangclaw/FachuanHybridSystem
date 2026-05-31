@@ -2,9 +2,11 @@ from __future__ import annotations
 
 from django.db import models
 
+
 class ContentTaskMode(models.TextChoices):
     SEARCH = "search", "检索模式"
     DIRECT = "direct", "直投模式"
+
 
 class ContentTaskStatus(models.TextChoices):
     PENDING = "pending", "待处理"
@@ -14,10 +16,12 @@ class ContentTaskStatus(models.TextChoices):
     FAILED = "failed", "失败"
     CANCELLED = "cancelled", "已取消"
 
+
 class ContentTaskOutputMode(models.TextChoices):
     NARRATION = "narration", "单人叙事"
     DISCUSSION = "discussion", "多人讨论"
     BOTH = "both", "两者都要"
+
 
 class ContentTask(models.Model):
     created_by = models.ForeignKey(

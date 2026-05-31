@@ -12,6 +12,7 @@ from apps.documents.services.placeholders.litigation.enforcement_judgment_servic
 )
 from apps.litigation_ai.placeholders.spec import LitigationPlaceholderKeys
 
+
 @dataclass
 class _CaseStub:
     id: int

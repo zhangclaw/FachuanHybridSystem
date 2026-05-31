@@ -69,6 +69,7 @@ except ImportError as exc:
                 errors={"detail": str(self._import_error)},
             )
 
+
 _openai_compatible_import_error: Exception | None = None
 try:
     from .openai_compatible import OpenAICompatibleBackend
@@ -97,6 +98,7 @@ except ImportError as exc:
                 message="OpenAI-compatible 后端依赖未安装或导入失败",
                 errors={"detail": str(self._import_error)},
             )
+
 
 __all__ = [
     # 基础类

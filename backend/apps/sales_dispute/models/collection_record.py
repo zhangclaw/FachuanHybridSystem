@@ -10,6 +10,7 @@ if TYPE_CHECKING:
 
     from django.db.models.fields.related_descriptors import RelatedManager
 
+
 class CollectionStage(models.TextChoices):
     PHONE_COLLECTION = "phone_collection", "电话催款"
     WRITTEN_COLLECTION = "written_collection", "书面催款"
@@ -17,8 +18,10 @@ class CollectionStage(models.TextChoices):
     ULTIMATUM = "ultimatum", "最后通牒"
     LITIGATION = "litigation", "起诉"
 
+
 # 阶段顺序列表，用于状态机校验
 STAGE_ORDER: list[str] = [s.value for s in CollectionStage]
+
 
 class CollectionRecord(models.Model):
     id: int
@@ -87,6 +90,7 @@ class CollectionRecord(models.Model):
         if self.next_due_date is None:
             return False
         return self.next_due_date < date.today()
+
 
 class CollectionLog(models.Model):
     id: int

@@ -16,6 +16,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("apps.automation")
 
+
 class CourtZxfwFilingService(FilingStepsMixin, PartyInfoHandlerMixin, ProgressReporterMixin):
     """
     全国法院"一张网"在线立案服务
@@ -96,9 +97,9 @@ class CourtZxfwFilingService(FilingStepsMixin, PartyInfoHandlerMixin, ProgressRe
                 message="HTTP主链路：开始民事一审立案",
             )
             if not token:
-                api_error = ValueError(str("HTTP立案缺少登录令牌"))
+                api_error = ValueError("HTTP立案缺少登录令牌")
                 if not self._allow_playwright_fallback(case_data):
-                    raise ValueError(str("接口立案失败: %(error)s") % {"error": api_error}) from api_error
+                    raise ValueError("接口立案失败: %(error)s" % {"error": api_error}) from api_error
                 self._report_progress(
                     case_data,
                     phase="http",
@@ -143,7 +144,7 @@ class CourtZxfwFilingService(FilingStepsMixin, PartyInfoHandlerMixin, ProgressRe
                     )
                     if not self._allow_playwright_fallback(case_data):
                         logger.error("HTTP立案失败: %s", api_err, exc_info=True)
-                        raise ValueError(str("接口立案失败: %(error)s") % {"error": api_err}) from api_err
+                        raise ValueError("接口立案失败: %(error)s" % {"error": api_err}) from api_err
                     logger.warning("HTTP立案失败，回退 Playwright: %s", api_err, exc_info=True)
 
         self._report_progress(
@@ -157,7 +158,7 @@ class CourtZxfwFilingService(FilingStepsMixin, PartyInfoHandlerMixin, ProgressRe
         cause_of_action: str = case_data["cause_of_action"]
 
         logger.info("=" * 60)
-        logger.info(str("开始民事一审立案: 法院=%s, 案由=%s"), court_name, cause_of_action)
+        logger.info("开始民事一审立案: 法院=%s, 案由=%s", court_name, cause_of_action)
         logger.info("=" * 60)
 
         try:
@@ -209,8 +210,8 @@ class CourtZxfwFilingService(FilingStepsMixin, PartyInfoHandlerMixin, ProgressRe
                 message="Playwright回退流程完成（已到预览页）",
             )
 
-            logger.info(str("民事一审立案流程执行完成"))
-            return {"success": True, "message": str("立案流程执行完成（已到预览页，未提交）"), "url": self.page.url}
+            logger.info("民事一审立案流程执行完成")
+            return {"success": True, "message": "立案流程执行完成（已到预览页，未提交）", "url": self.page.url}
 
         except Exception as e:
             self._report_progress(
@@ -226,7 +227,7 @@ class CourtZxfwFilingService(FilingStepsMixin, PartyInfoHandlerMixin, ProgressRe
             merged_error = str(e)
             if api_error is not None:
                 merged_error = f"HTTP主链路失败({api_error})，且Playwright回退失败({e})"
-            raise ValueError(str("立案失败: %(error)s") % {"error": merged_error}) from e
+            raise ValueError("立案失败: %(error)s" % {"error": merged_error}) from e
 
     def file_execution(self, case_data: dict[str, Any], token: str | None = None) -> dict[str, Any]:
         """执行申请执行在线立案全流程。"""
@@ -235,9 +236,9 @@ class CourtZxfwFilingService(FilingStepsMixin, PartyInfoHandlerMixin, ProgressRe
         if filing_engine == "api":
             self._report_progress(case_data, phase="http", stage="http.start", message="HTTP主链路：开始申请执行立案")
             if not token:
-                api_error = ValueError(str("HTTP立案缺少登录令牌"))
+                api_error = ValueError("HTTP立案缺少登录令牌")
                 if not self._allow_playwright_fallback(case_data):
-                    raise ValueError(str("接口立案失败: %(error)s") % {"error": api_error}) from api_error
+                    raise ValueError("接口立案失败: %(error)s" % {"error": api_error}) from api_error
                 self._report_progress(
                     case_data, phase="http", stage="http.failed", level="error", message=f"HTTP主链路失败: {api_error}"
                 )
@@ -270,7 +271,7 @@ class CourtZxfwFilingService(FilingStepsMixin, PartyInfoHandlerMixin, ProgressRe
                     )
                     if not self._allow_playwright_fallback(case_data):
                         logger.error("HTTP立案失败: %s", api_err, exc_info=True)
-                        raise ValueError(str("接口立案失败: %(error)s") % {"error": api_err}) from api_err
+                        raise ValueError("接口立案失败: %(error)s" % {"error": api_err}) from api_err
                     logger.warning("HTTP立案失败，回退 Playwright: %s", api_err, exc_info=True)
 
         self._report_progress(
@@ -280,7 +281,7 @@ class CourtZxfwFilingService(FilingStepsMixin, PartyInfoHandlerMixin, ProgressRe
         court_name: str = case_data["court_name"]
 
         logger.info("=" * 60)
-        logger.info(str("开始申请执行立案: 法院=%s"), court_name)
+        logger.info("开始申请执行立案: 法院=%s", court_name)
         logger.info("=" * 60)
 
         try:
@@ -342,10 +343,10 @@ class CourtZxfwFilingService(FilingStepsMixin, PartyInfoHandlerMixin, ProgressRe
                 message="Playwright回退流程完成（已到预览页）",
             )
 
-            logger.info(str("申请执行立案流程执行完成"))
+            logger.info("申请执行立案流程执行完成")
             return {
                 "success": True,
-                "message": str("申请执行流程执行完成（已到预览页，未提交）"),
+                "message": "申请执行流程执行完成（已到预览页，未提交）",
                 "url": self.page.url,
             }
 
@@ -363,4 +364,4 @@ class CourtZxfwFilingService(FilingStepsMixin, PartyInfoHandlerMixin, ProgressRe
             merged_error = str(e)
             if api_error is not None:
                 merged_error = f"HTTP主链路失败({api_error})，且Playwright回退失败({e})"
-            raise ValueError(str("申请执行立案失败: %(error)s") % {"error": merged_error}) from e
+            raise ValueError("申请执行立案失败: %(error)s" % {"error": merged_error}) from e

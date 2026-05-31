@@ -20,6 +20,7 @@ from .session_shared import MessageDTO
 
 logger = logging.getLogger("apps.litigation_ai")
 
+
 class SessionMessageService:
     """会话消息服务 - 管理消息的增删查和对话摘要"""
 

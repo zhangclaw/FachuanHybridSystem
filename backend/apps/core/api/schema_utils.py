@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any, cast
 
+
 def schema_to_update_dict(schema: Any) -> dict[str, Any]:
     if schema is None:
         return {}

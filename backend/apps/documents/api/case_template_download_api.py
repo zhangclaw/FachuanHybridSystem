@@ -6,7 +6,6 @@ import logging
 from typing import Any
 
 from django.utils import timezone
-
 from ninja import Router
 
 from apps.core.exceptions import NotFoundError, ValidationException
@@ -17,6 +16,7 @@ from .download_response_factory import build_download_response
 
 logger = logging.getLogger("apps.documents.api")
 router = Router(auth=JWTOrSessionAuth())
+
 
 @router.post("/cases/{case_id}/templates/{template_id}/download")
 @rate_limit_from_settings("EXPORT", by_user=True)
@@ -32,9 +32,7 @@ def download_case_template(request: Any, case_id: int, template_id: int) -> Any:
 
     template = get_active_template_or_none(template_id)
     if not template:
-        raise NotFoundError(
-            message="模板不存在", code="TEMPLATE_NOT_FOUND", errors={"template_id": str(template_id)}
-        )
+        raise NotFoundError(message="模板不存在", code="TEMPLATE_NOT_FOUND", errors={"template_id": str(template_id)})
 
     file_path = template.get_file_location()
     if not file_path:

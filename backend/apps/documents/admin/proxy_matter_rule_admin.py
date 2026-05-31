@@ -16,8 +16,10 @@ from apps.documents.services.proxy_matter_rule_init_service import ProxyMatterRu
 
 logger = logging.getLogger(__name__)
 
+
 def _get_proxy_matter_rule_init_service() -> ProxyMatterRuleInitService:
     return ProxyMatterRuleInitService()
+
 
 class ProxyMatterRuleAdminForm(forms.ModelForm[ProxyMatterRule]):
     case_types_field = forms.MultipleChoiceField(
@@ -56,6 +58,7 @@ class ProxyMatterRuleAdminForm(forms.ModelForm[ProxyMatterRule]):
         if commit:
             instance.save()
         return instance
+
 
 @admin.register(ProxyMatterRule)
 class ProxyMatterRuleAdmin(admin.ModelAdmin):

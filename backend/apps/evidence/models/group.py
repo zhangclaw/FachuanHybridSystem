@@ -6,6 +6,7 @@ from typing import ClassVar
 
 from django.db import models
 
+
 class EvidenceGroup(models.Model):
     """证据分组，对应案件的争议焦点"""
 

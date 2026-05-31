@@ -8,6 +8,7 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
+
 def compute_file_hash(file_path: Path) -> str:
     """计算文件 SHA-256 哈希值。失败返回空字符串。"""
     try:

@@ -25,6 +25,7 @@ if TYPE_CHECKING:
 case_log_storage = KeepOriginalNameStorage()
 logger = logging.getLogger(__name__)
 
+
 def validate_log_attachment(file: UploadedFile) -> None:
     """验证日志附件"""
     name = str(getattr(file, "name", ""))
@@ -38,6 +39,7 @@ def validate_log_attachment(file: UploadedFile) -> None:
         from django.core.exceptions import ValidationError
 
         raise ValidationError("文件大小超过50MB限制")
+
 
 class CaseLog(models.Model):
     id: int
@@ -146,6 +148,7 @@ class CaseLog(models.Model):
         due_at = reminder.get("due_at") if isinstance(reminder, dict) else getattr(reminder, "due_at", None)
         return due_at if isinstance(due_at, datetime) else None
 
+
 class CaseLogAttachment(models.Model):
     id: int
     log = models.ForeignKey(CaseLog, on_delete=models.CASCADE, related_name="attachments", verbose_name="日志")
@@ -175,6 +178,7 @@ class CaseLogAttachment(models.Model):
             if name:
                 self.original_filename = Path(name).name
         super().save(*args, **kwargs)
+
 
 class CaseLogVersion(models.Model):
     id: int

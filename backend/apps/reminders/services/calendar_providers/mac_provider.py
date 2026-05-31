@@ -22,6 +22,7 @@ logger = logging.getLogger(__name__)
 
 _OSASCRIPT = shutil.which("osascript") or "/usr/bin/osascript"
 
+
 class MacCalendarProvider:
     """Read events from macOS Calendar.app using AppleScript."""
 

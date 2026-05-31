@@ -8,6 +8,7 @@ from django.db import models
 
 from apps.core.filesystem.upload_paths import DatedUUIDPath
 
+
 class DocConverterJobStatus(models.TextChoices):
     PENDING = "pending", "待处理"
     CONVERTING = "converting", "转换中"
@@ -15,6 +16,7 @@ class DocConverterJobStatus(models.TextChoices):
     COMPLETED = "completed", "已完成"
     FAILED = "failed", "失败"
     CANCELLED = "cancelled", "已取消"
+
 
 class DocConverterTool(models.Model):
     """虚拟模型，仅用于 Admin 侧边栏入口"""
@@ -25,6 +27,7 @@ class DocConverterTool(models.Model):
         managed = False
         verbose_name = "DOC 转 DOCX"
         verbose_name_plural = "DOC 转 DOCX"
+
 
 class DocConverterJob(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -66,6 +69,7 @@ class DocConverterJob(models.Model):
 
     def __str__(self) -> str:
         return f"DOC转换任务 {self.id} ({self.get_status_display()})"
+
 
 class DocConverterItem(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

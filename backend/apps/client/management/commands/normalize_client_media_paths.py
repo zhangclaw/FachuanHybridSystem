@@ -6,6 +6,7 @@ from typing import Any
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
+
 class Command(BaseCommand):
     help: str = "将 apps.client 内涉及文件的绝对路径统一归一化为 MEDIA_ROOT 相对路径"
 

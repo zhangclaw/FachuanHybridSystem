@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from django.apps import AppConfig
 
+
 class DocumentRecognitionConfig(AppConfig):
     """Document recognition app configuration."""
 

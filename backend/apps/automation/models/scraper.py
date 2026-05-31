@@ -6,7 +6,6 @@ import logging
 from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
-
 from django_lifecycle import AFTER_UPDATE, LifecycleModel, hook
 
 if TYPE_CHECKING:
@@ -17,6 +16,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("apps.automation")
 
+
 class ScraperTaskType(models.TextChoices):
     """爬虫任务类型"""
 
@@ -25,6 +25,7 @@ class ScraperTaskType(models.TextChoices):
     JUSTICE_BUREAU = "justice_bureau", "司法局操作"
     POLICE = "police", "公安局操作"
 
+
 class ScraperTaskStatus(models.TextChoices):
     """爬虫任务状态"""
 
@@ -32,6 +33,7 @@ class ScraperTaskStatus(models.TextChoices):
     RUNNING = "running", "执行中"
     SUCCESS = "success", "成功"
     FAILED = "failed", "失败"
+
 
 class ScraperTask(LifecycleModel):
     """网络爬虫任务"""
@@ -63,9 +65,7 @@ class ScraperTask(LifecycleModel):
     updated_at = models.DateTimeField(auto_now=True, verbose_name="更新时间")
     started_at = models.DateTimeField(null=True, blank=True, verbose_name="开始时间")
     finished_at = models.DateTimeField(null=True, blank=True, verbose_name="完成时间")
-    scheduled_at = models.DateTimeField(
-        null=True, blank=True, verbose_name="计划执行时间", help_text="留空则立即执行"
-    )
+    scheduled_at = models.DateTimeField(null=True, blank=True, verbose_name="计划执行时间", help_text="留空则立即执行")
 
     class Meta:
         app_label = "automation"

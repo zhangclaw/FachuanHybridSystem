@@ -6,15 +6,18 @@ from typing import ClassVar
 
 from django.db import models
 
+
 class SourceType(models.TextChoices):
     IMAP = "imap", "IMAP 邮箱"
     COURT_INBOX = "court_inbox", "一张网收件箱"
     COURT_SCHEDULE = "court_schedule", "一张网庭审日程"
 
+
 class SyncStatus(models.TextChoices):
     PENDING = "pending", "待同步"
     SUCCESS = "success", "同步成功"
     FAILED = "failed", "同步失败"
+
 
 class MessageSource(models.Model):
     """消息来源配置，关联 AccountCredential，描述如何拉取消息。"""

@@ -21,6 +21,7 @@ from .base_court_scraper import BaseCourtDocumentScraper
 
 logger = logging.getLogger("apps.automation")
 
+
 class GdemsCourtScraper(BaseCourtDocumentScraper):
     """
     广东电子送达 (sd.gdems.com) 文书下载爬虫

@@ -17,6 +17,7 @@ from .export_types import ExportLayout
 
 logger = logging.getLogger(__name__)
 
+
 class DocxExportService:
     """单一职责：生成 DOCX 导出文件。"""
 

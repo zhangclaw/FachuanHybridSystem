@@ -9,6 +9,7 @@ from django.db import models
 from apps.core.models.enums import CaseStage, LegalStatus, SimpleCaseType
 from apps.documents.models.choices import LegalStatusMatchMode
 
+
 class ProxyMatterRule(models.Model):
     id: int
 

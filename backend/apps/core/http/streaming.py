@@ -8,6 +8,7 @@ from collections.abc import Iterator
 
 from django.http import HttpRequest, HttpResponse, HttpResponseBase
 
+
 def build_range_file_response(
     request: HttpRequest,
     file_path: str,

@@ -8,6 +8,7 @@ from typing import ClassVar
 
 from django.db import models
 
+
 class CauseOfAction(models.Model):
     """案由数据模型
 

@@ -39,17 +39,20 @@ from apps.documents.storage import (
 
 logger = logging.getLogger(__name__)
 
+
 def _get_template_service() -> Any:
     """工厂函数获取模板服务"""
     from apps.documents.services.template.template_service import DocumentTemplateService
 
     return DocumentTemplateService()
 
+
 def _get_admin_service() -> Any:
     """工厂函数获取Admin服务"""
     from apps.documents.services.template.document_template.admin_service import DocumentTemplateAdminService
 
     return DocumentTemplateAdminService()
+
 
 def _to_django_relative_path(path: Path) -> str:
     """将绝对路径尽量转换为相对 Django 服务目录（backend）的路径。"""
@@ -59,6 +62,7 @@ def _to_django_relative_path(path: Path) -> str:
         return target.relative_to(backend_root).as_posix()
     except ValueError:
         return Path(str(target)).as_posix()
+
 
 def _normalize_private_docx_root(raw_value: str) -> str:
     """标准化私有模板根目录输入（支持绝对路径或相对 backend 路径）。"""
@@ -74,12 +78,14 @@ def _normalize_private_docx_root(raw_value: str) -> str:
         candidate = candidate.resolve()
 
     if not candidate.exists() or not candidate.is_dir():
-        raise ValueError(str("模板根目录不存在或不是文件夹"))
+        raise ValueError("模板根目录不存在或不是文件夹")
 
     return str(candidate)
 
+
 def _get_system_config_service() -> Any:
     return ServiceLocator.get_system_config_service()
+
 
 class DocumentTemplateFolderBindingInline(admin.TabularInline):
     """文书模板文件夹绑定内联"""
@@ -93,6 +99,7 @@ class DocumentTemplateFolderBindingInline(admin.TabularInline):
     class Media:
         css = {LegalStatusMatchMode.ALL: ("documents/css/folder_binding_inline.css",)}
         js = ("admin/js/jquery.init.js", "documents/js/folder_binding_inline.js")
+
 
 class DocumentTemplateForm(forms.ModelForm):
     """文书模板表单,包含模板类型和适用范围选择(与文件夹模板保持一致)"""
@@ -355,6 +362,7 @@ class DocumentTemplateForm(forms.ModelForm):
             instance.save()
         return instance
 
+
 @admin.register(DocumentTemplate)
 class DocumentTemplateAdmin(admin.ModelAdmin):
     """
@@ -580,7 +588,11 @@ class DocumentTemplateAdmin(admin.ModelAdmin):
             defined_keys = set(Placeholder.objects.filter(is_active=True).values_list("key", flat=True))
             result = [{"key": p, "defined": p in defined_keys} for p in placeholders]
 
-            source_label = "上传文件" if tmp_path else f"模板文件: {request.POST.get('existing_file') or request.POST.get('file_path')}"
+            source_label = (
+                "上传文件"
+                if tmp_path
+                else f"模板文件: {request.POST.get('existing_file') or request.POST.get('file_path')}"
+            )
             return JsonResponse({"placeholders": result, "source": source_label, "count": len(result)})
 
         except Exception as e:
@@ -620,9 +632,9 @@ class DocumentTemplateAdmin(admin.ModelAdmin):
             if result.error:
                 return JsonResponse({"error": result.error}, status=400)
 
-            return JsonResponse({
-                "placeholders": [{"key": p.key, "value": p.value, "source": p.source} for p in result.placeholders]
-            })
+            return JsonResponse(
+                {"placeholders": [{"key": p.key, "value": p.value, "source": p.source} for p in result.placeholders]}
+            )
 
         except Exception as e:
             logger.exception("智能填充预览失败")

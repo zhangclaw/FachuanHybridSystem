@@ -4,6 +4,7 @@ from typing import Any, ClassVar
 
 from django.db import models
 
+
 class OAConfig(models.Model):
     """OA系统配置"""
 

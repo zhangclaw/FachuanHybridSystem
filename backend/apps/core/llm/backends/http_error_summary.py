@@ -9,6 +9,7 @@ import httpx
 
 logger = logging.getLogger(__name__)
 
+
 def summarize_http_error_response(
     response: httpx.Response,
     *,
@@ -57,12 +58,14 @@ def summarize_http_error_response(
         summary["upstream_error_text"] = _truncate(text, max_text_len)
     return summary
 
+
 def _first_str(data: dict[str, Any], keys: list[str]) -> str | None:
     for k in keys:
         v = data.get(k)
         if isinstance(v, str) and v.strip():
             return v.strip()
     return None
+
 
 def _truncate(value: str, max_len: int) -> str:
     if len(value) <= max_len:

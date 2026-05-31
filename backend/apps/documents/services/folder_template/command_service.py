@@ -14,6 +14,7 @@ from .repo import FolderTemplateRepo
 from .structure_rules import FolderTemplateStructureRules
 from .validation_service import FolderTemplateValidationService
 
+
 @dataclass(frozen=True)
 class FolderTemplateCommandService:
     repo: FolderTemplateRepo

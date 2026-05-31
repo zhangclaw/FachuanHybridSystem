@@ -10,6 +10,7 @@ _project_root_str = str(_project_root)
 if _project_root_str not in sys.path:
     sys.path.insert(0, _project_root_str)
 
+
 def main() -> None:
     """Run administrative tasks."""
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apiSystem.settings")
@@ -22,6 +23,7 @@ def main() -> None:
             "forget to activate a virtual environment?"
         ) from exc
     execute_from_command_line(sys.argv)
+
 
 if __name__ == "__main__":
     main()

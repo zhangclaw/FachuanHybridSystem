@@ -12,6 +12,7 @@ from apps.core.models.enums import CaseType
 
 logger = logging.getLogger("apps.contracts")
 
+
 class FilingNumberService:
     """
     建档编号生成服务

@@ -9,6 +9,7 @@ from .base import BaseScraper
 
 logger = logging.getLogger("apps.automation")
 
+
 class CourtFilingScraper(BaseScraper):
     """
     法院自动立案爬虫

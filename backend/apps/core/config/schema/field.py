@@ -4,6 +4,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any
 
+
 @dataclass
 class ConfigField:
     """配置字段定义"""

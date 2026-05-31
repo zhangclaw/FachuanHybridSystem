@@ -19,6 +19,7 @@ from apps.organization.services.access.organization_access_policy import Organiz
 
 logger = logging.getLogger("apps.organization")
 
+
 class AccountCredentialService:
     SITE_URL_MAPPING: ClassVar[dict[str, str]] = {
         "court_zxfw": "zxfw.court.gov.cn",

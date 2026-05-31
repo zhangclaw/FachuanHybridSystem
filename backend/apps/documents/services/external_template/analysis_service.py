@@ -31,6 +31,7 @@ if TYPE_CHECKING:
 
 logger: logging.Logger = logging.getLogger(__name__)
 
+
 class AnalysisService:
     """外部模板分析服务：上传校验 + 结构提取 + LLM 字段映射"""
 

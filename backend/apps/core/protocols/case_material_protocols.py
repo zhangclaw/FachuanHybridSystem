@@ -2,6 +2,7 @@
 
 from typing import Any, Protocol
 
+
 class ICaseMaterialService(Protocol):
     def list_bind_candidates(
         self,

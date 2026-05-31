@@ -11,6 +11,7 @@ from django.contrib import admin
 
 from apps.contracts.models import ContractAssignment
 
+
 class ContractAssignmentAdmin(admin.ModelAdmin):
     """合同律师指派 Admin"""
 

@@ -25,6 +25,7 @@ logger = logging.getLogger(__name__)
 # LPR数据源URL（中国银行，结构稳定无反爬）
 LPR_DATA_URL = "https://www.boc.cn/fimarkets/lilv/fd32/201310/t20131031_2591219.html"
 
+
 @dataclass
 class LPRData:
     """LPR数据结构."""
@@ -32,6 +33,7 @@ class LPRData:
     effective_date: date
     rate_1y: Decimal
     rate_5y: Decimal
+
 
 class LPRSyncService:
     """LPR数据同步服务.

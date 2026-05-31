@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+
 def _gender_from_id_number(id_number: str) -> str:
     """从身份证号码推断性别。
 
@@ -16,6 +17,7 @@ def _gender_from_id_number(id_number: str) -> str:
         return "01" if int(id_number[16]) % 2 == 1 else "02"
     return "01"
 
+
 @dataclass
 class ClientInfo:
     """委托方信息。"""
@@ -26,6 +28,7 @@ class ClientInfo:
     address: str | None = None
     phone: str | None = None
     legal_representative: str | None = None
+
 
 @dataclass
 class ConflictPartyInfo:
@@ -39,6 +42,7 @@ class ConflictPartyInfo:
     id_number: str | None = None
     contact_name: str | None = None
     contact_phone: str | None = None
+
 
 @dataclass
 class CaseInfo:
@@ -67,6 +71,7 @@ class CaseInfo:
     contact_name: str = "/"  # 客户联系人姓名
     contact_phone: str = "/"  # 客户联系人电话
 
+
 @dataclass
 class ContractInfo:
     """委托合同信息。"""
@@ -80,6 +85,7 @@ class ContractInfo:
     amount: str = ""
     stamp_count: int = 3  # 预盖章份数，默认 3（1人+2）
 
+
 @dataclass
 class FilingFormState:
     """立案表单状态。"""
@@ -87,6 +93,7 @@ class FilingFormState:
     action_url: str
     payload: dict[str, str]
     html_text: str
+
 
 @dataclass
 class ResolvedCustomer:

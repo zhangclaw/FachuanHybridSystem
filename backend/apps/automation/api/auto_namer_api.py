@@ -14,10 +14,12 @@ from apps.core.infrastructure.throttling import rate_limit_from_settings
 
 router = Router(tags=["自动命名"])
 
+
 def _get_auto_namer_service() -> Any:
     from apps.core.dependencies import build_auto_namer_service
 
     return build_auto_namer_service()
+
 
 @router.post("/process", response=AutoToolProcessOut)
 @rate_limit_from_settings("UPLOAD")
@@ -41,6 +43,7 @@ def auto_namer_process(
     return AutoToolProcessOut(
         text=result.get("text"), ollama_response=result.get("ollama_response"), error=result.get("error")
     )
+
 
 @router.post("/process-by-path", response=AutoToolProcessOut)
 @rate_limit_from_settings("UPLOAD")
@@ -66,9 +69,7 @@ def auto_namer_process_by_path(request: Any, payload: AutoToolProcessIn) -> Auto
 
     text_value = (extraction.text or "").strip()
     if not text_value:
-        return AutoToolProcessOut(
-            text=None, ollama_response=None, error=str("文档中没有提取到文字内容，无法生成命名")
-        )
+        return AutoToolProcessOut(text=None, ollama_response=None, error="文档中没有提取到文字内容，无法生成命名")
 
     # 调用服务生成文件名
     filename_suggestion = service.generate_filename(

@@ -8,18 +8,18 @@ from django.db import models
 
 from .contract import Contract
 
+
 class LogLevel(models.TextChoices):
     INFO = "INFO", "信息"
     WARN = "WARN", "预警"
     ERROR = "ERROR", "错误"
 
+
 class ContractFinanceLog(models.Model):
     id: int
     contract_id: int
     actor_id: int
-    contract = models.ForeignKey(
-        Contract, on_delete=models.CASCADE, related_name="finance_logs", verbose_name="合同"
-    )
+    contract = models.ForeignKey(Contract, on_delete=models.CASCADE, related_name="finance_logs", verbose_name="合同")
     action = models.CharField(max_length=64, verbose_name="动作")
     level = models.CharField(max_length=16, choices=LogLevel.choices, default=LogLevel.INFO, verbose_name="级别")
     actor = models.ForeignKey(

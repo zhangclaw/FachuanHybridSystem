@@ -6,6 +6,7 @@ from django.db import models
 
 from .lawyer import Lawyer
 
+
 class AccountCredential(models.Model):
     """账号凭证模型，存储律师在外部系统的登录凭证。"""
 

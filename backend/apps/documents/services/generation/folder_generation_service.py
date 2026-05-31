@@ -25,6 +25,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class DocumentPlacement:
     """文书放置配置"""
@@ -32,6 +33,7 @@ class DocumentPlacement:
     document_template: DocumentTemplate
     folder_path: str  # 相对于根目录的路径
     file_name: str  # 生成的文件名
+
 
 class FolderGenerationService:
     """

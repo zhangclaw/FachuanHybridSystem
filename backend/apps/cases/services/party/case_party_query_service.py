@@ -13,6 +13,7 @@ from apps.core.exceptions import NotFoundError
 
 logger = logging.getLogger("apps.cases")
 
+
 class CasePartyQueryService:
     def base_queryset(self) -> QuerySet[CaseParty, CaseParty]:
         return CaseParty.objects.select_related("case", "client").order_by("-id")

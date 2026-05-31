@@ -10,10 +10,12 @@ from apps.core.exceptions import ValidationException
 from .repo import CasePartyRepository
 from .wiring import get_client_service
 
+
 @dataclass(frozen=True)
 class SelectedParties:
     client: Any | None
     clients: list[Any] | None
+
 
 class PartySelectionPolicy:
     def __init__(self, *, repo: CasePartyRepository | None = None, client_service: Any | None = None) -> None:
@@ -42,7 +44,7 @@ class PartySelectionPolicy:
                 raise ValidationException(
                     message="法定代表人身份证明书需要指定当事人",
                     code="INVALID_CLIENT",
-                    errors={"client_id": str("必须提供 client_id")},
+                    errors={"client_id": "必须提供 client_id"},
                 )
             client = self._get_our_legal_client(case=case, client_id=client_id)
             return SelectedParties(client=client, clients=None)

@@ -14,6 +14,7 @@ from apps.core.security import AccessContext, DjangoPermsMixin
 
 from .wiring import get_case_service
 
+
 class CaseAccessService(DjangoPermsMixin):
     """
     案件访问授权服务

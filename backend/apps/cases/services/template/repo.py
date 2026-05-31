@@ -5,6 +5,7 @@ from __future__ import annotations
 from apps.cases.models import BindingSource, Case, CaseTemplateBinding
 from apps.core.exceptions import NotFoundError
 
+
 class CaseTemplateBindingRepo:
     """
     案件模板绑定仓储

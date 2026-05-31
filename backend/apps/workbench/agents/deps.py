@@ -3,6 +3,7 @@
 from dataclasses import dataclass
 from typing import Any
 
+
 @dataclass
 class WorkbenchDeps:
     """Agent 运行时依赖，通过 RunContext 注入到工具和提示函数中"""

@@ -6,6 +6,7 @@ from typing import Any
 
 from mcp_server.client import client
 
+
 def create_preservation_quote(
     preserve_amount: float,
     corp_id: str,

@@ -19,6 +19,7 @@ from apps.cases.models import (
 )
 from apps.core.exceptions import NotFoundError, ValidationException
 
+
 class CaseMaterialBindingWorkflow:
     def __init__(self, case_service: Any | None = None) -> None:
         self._case_service = case_service

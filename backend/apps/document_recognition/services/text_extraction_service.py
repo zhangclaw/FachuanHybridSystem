@@ -21,6 +21,7 @@ SUPPORTED_PDF_EXTENSIONS = {".pdf"}
 SUPPORTED_IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png"}
 SUPPORTED_EXTENSIONS = SUPPORTED_PDF_EXTENSIONS | SUPPORTED_IMAGE_EXTENSIONS
 
+
 def _remove_all_spaces(text: str) -> str:
     """
     删除文本中的所有空格（包括空格、制表符、换行符等）
@@ -36,6 +37,7 @@ def _remove_all_spaces(text: str) -> str:
     # 删除所有空白字符：空格、制表符、换行符、回车符等
     return re.sub(r"\s+", "", text) if text else ""
 
+
 @dataclass
 class TextExtractionResult:
     """
@@ -50,6 +52,7 @@ class TextExtractionResult:
     text: str
     extraction_method: str
     success: bool
+
 
 class TextExtractionService:
     """
@@ -317,9 +320,11 @@ class TextExtractionService:
         """
         return tuple(SUPPORTED_EXTENSIONS)
 
+
 def get_supported_extensions() -> tuple[str, ...]:
     """模块级函数：获取支持的文件扩展名列表"""
     return tuple(SUPPORTED_EXTENSIONS)
+
 
 def is_supported_format(file_path: str) -> bool:
     """模块级函数：检查文件格式是否支持"""

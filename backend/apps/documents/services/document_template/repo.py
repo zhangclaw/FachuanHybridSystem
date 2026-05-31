@@ -6,6 +6,7 @@ from typing import Any
 
 from apps.documents.models import DocumentTemplate
 
+
 class DocumentTemplateRepo:
     def create(self, **kwargs: Any) -> DocumentTemplate:
         return DocumentTemplate.objects.create(**kwargs)

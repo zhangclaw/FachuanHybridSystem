@@ -157,6 +157,7 @@ JUDGE_SUMMARY_SYSTEM = (
     "要求客观公正，分析深入，800-1200字。"
 )
 
+
 @dataclass
 class Agent:
     """单个 Agent 角色."""

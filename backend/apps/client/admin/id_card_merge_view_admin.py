@@ -15,11 +15,13 @@ from django.utils.html import format_html
 
 logger = logging.getLogger("apps.client")
 
+
 def _get_id_card_merge_service() -> Any:
     """工厂函数:获取身份证合并服务"""
     from apps.client.services.id_card_merge import IdCardMergeService
 
     return IdCardMergeService()
+
 
 @staff_member_required
 def id_card_merge_view(request: HttpRequest) -> HttpResponse:
@@ -78,6 +80,7 @@ def id_card_merge_view(request: HttpRequest) -> HttpResponse:
 
     return render(request, "admin/client/id_card_merge.html", context)
 
+
 @staff_member_required
 def id_card_merge_manual_view(request: HttpRequest) -> HttpResponse:
     """
@@ -125,6 +128,7 @@ def id_card_merge_manual_view(request: HttpRequest) -> HttpResponse:
 
     return redirect("admin:id_card_merge")
 
+
 def register_id_card_merge_urls(admin_site: admin.AdminSite) -> None:
     """注册身份证合并页面的 URL 到 admin site"""
     original_get_urls = admin_site.get_urls
@@ -146,5 +150,6 @@ def register_id_card_merge_urls(admin_site: admin.AdminSite) -> None:
         return custom_urls + urls
 
     admin_site.get_urls = get_urls  # type: ignore[method-assign]
+
 
 register_id_card_merge_urls(admin.site)

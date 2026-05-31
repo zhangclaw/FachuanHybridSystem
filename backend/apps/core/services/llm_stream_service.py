@@ -18,6 +18,7 @@ from apps.core.exceptions.error_presentation import ExceptionPresenter
 
 logger = logging.getLogger(__name__)
 
+
 async def build_chat_stream(
     *,
     message: str,

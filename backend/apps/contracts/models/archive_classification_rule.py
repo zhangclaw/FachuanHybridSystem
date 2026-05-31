@@ -9,11 +9,13 @@ from django.db import models
 if TYPE_CHECKING:
     pass
 
+
 class RuleSource(models.TextChoices):
     """规则来源"""
 
     LEARNED = "learned", "自动学习"
     MANUAL = "manual", "手动添加"
+
 
 class ArchiveClassificationRule(models.Model):
     """归档分类学习规则 - 从已归档材料中学习到的文件名关键词→归档清单项映射。"""

@@ -8,6 +8,7 @@ import pytest
 
 from apps.enterprise_data.services.clients.api_key_pool import McpApiKeyPool
 
+
 def _pool(*keys: str, provider: str = "test") -> McpApiKeyPool:
     return McpApiKeyPool(provider_name=provider, api_keys=list(keys))
 

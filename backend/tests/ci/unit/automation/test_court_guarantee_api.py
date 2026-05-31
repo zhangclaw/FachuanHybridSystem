@@ -7,6 +7,7 @@ from types import SimpleNamespace
 from apps.automation.api import court_guarantee_helpers as helpers
 from apps.core.dto.client import PropertyClueDTO
 
+
 class _FakeClientService:
     def __init__(self, clues_by_client_id: dict[int, list[PropertyClueDTO]]) -> None:
         self._clues_by_client_id = clues_by_client_id

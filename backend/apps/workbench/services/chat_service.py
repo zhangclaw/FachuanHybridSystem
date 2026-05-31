@@ -73,6 +73,7 @@ USAGE_LIMITS = UsageLimits(
 
 # ─── Token 估算 ──────────────────────────────────────────────────────────────
 
+
 def _estimate_tokens(text: str) -> int:
     """估算文本的 token 数量
 
@@ -92,7 +93,9 @@ def _estimate_tokens(text: str) -> int:
 
     return max(1, int(chinese_chars * 1.5 + other_chars * 0.3))
 
+
 # ─── 历史消息加载 ────────────────────────────────────────────────────────────
+
 
 async def _load_message_history(
     session_id: int,
@@ -136,9 +139,11 @@ async def _load_message_history(
     # 转换为 ModelMessage
     return _convert_to_model_messages(result)
 
+
 async def _async_list(queryset: Any) -> list[Any]:
     """异步遍历 QuerySet"""
     return [item async for item in queryset]
+
 
 def _convert_to_model_messages(messages: list[Any]) -> list[ModelMessage]:
     """将数据库消息转换为 Pydantic AI ModelMessage"""
@@ -167,7 +172,9 @@ def _convert_to_model_messages(messages: list[Any]) -> list[ModelMessage]:
 
     return result
 
+
 # ─── 自动摘要 ────────────────────────────────────────────────────────────────
+
 
 async def _maybe_create_summary(
     session_id: int,
@@ -227,7 +234,9 @@ async def _maybe_create_summary(
         logger.exception("生成对话摘要失败")
         return None
 
+
 # ─── 主服务 ───────────────────────────────────────────────────────────────────
+
 
 class WorkbenchChatService:
     """工作台对话编排服务"""

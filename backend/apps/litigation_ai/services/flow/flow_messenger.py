@@ -5,6 +5,7 @@ from typing import Any
 
 from asgiref.sync import sync_to_async
 
+
 class FlowMessenger:
     def __init__(self, conversation_service: Any) -> None:
         self.conversation_service = conversation_service

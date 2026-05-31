@@ -11,6 +11,7 @@ from django.template.response import TemplateResponse
 from apps.enterprise_data.models import McpWorkbench
 from apps.enterprise_data.services import McpWorkbenchService
 
+
 @admin.register(McpWorkbench)
 class McpWorkbenchAdmin(admin.ModelAdmin):
     """MCP tools 调试页。"""

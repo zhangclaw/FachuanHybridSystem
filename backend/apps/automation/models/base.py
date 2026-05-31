@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from django.db import models
 
+
 class AutomationTool(models.Model):
     name = models.CharField(max_length=64, default="Document Processor")
 
@@ -14,6 +15,7 @@ class AutomationTool(models.Model):
         verbose_name = "文档处理"
         verbose_name_plural = "文档处理"
 
+
 class NamerTool(models.Model):
     name = models.CharField(max_length=64, default="Namer Tool")
 
@@ -23,6 +25,7 @@ class NamerTool(models.Model):
         managed = False
         verbose_name = "自动命名工具"
         verbose_name_plural = "自动命名工具"
+
 
 class TestCourt(models.Model):
     """测试法院系统虚拟模型"""
@@ -35,6 +38,7 @@ class TestCourt(models.Model):
         verbose_name = "测试法院系统"
         verbose_name_plural = "测试法院系统"
 
+
 class TestToolsHub(models.Model):
     """测试工具入口虚拟模型"""
 
@@ -45,6 +49,7 @@ class TestToolsHub(models.Model):
         managed = False
         verbose_name = "测试工具"
         verbose_name_plural = "测试工具"
+
 
 class ImageRotation(models.Model):
     """图片自动旋转工具虚拟模型"""

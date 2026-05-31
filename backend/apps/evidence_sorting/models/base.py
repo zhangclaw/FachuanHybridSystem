@@ -2,6 +2,7 @@
 
 from django.db import models
 
+
 class EvidenceSorting(models.Model):
     """案件材料整理工具虚拟模型"""
 

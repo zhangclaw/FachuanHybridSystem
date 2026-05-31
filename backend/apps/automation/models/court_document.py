@@ -6,6 +6,7 @@ from typing import ClassVar
 
 from django.db import models
 
+
 class DocumentDownloadStatus(models.TextChoices):
     """文书下载状态"""
 
@@ -13,6 +14,7 @@ class DocumentDownloadStatus(models.TextChoices):
     DOWNLOADING = "downloading", "下载中"
     SUCCESS = "success", "成功"
     FAILED = "failed", "失败"
+
 
 class CourtDocument(models.Model):
     """法院文书记录"""
@@ -92,6 +94,7 @@ class CourtDocument(models.Model):
         # 否则拼接 MEDIA_ROOT
         return str(Path(settings.MEDIA_ROOT) / self.local_file_path)
 
+
 class DocumentQueryHistory(models.Model):
     """文书查询历史"""
 
@@ -126,6 +129,7 @@ class DocumentQueryHistory(models.Model):
 
     def __str__(self) -> str:
         return "{} - {} - {}".format(self.credential, self.case_number, self.send_time.strftime("%Y-%m-%d %H:%M"))
+
 
 class DocumentDeliverySchedule(models.Model):
     """文书送达定时任务"""

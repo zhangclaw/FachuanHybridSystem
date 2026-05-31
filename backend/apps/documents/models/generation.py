@@ -15,11 +15,13 @@ from apps.core.filesystem.upload_paths import DatedUUIDPath
 
 logger = logging.getLogger("apps.documents")
 
+
 class GenerationMethod(models.TextChoices):
     """生成方式"""
 
     TEMPLATE = "template", "模板生成"
     AI = "ai", "AI生成"
+
 
 class GenerationStatus(models.TextChoices):
     """生成状态"""
@@ -28,6 +30,7 @@ class GenerationStatus(models.TextChoices):
     PROCESSING = "processing", "生成中"
     COMPLETED = "completed", "已完成"
     FAILED = "failed", "失败"
+
 
 class GenerationTask(models.Model):
     """
@@ -72,9 +75,7 @@ class GenerationTask(models.Model):
     generation_method = models.CharField(
         max_length=20, choices=GenerationMethod.choices, default=GenerationMethod.TEMPLATE, verbose_name="生成方式"
     )
-    document_type = models.CharField(
-        max_length=100, verbose_name="文书类型", help_text="如:起诉状、答辩状、合同等"
-    )
+    document_type = models.CharField(max_length=100, verbose_name="文书类型", help_text="如:起诉状、答辩状、合同等")
     template_id = models.IntegerField(
         null=True, blank=True, verbose_name="模板ID", help_text="使用的模板ID(模板生成时)"
     )
@@ -85,9 +86,7 @@ class GenerationTask(models.Model):
         upload_to=DatedUUIDPath("generated_documents"), null=True, blank=True, verbose_name="生成文件"
     )
     error_message = models.TextField(blank=True, verbose_name="错误信息")
-    metadata: Any = models.JSONField(
-        default=dict, verbose_name="任务元数据", help_text="存储生成参数、token消耗等信息"
-    )
+    metadata: Any = models.JSONField(default=dict, verbose_name="任务元数据", help_text="存储生成参数、token消耗等信息")
     created_by = models.ForeignKey(
         "organization.Lawyer",
         on_delete=models.SET_NULL,
@@ -165,6 +164,7 @@ class GenerationTask(models.Model):
     def error_logs(self, value: list[Any] | None) -> None:
         self.metadata = self.metadata or {}
         self.metadata["error_logs"] = list(value or [])
+
 
 class GenerationConfig(models.Model):
     """

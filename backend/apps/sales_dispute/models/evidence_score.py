@@ -4,12 +4,14 @@ from typing import ClassVar
 
 from django.db import models
 
+
 class EvidenceType(models.TextChoices):
     WRITTEN_CONTRACT = "written_contract", "书面合同"
     DELIVERY_RECEIPT = "delivery_receipt", "送货/收货凭证"
     RECONCILIATION = "reconciliation", "对账确认"
     COLLECTION_RECORD = "collection_record", "催款记录"
     PAYMENT_RECORD = "payment_record", "付款记录"
+
 
 class EvidenceScore(models.Model):
     id: int

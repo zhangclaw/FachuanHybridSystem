@@ -1,5 +1,6 @@
 from django.apps import AppConfig
 
+
 class LegalSolutionConfig(AppConfig):
     name = "apps.legal_solution"
     verbose_name = "法律服务方案"

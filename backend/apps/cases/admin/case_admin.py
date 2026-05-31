@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING, Any, ClassVar, cast
 
 from django.contrib import admin
 from django.http import HttpRequest
-
 from simple_history.admin import SimpleHistoryAdmin
 
 from apps.cases.admin.base_admin import BaseModelAdmin, BaseStackedInline, BaseTabularInline
@@ -39,6 +38,7 @@ if TYPE_CHECKING:
     from django.db.models import QuerySet
 
 logger = logging.getLogger(__name__)
+
 
 class CasePartyInline(BaseTabularInline):
     """案件当事人内联编辑组件"""
@@ -108,11 +108,13 @@ class CasePartyInline(BaseTabularInline):
         )
         css: ClassVar[dict[str, tuple[str, ...]]] = {"all": ("cases/admin_caseparty.css",)}
 
+
 class CaseAssignmentInline(BaseTabularInline):
     model = CaseAssignment
     extra = 1
     fields = ("lawyer",)
     autocomplete_fields = ("lawyer",)
+
 
 class SupervisingAuthorityInline(BaseTabularInline):
     """主管机关内联"""
@@ -122,9 +124,11 @@ class SupervisingAuthorityInline(BaseTabularInline):
     extra = 1
     fields = ("name", "authority_type")
 
+
 class CaseLogAttachmentInline(BaseTabularInline):
     model = CaseLogAttachment
     extra = 0
+
 
 class CaseNumberInline(BaseStackedInline):
     model = CaseNumber
@@ -154,6 +158,7 @@ class CaseNumberInline(BaseStackedInline):
         ),
     )
 
+
 class CaseLogInline(BaseStackedInline):
     model = CaseLog
     extra = 0
@@ -167,11 +172,13 @@ class CaseLogInline(BaseStackedInline):
     if BaseModelAdmin is not admin.ModelAdmin:
         pass
 
+
 def serialize_case_obj(obj: Case) -> dict[str, object]:
     """将单个 Case 实例序列化为 dict（供 CaseAdmin 和 ContractAdmin 共用）。"""
     from apps.cases.services.case.case_export_serializer_service import serialize_case_obj as serialize_case_obj_service
 
     return serialize_case_obj_service(obj)
+
 
 @admin.register(Case)
 class CaseAdmin(

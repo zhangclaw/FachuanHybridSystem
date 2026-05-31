@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 from django.core.cache import cache
 
+
 def _tracked_unit_modules() -> list[str]:
     unit_dir = Path(__file__).resolve().parent
     this_module = Path(__file__).stem

@@ -7,6 +7,7 @@ from typing import Any
 from apps.core.exceptions import ValidationException
 from apps.documents.storage import resolve_docx_template_path
 
+
 class DocumentTemplateValidationService:
     def normalize_file_path(self, file_path: str | None) -> str | None:
         if file_path is None:

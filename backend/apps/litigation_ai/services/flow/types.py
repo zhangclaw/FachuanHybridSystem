@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Any
 
+
 class ConversationStep(str, Enum):
     INIT = "init"
     DOCUMENT_TYPE = "document_type"
@@ -13,6 +14,7 @@ class ConversationStep(str, Enum):
     GENERATING = "generating"
     REFINING = "refining"
     COMPLETED = "completed"
+
 
 @dataclass
 class FlowContext:

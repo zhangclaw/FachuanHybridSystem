@@ -13,10 +13,12 @@ router = Router(tags=["文书送达自动下载"])
 
 from typing import Any, ClassVar
 
+
 def _get_document_delivery_service() -> Any:
     from apps.automation.services.document_delivery.document_delivery_service import DocumentDeliveryService
 
     return DocumentDeliveryService()
+
 
 def _get_document_delivery_schedule_service() -> Any:
     from apps.automation.services.document_delivery.document_delivery_schedule_service import (
@@ -25,9 +27,11 @@ def _get_document_delivery_schedule_service() -> Any:
 
     return DocumentDeliveryScheduleService()
 
+
 # ============================================================================
 # 请求/响应 Schemas
 # ============================================================================
+
 
 class DocumentDeliveryQueryIn(BaseModel):
     """手动查询文书请求"""
@@ -51,6 +55,7 @@ class DocumentDeliveryQueryIn(BaseModel):
             "example": {"credential_id": 1, "cutoff_hours": 24, "tab": "pending"}  # type: ignore[dict-item]
         }
 
+
 class DocumentDeliveryQueryOut(BaseModel):
     """手动查询文书响应"""
 
@@ -73,6 +78,7 @@ class DocumentDeliveryQueryOut(BaseModel):
                 "message": "查询完成，处理了3个文书",
             }
         }
+
 
 class DocumentDeliveryScheduleCreateIn(BaseModel):
     """创建定时任务请求"""
@@ -102,6 +108,7 @@ class DocumentDeliveryScheduleCreateIn(BaseModel):
             }
         }
 
+
 class DocumentDeliveryScheduleUpdateIn(BaseModel):
     """更新定时任务请求"""
 
@@ -118,6 +125,7 @@ class DocumentDeliveryScheduleUpdateIn(BaseModel):
         json_schema_extra: ClassVar[dict[str, str]] = {
             "example": {"runs_per_day": 3, "hour_interval": 8, "cutoff_hours": 48, "is_active": False}  # type: ignore[dict-item]
         }
+
 
 class DocumentDeliveryScheduleOut(BaseModel):
     """定时任务响应"""
@@ -153,9 +161,11 @@ class DocumentDeliveryScheduleOut(BaseModel):
         from_attributes = True
         json_encoders: ClassVar[dict[str, str]] = {datetime: lambda v: v.isoformat() if v is not None else None}  # type: ignore[dict-item]
 
+
 # ============================================================================
 # 手动查询接口
 # ============================================================================
+
 
 @router.post("/document-delivery/query", response=DocumentDeliveryQueryOut)
 def manual_query(request: Any, payload: DocumentDeliveryQueryIn) -> DocumentDeliveryQueryOut:
@@ -185,9 +195,11 @@ def manual_query(request: Any, payload: DocumentDeliveryQueryIn) -> DocumentDeli
         message=f"查询完成，处理了{result.processed_count}个文书",
     )
 
+
 # ============================================================================
 # 定时任务管理接口
 # ============================================================================
+
 
 @router.get("/document-delivery/schedules", response=list[DocumentDeliveryScheduleOut])
 @paginate(PageNumberPagination, page_size=20)
@@ -203,6 +215,7 @@ def list_schedules(
     schedules = service.list_schedules(credential_id=credential_id, is_active=is_active)
 
     return [DocumentDeliveryScheduleOut.from_model(schedule) for schedule in schedules]
+
 
 @router.post("/document-delivery/schedules", response=DocumentDeliveryScheduleOut)
 def create_schedule(request: Any, payload: DocumentDeliveryScheduleCreateIn) -> DocumentDeliveryScheduleOut:
@@ -222,6 +235,7 @@ def create_schedule(request: Any, payload: DocumentDeliveryScheduleCreateIn) -> 
     )
 
     return DocumentDeliveryScheduleOut.from_model(schedule)
+
 
 @router.put("/document-delivery/schedules/{schedule_id}", response=DocumentDeliveryScheduleOut)
 def update_schedule(
@@ -249,6 +263,7 @@ def update_schedule(
 
     return DocumentDeliveryScheduleOut.from_model(schedule)
 
+
 @router.delete("/document-delivery/schedules/{schedule_id}")
 def delete_schedule(request: Any, schedule_id: int) -> dict[str, Any]:
     """
@@ -260,6 +275,7 @@ def delete_schedule(request: Any, schedule_id: int) -> dict[str, Any]:
     service.delete_schedule(schedule_id)
 
     return {"success": True, "message": f"定时任务 {schedule_id} 已删除"}
+
 
 @router.get("/document-delivery/schedules/{schedule_id}", response=DocumentDeliveryScheduleOut)
 def get_schedule(request: Any, schedule_id: int) -> DocumentDeliveryScheduleOut:

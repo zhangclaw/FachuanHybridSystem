@@ -26,6 +26,7 @@ from .performance_monitor import performance_monitor
 
 logger = logging.getLogger(__name__)
 
+
 class AutoTokenAcquisitionService:
     """
     自动Token获取核心服务实现

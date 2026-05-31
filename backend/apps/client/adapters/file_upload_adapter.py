@@ -8,6 +8,7 @@ from ninja.files import UploadedFile
 
 from apps.core.services.file_upload_service import FileUploadService
 
+
 class FileUploadAdapter:
     """文件上传服务适配器。
 

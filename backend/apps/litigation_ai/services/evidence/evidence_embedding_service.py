@@ -9,6 +9,7 @@ from apps.core.interfaces import ServiceLocator
 
 logger = logging.getLogger("apps.litigation_ai")
 
+
 class EvidenceEmbeddingService:
     def __init__(self, llm_service: Any | None = None) -> None:
         self._llm_service = llm_service

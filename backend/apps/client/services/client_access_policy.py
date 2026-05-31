@@ -4,6 +4,7 @@ from typing import Any
 
 from apps.core.security import DjangoPermsMixin
 
+
 class ClientAccessPolicy(DjangoPermsMixin):
     def can_create_client(self, user: Any | None) -> bool:
         return bool(self.has_perm(user, "client.add_client"))

@@ -19,6 +19,7 @@ from .case_log_query_service import CaseLogQueryService
 from .case_log_version_service import CaseLogVersionService
 from .wiring import get_case_service
 
+
 class CaseLogService:
     """
     案件日志服务

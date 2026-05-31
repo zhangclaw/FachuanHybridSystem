@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from django.db import models
 
+
 class FeeNoticeTool(models.Model):
     """Admin entry model for fee notice recognition."""
 

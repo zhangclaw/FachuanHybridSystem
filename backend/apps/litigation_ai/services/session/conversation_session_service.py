@@ -26,6 +26,7 @@ __all__: list[str] = [
     "SessionMessageService",
 ]
 
+
 class LitigationConversationSessionService:
     """诉讼AI对话会话服务 - 委托给专门的生命周期和消息服务"""
 

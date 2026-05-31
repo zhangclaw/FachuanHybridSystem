@@ -6,6 +6,7 @@ from pathlib import Path
 
 from apps.core.exceptions import ValidationException
 
+
 class MacPrintExecutorService:
     def print_pdf(self, *, printer_name: str, options: dict[str, str], pdf_path: Path) -> str:
         if not pdf_path.exists():

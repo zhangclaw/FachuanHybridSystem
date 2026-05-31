@@ -25,6 +25,7 @@ _CLIENT_FIELDS: tuple[str, ...] = (
     "is_our_client",
 )
 
+
 class ClientResolveService:
     """按 id_number get_or_create Client，维护会话内缓存避免重复创建。"""
 

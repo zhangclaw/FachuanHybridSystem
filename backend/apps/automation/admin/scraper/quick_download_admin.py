@@ -15,6 +15,7 @@ from django.utils.html import escape
 
 from apps.automation.models import NamerTool, ScraperTask, ScraperTaskType
 
+
 class QuickDownloadTool(NamerTool):
     class Meta:
         proxy = True
@@ -22,6 +23,7 @@ class QuickDownloadTool(NamerTool):
         app_label = "automation"
         verbose_name = "快速下载文书"
         verbose_name_plural = "快速下载文书"
+
 
 # @admin.register(QuickDownloadTool)  # 隐藏快速下载页面，保留功能代码
 class QuickDownloadAdmin(admin.ModelAdmin):

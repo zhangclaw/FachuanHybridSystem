@@ -6,6 +6,7 @@ from django.contrib import admin
 
 from apps.evidence.models import EvidenceItem
 
+
 @admin.register(EvidenceItem)
 class EvidenceItemAdmin(admin.ModelAdmin):
     list_display: ClassVar = (  # type: ignore[misc]

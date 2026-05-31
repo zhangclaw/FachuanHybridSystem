@@ -8,6 +8,7 @@ from ninja import Schema
 
 # ── 催收工作流 ──
 
+
 class StartCollectionRequest(Schema):
     """启动催收请求"""
 
@@ -15,10 +16,12 @@ class StartCollectionRequest(Schema):
     start_date: date | None = None
     remarks: str = ""
 
+
 class AdvanceStageRequest(Schema):
     """推进阶段请求"""
 
     description: str = ""
+
 
 class CollectionLogSchema(Schema):
     """催收操作日志"""
@@ -29,6 +32,7 @@ class CollectionLogSchema(Schema):
     document_type: str
     document_filename: str
 
+
 class TimelineNodeSchema(Schema):
     """时间线节点"""
 
@@ -36,6 +40,7 @@ class TimelineNodeSchema(Schema):
     stage_display: str
     planned_date: date
     is_completed: bool
+
 
 class CollectionRecordResponse(Schema):
     """催收记录响应"""
@@ -50,11 +55,13 @@ class CollectionRecordResponse(Schema):
     is_overdue: bool
     remarks: str
 
+
 class CollectionDetailResponse(CollectionRecordResponse):
     """催收记录详情响应（含日志和时间线）"""
 
     logs: list[CollectionLogSchema]
     timeline: list[TimelineNodeSchema]
+
 
 class ReminderItemSchema(Schema):
     """到期提醒项"""
@@ -66,7 +73,9 @@ class ReminderItemSchema(Schema):
     next_due_date: date
     days_until_due: int
 
+
 # ── 律师函 ──
+
 
 class LawyerLetterRequest(Schema):
     """律师函生成请求"""
@@ -80,7 +89,9 @@ class LawyerLetterRequest(Schema):
     contract_no: str = ""
     deadline_days: int = 7
 
+
 # ── 对账函 ──
+
 
 class TransactionItemSchema(Schema):
     """交易明细项"""
@@ -88,6 +99,7 @@ class TransactionItemSchema(Schema):
     transaction_date: date
     description: str
     amount: float
+
 
 class ReconciliationRequest(Schema):
     """对账函生成请求"""
@@ -99,13 +111,16 @@ class ReconciliationRequest(Schema):
     paid_amount: float
     outstanding_amount: float
 
+
 # ── 和解协议 ──
+
 
 class InstallmentPlanSchema(Schema):
     """分期还款计划"""
 
     due_date: date
     amount: float
+
 
 class SettlementRequest(Schema):
     """和解协议生成请求"""
@@ -124,7 +139,9 @@ class SettlementRequest(Schema):
     dispute_resolution: str
     arbitration_institution: str = ""
 
+
 # ── 执行文书 ──
+
 
 class EnforcementRequest(Schema):
     """强制执行申请书请求"""
@@ -140,6 +157,7 @@ class EnforcementRequest(Schema):
     execution_amount: float
     execution_requests: str
 
+
 class PropertyInvestigationRequest(Schema):
     """财产调查申请书请求"""
 
@@ -150,6 +168,7 @@ class PropertyInvestigationRequest(Schema):
     respondent_address: str
     execution_case_number: str
     property_types: list[str]
+
 
 class SpendingRestrictionRequest(Schema):
     """限制高消费申请书请求"""
@@ -162,6 +181,7 @@ class SpendingRestrictionRequest(Schema):
     legal_representative: str
     execution_case_number: str
     outstanding_amount: float
+
 
 class AddExecuteeRequest(Schema):
     """追加被执行人申请书请求"""
@@ -176,6 +196,7 @@ class AddExecuteeRequest(Schema):
     added_respondent_id_number: str
     add_reason: str
     legal_basis: str
+
 
 class ExecutionDocRequest(Schema):
     """执行文书生成请求（统一入口）"""

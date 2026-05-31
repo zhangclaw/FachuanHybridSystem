@@ -19,6 +19,7 @@ from apps.core.exceptions import RateLimitError
 
 logger = logging.getLogger(__name__)
 
+
 class RateLimiter:
     """
     请求限流器
@@ -142,10 +143,12 @@ class RateLimiter:
             return False, info
         return True, info
 
+
 # 预定义的限流器实例
 default_limiter = RateLimiter(requests=100, window=60)  # 每分钟 100 次
 strict_limiter = RateLimiter(requests=10, window=60)  # 每分钟 10 次
 auth_limiter = RateLimiter(requests=5, window=60)  # 登录限流:每分钟 5 次
+
 
 def get_rate_limit_config(kind: str, *, fallback_requests: int, fallback_window: int) -> tuple[int, int]:
     try:
@@ -160,6 +163,7 @@ def get_rate_limit_config(kind: str, *, fallback_requests: int, fallback_window:
     requests = int(cfg.get(f"{kind}_REQUESTS", default_requests) or default_requests)
     window = int(cfg.get(f"{kind}_WINDOW", default_window) or default_window)
     return requests, window
+
 
 def rate_limit(
     requests: int = 100,
@@ -234,6 +238,7 @@ def rate_limit(
 
     return decorator
 
+
 def rate_limit_by_user(
     requests: int = 60,
     window: int = 60,
@@ -247,6 +252,7 @@ def rate_limit_by_user(
         return f"ip:{RateLimiter().get_client_ip(request)}"
 
     return rate_limit(requests=requests, window=window, key_func=key_func)
+
 
 def rate_limit_from_settings(
     kind: str, *, by_user: bool = True, key_func: Callable[[HttpRequest], str] | None = None

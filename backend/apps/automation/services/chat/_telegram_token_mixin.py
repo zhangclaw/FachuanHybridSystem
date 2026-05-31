@@ -29,6 +29,7 @@ from apps.core.exceptions import ConfigurationException
 
 logger = logging.getLogger(__name__)
 
+
 class TelegramTokenMixin:
     """负责 Telegram 配置加载
 

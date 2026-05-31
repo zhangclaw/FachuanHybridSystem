@@ -11,6 +11,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+
 @dataclass
 class SessionDTO:
     id: int
@@ -23,6 +24,7 @@ class SessionDTO:
     metadata: dict[str, Any]
     created_at: Any
     updated_at: Any
+
 
 @dataclass
 class MessageDTO:

@@ -27,6 +27,7 @@ else:
         BaseStackedInline = admin.StackedInline
         BaseTabularInline = admin.TabularInline
 
+
 class FinalizedMaterialAdminForm(forms.ModelForm[FinalizedMaterial]):
     file = forms.FileField(
         required=False,
@@ -52,6 +53,7 @@ class FinalizedMaterialAdminForm(forms.ModelForm[FinalizedMaterial]):
         if commit:
             instance.save()
         return instance
+
 
 class FinalizedMaterialInline(BaseTabularInline):
     model = FinalizedMaterial
@@ -79,6 +81,7 @@ class FinalizedMaterialInline(BaseTabularInline):
     class Media:
         css = {"all": ("contracts/css/finalized_material_inline.css",)}
 
+
 class ContractPartyInline(BaseTabularInline):
     model = ContractParty
     extra = 1
@@ -89,11 +92,13 @@ class ContractPartyInline(BaseTabularInline):
     class Media:
         js = ("contracts/js/party_role_auto.js",)
 
+
 class ContractAssignmentInline(BaseTabularInline):
     model = ContractAssignment
     extra = 1
     fields = ("lawyer", "is_primary", "order")
     autocomplete_fields: ClassVar = ["lawyer"]
+
 
 class SupplementaryAgreementPartyInline(BaseTabularInline):
     """补充协议当事人内联（嵌套在补充协议中）"""
@@ -103,6 +108,7 @@ class SupplementaryAgreementPartyInline(BaseTabularInline):
     fields = ("client", "role")
     autocomplete_fields: ClassVar = ["client"]
 
+
 class SupplementaryAgreementInline(BaseStackedInline):
     """补充协议内联（在合同中）"""
 
@@ -111,6 +117,7 @@ class SupplementaryAgreementInline(BaseStackedInline):
     fields = ("name",)
     show_change_link = True
     classes = ("collapse",)
+
 
 # 如果支持嵌套 Admin，添加当事人内联到补充协议
 if BaseStackedInline is not admin.StackedInline:

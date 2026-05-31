@@ -19,6 +19,7 @@ from apps.core.security import get_request_access_context
 
 logger = logging.getLogger("apps.contracts")
 
+
 def _build_docx_response(result: Any) -> Any:
     """构建 DOCX 文件下载响应"""
     response = HttpResponse(
@@ -29,16 +30,19 @@ def _build_docx_response(result: Any) -> Any:
     response["Content-Disposition"] = f"attachment; filename*=UTF-8''{encoded_filename}"
     return response
 
+
 def _get_contract_admin_service() -> Any:
     """工厂函数获取合同 Admin 服务"""
     from apps.contracts.admin.wiring_admin import get_contract_admin_service
 
     return get_contract_admin_service()
 
+
 def _get_contract_mutation_facade() -> Any:
     from apps.contracts.admin.wiring_admin import get_contract_mutation_facade
 
     return get_contract_mutation_facade()
+
 
 class ContractActionMixin:
     """合同 Admin 操作处理方法的 Mixin"""

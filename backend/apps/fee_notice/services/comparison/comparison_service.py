@@ -21,9 +21,11 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("apps.fee_notice")
 
+
 def _to_decimal(value: Any) -> Decimal | None:
     """将值转换为 Decimal"""
     return Decimal(str(value)) if value is not None else None
+
 
 def _compare_single_fee(
     extracted: Decimal | None,
@@ -46,6 +48,7 @@ def _compare_single_fee(
     if diff <= tolerance:
         return False, True, diff
     return False, False, diff
+
 
 class FeeComparisonService:
     """

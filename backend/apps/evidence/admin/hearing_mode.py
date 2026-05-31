@@ -15,6 +15,7 @@ from apps.evidence.models import EvidenceDirection, EvidenceItem, EvidenceList, 
 
 logger = logging.getLogger("apps.evidence")
 
+
 class HearingModeAdminMixin:
     """开庭模式 Admin Mixin，添加到 EvidenceListAdmin"""
 
@@ -99,6 +100,7 @@ class HearingModeAdminMixin:
                         break
 
         return JsonResponse({"success": True, "note_id": note.pk})
+
 
 def _format_properties(data: dict[str, Any] | None) -> str:
     """格式化三性/质证意见 JSON 为可读文本"""

@@ -20,11 +20,13 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("apps.contracts")
 
+
 def _get_contract_display_service() -> Any:
     """工厂函数获取合同显示服务"""
     from apps.contracts.admin.wiring_admin import get_contract_display_service
 
     return get_contract_display_service()
+
 
 class ContractDisplayFormatMixin:
     """合同 Admin 只读显示方法的 Mixin"""

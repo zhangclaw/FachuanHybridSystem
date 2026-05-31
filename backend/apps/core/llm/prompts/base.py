@@ -15,6 +15,7 @@ from typing import Any, ClassVar
 
 from apps.core.exceptions import NotFoundError, ValidationException
 
+
 @dataclass
 class CodePromptTemplate:
     """
@@ -31,6 +32,7 @@ class CodePromptTemplate:
     template: str
     description: str = ""
     variables: list[str] = field(default_factory=list)
+
 
 class PromptManager:
     """

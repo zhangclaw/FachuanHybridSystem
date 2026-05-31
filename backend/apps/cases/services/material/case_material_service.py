@@ -24,6 +24,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+
 class CaseMaterialService:
     def __init__(
         self,
@@ -312,9 +313,7 @@ class CaseMaterialService:
         old_attachment_id = material.source_attachment_id
 
         if old_attachment_id == new_attachment_id:
-            raise ValidationException(
-                message="新附件与当前附件相同", errors={"new_attachment_id": new_attachment_id}
-            )
+            raise ValidationException(message="新附件与当前附件相同", errors={"new_attachment_id": new_attachment_id})
 
         try:
             new_attachment = CaseLogAttachment.objects.select_related("log").get(
@@ -326,9 +325,7 @@ class CaseMaterialService:
         # 检查新附件是否已被其他材料绑定
         existing = CaseMaterial.objects.filter(source_attachment_id=new_attachment_id).first()
         if existing and existing.id != material_id:
-            raise ValidationException(
-                message="新附件已被其他材料绑定", errors={"new_attachment_id": new_attachment_id}
-            )
+            raise ValidationException(message="新附件已被其他材料绑定", errors={"new_attachment_id": new_attachment_id})
 
         old_attachment = material.source_attachment
         old_attachment_id_val = material.source_attachment_id

@@ -10,9 +10,11 @@ from .law_firm import LawFirm
 from .storage import KeepOriginalNameStorage
 from .team import Team, TeamType
 
+
 def lawyer_license_upload_path(instance: object, filename: str) -> str:
     """Deprecated: 保留用于旧 migration 兼容，新代码请使用 DatedOriginalPath。"""
     return f"lawyers/licenses/{filename}"
+
 
 class LawyerManager(UserManager):
     """自定义 UserManager，处理 email 的 None 值。
@@ -30,6 +32,7 @@ class LawyerManager(UserManager):
             user.save(using=self._db)
             return user  # type: ignore[return-value]
         return super()._create_user(username, email, password, **extra_fields)  # type: ignore[misc,no-any-return]
+
 
 class Lawyer(AbstractUser):
     """律师模型，扩展自 Django AbstractUser，代表系统用户。"""

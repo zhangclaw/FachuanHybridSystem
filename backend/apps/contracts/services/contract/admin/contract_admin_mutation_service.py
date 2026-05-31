@@ -20,6 +20,7 @@ from .workflows.clone_workflow import plus_one_year_due_at
 
 logger = logging.getLogger("apps.contracts")
 
+
 class ContractAdminMutationService:
     CASE_ALLOWED_TYPES: ClassVar = {
         CaseType.CIVIL,
@@ -134,9 +135,7 @@ class ContractAdminMutationService:
             raise ValidationException(
                 message="该合同类型不支持创建案件",
                 code="INVALID_CONTRACT_TYPE",
-                errors={
-                    "case_type": "合同类型 %(type)s 不支持创建案件" % {"type": contract.get_case_type_display()}
-                },
+                errors={"case_type": "合同类型 %(type)s 不支持创建案件" % {"type": contract.get_case_type_display()}},
             )
 
         from apps.core.models.enums import SimpleCaseType

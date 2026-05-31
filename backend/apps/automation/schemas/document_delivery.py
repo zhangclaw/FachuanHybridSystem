@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
 
+
 @dataclass
 class DocumentDeliveryRecord:
     """文书送达记录"""
@@ -69,6 +70,7 @@ class DocumentDeliveryRecord:
             court_name=court_name,
         )
 
+
 @dataclass
 class DocumentQueryResult:
     """文书查询结果"""
@@ -79,6 +81,7 @@ class DocumentQueryResult:
     failed_count: int  # 处理失败数
     case_log_ids: list[int]  # 创建的案件日志 ID 列表
     errors: list[str]  # 错误信息列表
+
 
 @dataclass
 class DocumentProcessResult:

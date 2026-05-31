@@ -19,6 +19,7 @@ from .service import CaseAdminServiceMixin
 
 logger = logging.getLogger("apps.cases")
 
+
 class CaseAdminSaveMixin(CaseAdminServiceMixin):
     def _cleanup_before_delete(self, case_ids: list[int]) -> None:
         if not case_ids:
@@ -192,5 +193,6 @@ class CaseAdminSaveMixin(CaseAdminServiceMixin):
                 logger.warning(
                     "删除关联对象失败: %s pk=%s", type(obj).__name__, getattr(obj, "pk", None), exc_info=True
                 )
+
 
 __all__: list[str] = ["CaseAdminSaveMixin"]

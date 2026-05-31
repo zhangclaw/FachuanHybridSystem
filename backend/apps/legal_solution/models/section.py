@@ -4,6 +4,7 @@ from typing import ClassVar
 
 from django.db import models
 
+
 class SectionType(models.TextChoices):
     CASE_ANALYSIS = "case_analysis", "案情分析"
     LEGAL_RELATION = "legal_relation", "法律关系认定"
@@ -12,6 +13,7 @@ class SectionType(models.TextChoices):
     LITIGATION_STRATEGY = "litigation_strategy", "诉讼策略建议"
     RISK_ASSESSMENT = "risk_assessment", "风险评估"
     COST_ESTIMATE = "cost_estimate", "费用预估"
+
 
 SECTION_ORDER = [
     SectionType.CASE_ANALYSIS,
@@ -33,11 +35,13 @@ SECTION_TITLES = {
     SectionType.COST_ESTIMATE: "费用预估",
 }
 
+
 class SectionStatus(models.TextChoices):
     PENDING = "pending", "待生成"
     GENERATING = "generating", "生成中"
     COMPLETED = "completed", "已完成"
     FAILED = "failed", "失败"
+
 
 class SolutionSection(models.Model):
     task = models.ForeignKey(

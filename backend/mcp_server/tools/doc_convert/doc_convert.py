@@ -9,6 +9,7 @@ from urllib.parse import unquote
 
 from mcp_server.client import client
 
+
 def list_doc_convert_types() -> dict[str, Any]:
     """获取支持的文书类型列表（mbid），按类别分组。需要系统启用 ZNSZJ_ENABLED。"""
     return client.get("/doc-convert/mbid-list")  # type: ignore[return-value]

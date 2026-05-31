@@ -9,6 +9,7 @@ from apps.core.models.enums import CaseStage, CaseType
 
 APPLICABLE_TYPES = {CaseType.CIVIL, CaseType.CRIMINAL, CaseType.ADMINISTRATIVE, CaseType.LABOR, CaseType.INTL}
 
+
 def normalize_representation_stages(
     case_type: str | None,
     representation_stages: Iterable[str] | None,

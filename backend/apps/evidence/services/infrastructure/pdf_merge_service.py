@@ -16,8 +16,10 @@ from apps.core.exceptions import BusinessException, ValidationException
 from apps.core.services.filename_template_service import FilenameTemplateService
 from apps.evidence.models import EvidenceList
 
+
 def _get_pdf_merge_utils_module() -> Any:
     return import_module("apps.documents.services.infrastructure.pdf_merge_utils")
+
 
 class PDFMergeValidator:
     SUPPORTED_FORMATS: ClassVar = [".pdf", ".doc", ".docx", ".jpg", ".jpeg", ".png", ".gif", ".bmp"]
@@ -41,6 +43,7 @@ class PDFMergeValidator:
                 code="UNSUPPORTED_FILE_FORMAT",
                 errors={"file_path": file_path, "extension": ext},
             )
+
 
 class PDFMergeWorkflow:
     def __init__(self, validator: PDFMergeValidator | None = None) -> None:
@@ -156,6 +159,7 @@ class PDFMergeWorkflow:
         from apps.evidence.services.infrastructure.pdf_utils import get_pdf_page_count
 
         return get_pdf_page_count(pdf_input, default=0)
+
 
 class PDFMergeService:
     def __init__(self, workflow: PDFMergeWorkflow | None = None) -> None:

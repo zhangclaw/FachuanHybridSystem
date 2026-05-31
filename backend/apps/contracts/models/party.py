@@ -8,12 +8,14 @@ from django.db import models
 
 from .contract import Contract
 
+
 class PartyRole(models.TextChoices):
     """当事人身份"""
 
     PRINCIPAL = "PRINCIPAL", "委托人"
     BENEFICIARY = "BENEFICIARY", "受益人"
     OPPOSING = "OPPOSING", "对方当事人"
+
 
 class ContractParty(models.Model):
     id: int
@@ -25,9 +27,7 @@ class ContractParty(models.Model):
     client = models.ForeignKey(
         "client.Client", on_delete=models.CASCADE, related_name="contracts", verbose_name="当事人"
     )
-    role = models.CharField(
-        max_length=16, choices=PartyRole.choices, default=PartyRole.PRINCIPAL, verbose_name="身份"
-    )
+    role = models.CharField(max_length=16, choices=PartyRole.choices, default=PartyRole.PRINCIPAL, verbose_name="身份")
 
     class Meta:
         unique_together = ("contract", "client")
@@ -39,6 +39,7 @@ class ContractParty(models.Model):
 
     def __str__(self) -> str:
         return f"{self.contract_id}-{self.client_id}-{self.role}"
+
 
 class ContractAssignment(models.Model):
     id: int

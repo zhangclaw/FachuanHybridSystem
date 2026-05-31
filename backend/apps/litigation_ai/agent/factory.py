@@ -15,6 +15,7 @@ from .llm_provider import LitigationLLMProvider
 
 logger = logging.getLogger("apps.litigation_ai")
 
+
 class LitigationAgent:
     """诉讼文书生成 Agent。"""
 
@@ -259,6 +260,7 @@ class LitigationAgent:
                 },
             )
             return {"error": f"工具执行失败: {e!s}"}
+
 
 class LitigationAgentFactory(IAgentFactory):
     """诉讼文书生成 Agent 工厂。"""

@@ -11,6 +11,7 @@ from django.core.management.base import BaseCommand
 
 from apps.core.models import SystemConfig
 
+
 class Command(BaseCommand):
     help = "初始化系统配置项"
 

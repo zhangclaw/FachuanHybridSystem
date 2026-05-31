@@ -22,6 +22,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("apps.automation")
 
+
 @dataclass
 class SMSParseResult:
     """短信解析结果"""
@@ -32,6 +33,7 @@ class SMSParseResult:
     party_names: list[str]
     has_valid_download_link: bool
     verification_code: str = ""
+
 
 class SMSParserService:
     """短信解析服务"""

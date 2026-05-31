@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from django.db import models
 
+
 class JurisdictionAnalysis(models.Model):
     id: int
     assessment_id: int

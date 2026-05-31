@@ -10,6 +10,7 @@ from apps.core.models.enums import LegalStatus
 
 from .case import Case
 
+
 class CaseParty(models.Model):
     id: int
     case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name="parties", verbose_name="案件")
@@ -31,6 +32,7 @@ class CaseParty(models.Model):
     def __str__(self) -> str:
         return f"{self.case_id}-{self.client_id}-{self.legal_status}"
 
+
 class CaseAssignment(models.Model):
     id: int
     case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name="assignments", verbose_name="案件")
@@ -48,6 +50,7 @@ class CaseAssignment(models.Model):
 
     def __str__(self) -> str:
         return f"{self.case_id}-{self.lawyer_id}"
+
 
 class CaseAccessGrant(models.Model):
     id: int

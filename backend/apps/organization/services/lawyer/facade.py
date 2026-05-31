@@ -7,7 +7,6 @@ LawyerService 门面类
 from __future__ import annotations
 
 from django.db.models import QuerySet
-
 from ninja.files import UploadedFile
 
 from apps.core.exceptions import AuthenticationError
@@ -18,6 +17,7 @@ from apps.organization.services.access.organization_access_policy import Organiz
 from .mutation import LawyerMutationService
 from .query import LawyerQueryService
 from .upload import LawyerUploadService
+
 
 class LawyerService:
     """

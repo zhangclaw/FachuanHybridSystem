@@ -6,6 +6,7 @@ from typing import Any
 
 from mcp_server.client import client
 
+
 def query_document_delivery(
     credential_id: int,
     cutoff_hours: int = 24,

@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 _PARTY_FIELDS = ("party_a", "party_b", "party_c", "party_d")
 
+
 @admin.register(ReviewTask)
 class ReviewTaskAdmin(admin.ModelAdmin):
     list_display = ("contract_title", "user", "status", "current_step_display", "created_at")

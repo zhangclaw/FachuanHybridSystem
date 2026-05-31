@@ -13,6 +13,7 @@ from apps.litigation_ai.placeholders.mock_trial_report import MockTrialReportPla
 
 logger = logging.getLogger("apps.litigation_ai")
 
+
 class MockTrialExportService:
     """模拟庭审报告导出服务."""
 

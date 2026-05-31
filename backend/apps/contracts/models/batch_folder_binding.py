@@ -8,6 +8,7 @@ from django.db import models
 
 from apps.core.models.enums import CaseType
 
+
 class ContractTypeFolderRootPreset(models.Model):
     """按合同类型保存默认根目录。"""
 

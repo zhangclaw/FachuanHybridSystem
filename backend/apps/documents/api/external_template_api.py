@@ -10,7 +10,6 @@ import logging
 from typing import Any
 
 from django.http import HttpRequest, HttpResponse
-
 from ninja import Router, Schema
 
 from apps.core.security.auth import JWTOrSessionAuth
@@ -22,24 +21,29 @@ router = Router(auth=JWTOrSessionAuth())
 # Factory functions
 # ---------------------------------------------------------------------------
 
+
 def _get_analysis_service() -> Any:
     from apps.documents.services.infrastructure.wiring import get_analysis_service
 
     return get_analysis_service()
+
 
 def _get_filling_service() -> Any:
     from apps.documents.services.infrastructure.wiring import get_filling_service
 
     return get_filling_service()
 
+
 def _get_matching_service() -> Any:
     from apps.documents.services.infrastructure.wiring import get_matching_service
 
     return get_matching_service()
 
+
 # ---------------------------------------------------------------------------
 # Request schemas
 # ---------------------------------------------------------------------------
+
 
 class FillRequestSchema(Schema):
     """填充请求体"""
@@ -49,12 +53,14 @@ class FillRequestSchema(Schema):
     party_ids: list[int] | None = None
     custom_values: dict[str, dict[str, str]] | None = None
 
+
 class MappingUpdateSchema(Schema):
     """映射更新请求体"""
 
     semantic_label: str | None = None
     fill_type: str | None = None
     position_description: str | None = None
+
 
 class MappingCreateSchema(Schema):
     """映射创建请求体"""
@@ -64,9 +70,11 @@ class MappingCreateSchema(Schema):
     semantic_label: str
     fill_type: str = "text"
 
+
 # ---------------------------------------------------------------------------
 # Endpoints
 # ---------------------------------------------------------------------------
+
 
 @router.post("/{template_id}/analyze")
 def analyze_template(request: HttpRequest, template_id: int) -> dict[str, Any]:
@@ -83,6 +91,7 @@ def analyze_template(request: HttpRequest, template_id: int) -> dict[str, Any]:
         "mapping_count": len(mappings),
     }
 
+
 @router.post("/{template_id}/confirm")
 def confirm_mappings(request: HttpRequest, template_id: int) -> dict[str, Any]:
     """确认字段映射"""
@@ -90,6 +99,7 @@ def confirm_mappings(request: HttpRequest, template_id: int) -> dict[str, Any]:
     service.confirm_mappings(template_id)
     logger.info("映射已确认", extra={"template_id": template_id})
     return {"success": True, "template_id": template_id}
+
 
 @router.post("/fill")
 def fill_templates(request: HttpRequest, payload: FillRequestSchema) -> dict[str, Any] | HttpResponse:
@@ -117,6 +127,7 @@ def fill_templates(request: HttpRequest, payload: FillRequestSchema) -> dict[str
         "summary": batch_task.summary_json,
         "records": [{"id": r[0], "filename": r[1], "file_path": r[2]} for r in records],
     }
+
 
 @router.get("/{template_id}/preview")
 def preview_fill(
@@ -149,6 +160,7 @@ def preview_fill(
         ],
     }
 
+
 @router.get("/match")
 def match_templates(
     request: HttpRequest,
@@ -161,7 +173,7 @@ def match_templates(
     law_firm_id: int | None = getattr(user, "law_firm_id", None)
 
     if law_firm_id is None:
-        return {"success": False, "message": str("无法确定所属律所")}
+        return {"success": False, "message": "无法确定所属律所"}
 
     if case_id is not None:
         results = service.match_by_case(case_id=case_id, law_firm_id=law_firm_id)
@@ -171,12 +183,13 @@ def match_templates(
             law_firm_id=law_firm_id,
         )
     else:
-        return {"success": False, "message": str("请提供 case_id 或 source_name 参数")}
+        return {"success": False, "message": "请提供 case_id 或 source_name 参数"}
 
     return {
         "success": True,
         "results": [{"id": t.id, "name": t.name, "status": t.status, "version": t.version} for t in results],
     }
+
 
 @router.get("/{template_id}/custom-fields")
 def get_custom_fields(request: HttpRequest, template_id: int) -> dict[str, Any]:
@@ -184,6 +197,7 @@ def get_custom_fields(request: HttpRequest, template_id: int) -> dict[str, Any]:
     service = _get_filling_service()
     fields = service.get_custom_fields(template_id)
     return {"template_id": template_id, "fields": fields}
+
 
 @router.get("/history")
 def get_fill_history(
@@ -199,7 +213,7 @@ def get_fill_history(
     elif template_id is not None:
         qs = service.get_fill_history_by_template(template_id)
     else:
-        return {"success": False, "message": str("请提供 case_id 或 template_id 参数")}
+        return {"success": False, "message": "请提供 case_id 或 template_id 参数"}
 
     records = list(
         qs.values(
@@ -214,6 +228,7 @@ def get_fill_history(
     )
     return {"success": True, "records": records}
 
+
 @router.get("/statistics")
 def get_statistics(request: HttpRequest) -> dict[str, Any]:
     """模板统计"""
@@ -222,14 +237,16 @@ def get_statistics(request: HttpRequest) -> dict[str, Any]:
     law_firm_id: int | None = getattr(user, "law_firm_id", None)
 
     if law_firm_id is None:
-        return {"success": False, "message": str("无法确定所属律所")}
+        return {"success": False, "message": "无法确定所属律所"}
 
     stats = service.get_template_statistics(law_firm_id)
     return {"success": True, "statistics": stats}
 
+
 # ---------------------------------------------------------------------------
 # 预览与映射编辑 API
 # ---------------------------------------------------------------------------
+
 
 @router.get("/{template_id}/preview-html")
 def get_preview_html(request: HttpRequest, template_id: int) -> dict[str, Any]:
@@ -252,6 +269,7 @@ def get_preview_html(request: HttpRequest, template_id: int) -> dict[str, Any]:
         "messages": [str(m) for m in result.messages],
     }
 
+
 @router.get("/{template_id}/mappings")
 def list_mappings(request: HttpRequest, template_id: int) -> list[dict[str, Any]]:
     """获取模板的所有字段映射"""
@@ -270,6 +288,7 @@ def list_mappings(request: HttpRequest, template_id: int) -> list[dict[str, Any]
         }
         for m in mappings
     ]
+
 
 @router.post("/{template_id}/mappings")
 def create_mapping(request: HttpRequest, template_id: int, payload: MappingCreateSchema) -> dict[str, Any]:
@@ -291,6 +310,7 @@ def create_mapping(request: HttpRequest, template_id: int, payload: MappingCreat
         "fill_type": m.fill_type,
         "sort_order": m.sort_order,
     }
+
 
 @router.put("/mappings/{mapping_id}")
 def update_mapping(request: HttpRequest, mapping_id: int, payload: MappingUpdateSchema) -> dict[str, Any]:
@@ -320,6 +340,7 @@ def update_mapping(request: HttpRequest, mapping_id: int, payload: MappingUpdate
         "fill_type": m.fill_type,
         "sort_order": m.sort_order,
     }
+
 
 @router.delete("/mappings/{mapping_id}")
 def delete_mapping(request: HttpRequest, mapping_id: int) -> dict[str, bool]:

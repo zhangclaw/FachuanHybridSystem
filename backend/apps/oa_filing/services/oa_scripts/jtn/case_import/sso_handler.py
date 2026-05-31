@@ -14,6 +14,7 @@ from .http_client import _CASE_LIST_URL, _HTTP_HEADERS
 
 logger = logging.getLogger("apps.oa_filing.jtn_case_import")
 
+
 class JtnSsoHandlerMixin:
     """SSO/飞连/企微登录处理。"""
 
@@ -109,10 +110,10 @@ class JtnSsoHandlerMixin:
 
                 time.sleep(1)
             else:
-                raise RuntimeError(str("等待扫码登录超时，请完成扫码后重试"))
+                raise RuntimeError("等待扫码登录超时，请完成扫码后重试")
 
             if not merged_cookies:
-                raise RuntimeError(str("扫码登录完成，但未获取到 OA 会话，请重试"))
+                raise RuntimeError("扫码登录完成，但未获取到 OA 会话，请重试")
 
             self._http_cookies_cache = dict(merged_cookies)
             logger.info("交互登录成功，已回灌 cookie=%d", len(merged_cookies))

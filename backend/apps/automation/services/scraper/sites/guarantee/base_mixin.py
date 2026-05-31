@@ -9,6 +9,7 @@ from typing import Any
 
 logger = logging.getLogger("apps.automation")
 
+
 class GuaranteeBaseMixin:
     """Playwright 等待与 UI 交互工具。"""
 

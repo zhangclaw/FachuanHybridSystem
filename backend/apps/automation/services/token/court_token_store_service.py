@@ -8,6 +8,7 @@ from apps.automation.dtos import CourtTokenDTO
 
 logger = logging.getLogger("apps.automation")
 
+
 class CourtTokenStoreService:
     """实现 ICourtTokenStoreService，封装 CourtToken 模型的读写操作"""
 

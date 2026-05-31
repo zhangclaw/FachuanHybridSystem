@@ -21,6 +21,7 @@ logger = logging.getLogger(__name__)
 TEMPLATE_DIR: Path = Path(str(get_docx_templates_root() / "2-案件材料" / "3-催收材料"))
 TEMPLATE_FILE = "和解协议.docx"
 
+
 class DisputeResolution(str, Enum):
     """争议解决方式枚举"""
 
@@ -28,11 +29,13 @@ class DisputeResolution(str, Enum):
     ARBITRATION = "arbitration"
     LITIGATION = "litigation"
 
+
 _RESOLUTION_DISPLAY: dict[DisputeResolution, str] = {
     DisputeResolution.NEGOTIATION: "协商",
     DisputeResolution.ARBITRATION: "仲裁",
     DisputeResolution.LITIGATION: "诉讼",
 }
+
 
 @dataclass(frozen=True)
 class InstallmentPlan:
@@ -40,6 +43,7 @@ class InstallmentPlan:
 
     due_date: date
     amount: Decimal
+
 
 @dataclass(frozen=True)
 class SettlementParams:
@@ -58,6 +62,7 @@ class SettlementParams:
     penalty_rate: Decimal
     dispute_resolution: DisputeResolution
     arbitration_institution: str = ""
+
 
 class SettlementGeneratorService:
     """和解协议生成服务"""
@@ -95,7 +100,7 @@ class SettlementGeneratorService:
                 record=record,
                 action_type="lawyer_letter",
                 action_date=date.today(),
-                description=str("生成和解协议"),
+                description="生成和解协议",
                 document_type="和解协议",
                 document_filename=filename,
             )

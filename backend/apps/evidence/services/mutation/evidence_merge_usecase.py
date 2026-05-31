@@ -14,6 +14,7 @@ from apps.evidence.services.wiring import get_case_service
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class MergeProgressReporter:
     list_id: int
@@ -38,6 +39,7 @@ class MergeProgressReporter:
         )
         self._last_progress = progress
         self._last_update_ts = now_ts
+
 
 class EvidenceMergeUseCase:
     def merge(self, *, list_id: int, reporter: MergeProgressReporter | None = None) -> dict[str, Any]:
@@ -65,7 +67,7 @@ class EvidenceMergeUseCase:
                 evidence_list.merge_progress = 0
                 evidence_list.merge_current = 0
                 evidence_list.merge_total = total_files
-                evidence_list.merge_message = str("准备合并")
+                evidence_list.merge_message = "准备合并"
                 evidence_list.save(
                     update_fields=[
                         "merge_status",

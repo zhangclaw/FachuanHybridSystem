@@ -8,6 +8,7 @@ from typing import ClassVar
 
 from django.db import models
 
+
 class Court(models.Model):
     """法院数据模型
 

@@ -14,6 +14,7 @@ from apps.client.utils.media import resolve_media_url
 
 from .client import Client
 
+
 def client_identity_doc_upload_path(instance: Any, filename: str) -> str:
     """生成当事人证件文件上传路径"""
     # 获取文件扩展名
@@ -31,6 +32,7 @@ def client_identity_doc_upload_path(instance: Any, filename: str) -> str:
     new_filename = f"{client_name}_{doc_type_display}{ext}"
 
     return f"client_identity_docs/{new_filename}"
+
 
 class ClientIdentityDoc(models.Model):
     id: int

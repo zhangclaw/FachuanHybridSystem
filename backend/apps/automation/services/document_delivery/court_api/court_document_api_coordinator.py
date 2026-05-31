@@ -8,6 +8,7 @@ from .court_document_api_exceptions import ApiResponseError, TokenExpiredError
 from .court_document_http_client import CourtDocumentHttpClient
 from .court_document_response_parser import CourtDocumentResponseParser
 
+
 class CourtDocumentApiCoordinator:
     def __init__(
         self,

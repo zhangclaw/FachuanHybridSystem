@@ -13,6 +13,7 @@ from apps.core.exceptions import NotFoundError, ValidationException
 
 logger = logging.getLogger("apps.document_recognition")
 
+
 class DocumentRecognitionTaskService:
     """文书识别任务管理服务"""
 

@@ -7,6 +7,7 @@ from typing import Any
 
 from .id_service import FolderTemplateIdService
 
+
 @dataclass(frozen=True)
 class FolderTemplateStructureRules:
     id_service: FolderTemplateIdService

@@ -11,6 +11,7 @@ from apps.documents.services.folder_template.query_service import FolderTemplate
 from apps.documents.services.folder_template.structure_rules import FolderTemplateStructureRules
 from apps.documents.services.folder_template.validation_service import FolderTemplateValidationService
 
+
 @dataclass(frozen=True)
 class FolderTemplateUsecases:
     command_service: FolderTemplateCommandService

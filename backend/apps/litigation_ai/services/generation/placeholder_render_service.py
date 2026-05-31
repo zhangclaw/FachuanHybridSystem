@@ -6,6 +6,7 @@ from typing import Any
 
 from apps.documents.services.placeholders.fallback import resolve_render_variable
 
+
 @dataclass(frozen=True)
 class RenderStats:
     placeholders_found: list[str]
@@ -16,6 +17,7 @@ class RenderStats:
     def hit_rate(self) -> float:
         total = len(self.placeholders_found)
         return (len(self.placeholders_hit) / total) if total else 1.0
+
 
 class PlaceholderRenderService:
     _double_brace_pattern = re.compile(r"\{\{\s*([^{}]+?)\s*\}\}")

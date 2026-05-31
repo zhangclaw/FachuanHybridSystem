@@ -24,6 +24,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("apps.automation")
 
+
 class DocumentProcessor:
     """文书处理器"""
 
@@ -298,7 +299,7 @@ class DocumentProcessor:
                         logger.info(f"通知发送成功: SMS ID={sms_id}")
                     else:
                         sms.status = CourtSMSStatus.FAILED
-                        sms.error_message = str("通知发送失败")
+                        sms.error_message = "通知发送失败"
                         sms_id = sms.id
                         logger.warning(f"通知发送失败: SMS ID={sms_id}")
 

@@ -4,6 +4,7 @@ from apps.automation.services.sms._sms_download_mixin import SMSDownloadMixin
 from apps.automation.services.sms.parsing.download_link_extractor import DownloadLinkExtractor
 from apps.automation.services.sms.sms_parser_service import SMSParserService
 
+
 def test_sms_parser_extract_guangxi_sfdw_link() -> None:
     service = SMSParserService()
     content = (

@@ -15,12 +15,14 @@ from django.utils.html import format_html
 from apps.cases.admin.base_admin import BaseModelAdmin, BaseTabularInline
 from apps.cases.models import CaseLog, CaseLogAttachment
 
+
 class CaseLogAttachmentInline(BaseTabularInline):
     model = CaseLogAttachment
     extra = 0
     fields = ("file", "original_filename", "uploaded_at")
     readonly_fields = ("original_filename", "uploaded_at")
     autocomplete_fields = ("log",)
+
 
 class ReminderInline(BaseTabularInline):
     model = CaseLog.reminders.rel.related_model  # type: ignore[assignment]  # Reminder
@@ -29,6 +31,7 @@ class ReminderInline(BaseTabularInline):
     verbose_name = "重要日期提醒"
     verbose_name_plural = "重要日期提醒"
     ordering = ("due_at",)
+
 
 @admin.register(CaseLog)
 class CaseLogAdmin(BaseModelAdmin):
@@ -213,6 +216,7 @@ class CaseLogAdmin(BaseModelAdmin):
             created = CaseLog.objects.bulk_create(logs)
 
         return JsonResponse({"success": True, "created_count": len(created)})
+
 
 @admin.register(CaseLogAttachment)
 class CaseLogAttachmentAdmin(BaseModelAdmin):

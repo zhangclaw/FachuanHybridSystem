@@ -8,6 +8,7 @@ from django.db import models
 
 from .payment import ContractPayment
 
+
 class Invoice(models.Model):
     """与某条 ContractPayment 关联的发票文件。"""
 

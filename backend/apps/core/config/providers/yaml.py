@@ -16,6 +16,7 @@ from apps.core.config.exceptions import ConfigException, ConfigFileError
 
 from .base import ConfigProvider
 
+
 class YamlProvider(ConfigProvider):
     """YAML 文件配置提供者"""
 

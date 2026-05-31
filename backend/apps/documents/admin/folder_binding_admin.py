@@ -14,10 +14,12 @@ from django.utils.html import format_html
 from apps.core.exceptions import NotFoundError
 from apps.documents.models import DocumentTemplateFolderBinding, FolderTemplate
 
+
 def _get_folder_template_admin_service() -> Any:
     from ..services import FolderTemplateAdminService
 
     return FolderTemplateAdminService()
+
 
 class FolderNodeChoiceField(forms.ChoiceField):
     """动态加载文件夹节点的选择字段"""
@@ -25,6 +27,7 @@ class FolderNodeChoiceField(forms.ChoiceField):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         kwargs.setdefault("choices", [("", "---------")])
         super().__init__(*args, **kwargs)
+
 
 class DocumentTemplateFolderBindingForm(forms.ModelForm[DocumentTemplateFolderBinding]):
     """文书模板文件夹绑定表单"""
@@ -78,6 +81,7 @@ class DocumentTemplateFolderBindingForm(forms.ModelForm[DocumentTemplateFolderBi
             if sub_children:
                 new_prefix = f"{display_name} / "
                 self._extract_nodes(sub_children, choices, new_prefix)
+
 
 @admin.register(DocumentTemplateFolderBinding)
 class DocumentTemplateFolderBindingAdmin(admin.ModelAdmin):

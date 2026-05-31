@@ -16,6 +16,7 @@ from ..folder_service import FolderTemplateService
 
 logger = logging.getLogger("apps.documents.services.folder_template_admin_service")
 
+
 class FolderTemplateAdminService:
     """文件夹模板Admin服务"""
 

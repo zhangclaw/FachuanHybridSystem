@@ -7,6 +7,7 @@ from apps.documents.models import EvidenceItem
 
 _VALUES = ("id", "order", "name", "purpose", "page_start", "page_end", "file")
 
+
 class EvidenceQueryService:
     def _build_dtos(self, items: list[dict]) -> list[EvidenceItemDigestDTO]:
         file_field = EvidenceItem._meta.get_field("file")

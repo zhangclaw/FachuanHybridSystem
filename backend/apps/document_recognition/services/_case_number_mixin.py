@@ -12,6 +12,7 @@ CASE_NUMBER_PATTERNS = [
     r"(\d{4})([^\d\s]{1}[^\s（）\(\)]{1,19}?)(\d+)号",
 ]
 
+
 class CaseNumberMixin:
     """案号提取 Mixin"""
 

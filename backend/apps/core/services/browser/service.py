@@ -18,6 +18,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("apps.core")
 
+
 class BrowserService:
     """浏览器服务单例。
 
@@ -123,6 +124,7 @@ class BrowserService:
         if cls._instance:
             cls._instance.close()
             cls._instance = None
+
 
 def get_browser_service() -> BrowserService:
     """获取浏览器服务单例。"""

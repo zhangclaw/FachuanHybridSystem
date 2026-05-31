@@ -17,6 +17,7 @@ if TYPE_CHECKING:
     from apps.automation.services.scraper.core.captcha_recognizer import CaptchaRecognizer
     from apps.automation.services.scraper.core.token_service import TokenService
 
+
 class CookieServiceProtocol(Protocol):
     """Cookie 服务协议，支持依赖注入"""
 
@@ -28,7 +29,9 @@ class CookieServiceProtocol(Protocol):
         """保存浏览器上下文中的 Cookie，返回存储路径"""
         ...
 
+
 logger = logging.getLogger("apps.automation")
+
 
 class CourtZxfwService:
     """

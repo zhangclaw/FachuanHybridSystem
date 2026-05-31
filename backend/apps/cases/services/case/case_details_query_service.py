@@ -8,6 +8,7 @@ from django.db.models import Prefetch
 
 from apps.cases.models import Case, CaseAssignment
 
+
 class CaseDetailsQueryService:
     def get_case_model_internal(self, case_id: int) -> Any | None:
         try:

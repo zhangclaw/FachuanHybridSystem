@@ -47,6 +47,7 @@ CAUSE_SPECIFIC_KNOWLEDGE: dict[str, str] = {
     ),
 }
 
+
 def _get_cause_knowledge(cause_of_action: str) -> str:
     """根据案由匹配特定知识."""
     for key, knowledge in CAUSE_SPECIFIC_KNOWLEDGE.items():
@@ -54,15 +55,18 @@ def _get_cause_knowledge(cause_of_action: str) -> str:
             return knowledge
     return ""
 
+
 def _clean_llm_output(text: str) -> str:
     """清理 LLM 输出中的 markdown 标记."""
     return clean_text(text)
+
 
 @dataclass
 class JudgePerspectiveResult:
     report: dict[str, Any]
     model: str
     token_usage: dict[str, int]
+
 
 class JudgePerspectiveChain:
     """法官视角分析 Chain."""
@@ -150,11 +154,13 @@ class JudgePerspectiveChain:
             token_usage=token_usage,
         )
 
+
 @dataclass
 class CrossExamResult:
     opinion: dict[str, Any]
     model: str
     token_usage: dict[str, int]
+
 
 class CrossExamChain:
     """质证模拟 Chain：扮演对方律师，对单份证据进行三性质证."""
@@ -221,10 +227,12 @@ class CrossExamChain:
             },
         )
 
+
 @dataclass
 class DisputeFocusResult:
     focuses: list[dict[str, Any]]
     model: str
+
 
 class DisputeFocusChain:
     """争议焦点归纳 Chain."""
@@ -278,10 +286,12 @@ class DisputeFocusChain:
 
         return DisputeFocusResult(focuses=focuses, model=model_name)
 
+
 @dataclass
 class DebateResult:
     rebuttal: str
     model: str
+
 
 class DebateChain:
     """辩论模拟 Chain：扮演对方律师进行反驳."""

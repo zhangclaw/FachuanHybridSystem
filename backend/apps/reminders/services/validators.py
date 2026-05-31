@@ -17,6 +17,7 @@ if TYPE_CHECKING:
 
     from ..ports import CaseLogTargetQueryPort, CaseTargetQueryPort, ContractTargetQueryPort
 
+
 def normalize_target_id(value: int | None, *, field_name: str | Promise) -> int | None:
     if value is None:
         return None
@@ -24,10 +25,12 @@ def normalize_target_id(value: int | None, *, field_name: str | Promise) -> int 
         raise ValidationException("%(field_name)s 必须为正整数" % {"field_name": field_name})
     return value
 
+
 def validate_positive_id(value: int, *, field_name: str | Promise) -> None:
     """校验 ID 为正整数（非 bool）。"""
     if isinstance(value, bool) or value <= 0:
         raise ValidationException("%(field_name)s 必须为正整数" % {"field_name": field_name})
+
 
 def validate_binding_exclusive(
     *,
@@ -38,6 +41,7 @@ def validate_binding_exclusive(
     bound_count = sum(target_id is not None for target_id in (contract_id, case_id, case_log_id))
     if bound_count > 1:
         raise ValidationException("合同、案件、案件日志最多只能绑定一个")
+
 
 def validate_fk_exists(
     *,
@@ -65,6 +69,7 @@ def validate_fk_exists(
         if not case_log_target_query.exists(case_log_id):
             raise ValidationException("案件日志 %(id)s 不存在" % {"id": case_log_id})
 
+
 def normalize_reminder_type(reminder_type: str) -> str:
     value = str(reminder_type).strip()
     if not value:
@@ -73,8 +78,10 @@ def normalize_reminder_type(reminder_type: str) -> str:
         raise ValidationException("无效的提醒类型")
     return value
 
+
 # 与 Reminder.content max_length=255 保持同步
 _CONTENT_MAX_LENGTH = 255
+
 
 def normalize_content(content: str) -> str:
     value = str(content).strip()
@@ -84,12 +91,14 @@ def normalize_content(content: str) -> str:
         raise ValidationException("提醒事项不能超过 %(max)d 个字符" % {"max": _CONTENT_MAX_LENGTH})
     return value
 
+
 def normalize_due_at(due_at: datetime) -> datetime:
     if not isinstance(due_at, datetime):
         raise ValidationException("到期时间格式不正确")
     if timezone.is_naive(due_at):
         return timezone.make_aware(due_at)
     return due_at
+
 
 def normalize_metadata(metadata: Any) -> dict[str, Any]:
     if metadata is None:

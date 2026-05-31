@@ -9,6 +9,7 @@ from apps.litigation_ai.placeholders.spec import LitigationPlaceholderKeys
 
 logger = logging.getLogger(__name__)
 
+
 @PlaceholderRegistry.register
 class EnforcementJudgmentMainTextService(BasePlaceholderService):
     """执行依据主文服务"""

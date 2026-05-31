@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
+
 class GuaranteeDialogFieldFillingMixin:
     """gTwo 对话框中的 select / date / required 字段填充。"""
 

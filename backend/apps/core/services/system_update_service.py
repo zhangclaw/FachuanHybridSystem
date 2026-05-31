@@ -22,6 +22,7 @@ _DEFAULT_LOCK_TIMEOUT_SECONDS: Final[int] = 30 * 60
 _DEFAULT_TASK_TIMEOUT_SECONDS: Final[int] = 15 * 60
 _DEFAULT_STEP_TIMEOUT_SECONDS: Final[int] = 60
 
+
 class SystemUpdateService:
     """封装系统更新触发、执行与状态管理。"""
 
@@ -370,6 +371,7 @@ class SystemUpdateService:
     @staticmethod
     def _now_iso() -> str:
         return datetime.now(tz=UTC).isoformat()
+
 
 def run_system_update_task(
     *,

@@ -17,6 +17,7 @@ from .filing_models import CaseInfo, ClientInfo, ConflictPartyInfo, ContractInfo
 
 logger = logging.getLogger("apps.oa_filing.jtn")
 
+
 class HttpFilingMixin:
     """HTTP 立案主链路 mixin。"""
 

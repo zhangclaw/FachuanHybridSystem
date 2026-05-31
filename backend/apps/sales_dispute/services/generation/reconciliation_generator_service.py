@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 TEMPLATE_DIR: Path = Path(str(get_docx_templates_root() / "2-案件材料" / "3-催收材料"))
 TEMPLATE_FILE = "对账函.docx"
 
+
 @dataclass(frozen=True)
 class TransactionItem:
     """交易明细项"""
@@ -27,6 +28,7 @@ class TransactionItem:
     transaction_date: date
     description: str
     amount: Decimal
+
 
 @dataclass(frozen=True)
 class ReconciliationParams:
@@ -38,6 +40,7 @@ class ReconciliationParams:
     transactions: list[TransactionItem]
     paid_amount: Decimal
     outstanding_amount: Decimal
+
 
 class ReconciliationGeneratorService:
     """对账函生成服务"""
@@ -75,7 +78,7 @@ class ReconciliationGeneratorService:
                 record=record,
                 action_type="written_collection",
                 action_date=date.today(),
-                description=str("生成对账函"),
+                description="生成对账函",
                 document_type="对账函",
                 document_filename=filename,
             )

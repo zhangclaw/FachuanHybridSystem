@@ -6,6 +6,7 @@ from apps.core.interfaces import ServiceLocator
 
 from .authorization_material_generation_service import AuthorizationMaterialGenerationService
 
+
 def build_authorization_material_generation_service() -> AuthorizationMaterialGenerationService:
     return AuthorizationMaterialGenerationService(
         case_service=ServiceLocator.get_case_service(),

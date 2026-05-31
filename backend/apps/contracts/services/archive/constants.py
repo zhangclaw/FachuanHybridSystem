@@ -12,6 +12,7 @@ from __future__ import annotations
 
 from typing import TypedDict
 
+
 class ChecklistItem(TypedDict):
     """检查清单项"""
 
@@ -21,6 +22,7 @@ class ChecklistItem(TypedDict):
     required: bool  # 是否必需
     auto_detect: str | None  # 自动检测类型，如 "supervision_card"
     source: str  # 材料来源: "template" | "contract" | "case" | "manual"
+
 
 # ============================================================
 # 法律顾问及非诉事务

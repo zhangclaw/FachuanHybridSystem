@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Protocol
 
+
 class IBrowserService(Protocol):
     """浏览器服务接口"""
 
@@ -13,10 +14,12 @@ class IBrowserService(Protocol):
 
     def create_context(self, use_anti_detection: bool = True, **kwargs: Any) -> Any: ...
 
+
 class ICaptchaService(Protocol):
     """验证码服务接口"""
 
     def recognize(self, image_data: bytes) -> str: ...
+
 
 class IOcrService(Protocol):
     def extract_text(self, image_bytes: bytes) -> Any: ...

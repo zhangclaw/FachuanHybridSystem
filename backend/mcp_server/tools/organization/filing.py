@@ -6,6 +6,7 @@ from typing import Any
 
 from mcp_server.client import client
 
+
 def list_oa_configs() -> list[dict[str, Any]]:
     """获取当前用户可用的 OA 系统列表（需要有对应账号凭证）。"""
     return client.get("/oa-filing/configs")  # type: ignore[return-value]

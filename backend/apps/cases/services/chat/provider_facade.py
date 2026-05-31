@@ -10,6 +10,7 @@ from apps.core.models.enums import ChatPlatform
 
 logger = logging.getLogger(__name__)
 
+
 class ChatProviderFacade:
     def __init__(self, *, factory: Any | None = None) -> None:
         if factory is None:
@@ -34,7 +35,7 @@ class ChatProviderFacade:
                 message="群聊平台不可用: %(platform)s" % {"platform": platform.label},
                 code="PROVIDER_NOT_AVAILABLE",
                 platform=platform.value,
-                errors={"platform_status": str("配置不完整或服务不可用")},
+                errors={"platform_status": "配置不完整或服务不可用"},
             )
         return provider
 

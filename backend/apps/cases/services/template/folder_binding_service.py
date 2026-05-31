@@ -23,6 +23,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("apps.cases")
 
+
 class CaseFolderBindingService(FolderBindingCrudService):
     """
     案件文件夹绑定服务

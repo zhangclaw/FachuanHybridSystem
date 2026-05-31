@@ -15,6 +15,7 @@ from .case_chat_service import CaseChatService
 
 logger = logging.getLogger(__name__)
 
+
 class CaseChatServiceAdapter(ICaseChatService):
     """
     案件群聊服务适配器

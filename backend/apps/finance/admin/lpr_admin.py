@@ -25,6 +25,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+
 @admin.register(LPRRate)
 class LPRRateAdmin(BaseModelAdmin):
     """LPR利率Admin配置.

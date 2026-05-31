@@ -8,8 +8,10 @@ from typing import Protocol
 from apps.automation.services.chat.base import ChatResult, MessageContent
 from apps.core.models.enums import ChatPlatform
 
+
 class ChatMessageSender(Protocol):
     def send_text(self, *, platform: ChatPlatform, chat_id: str, text: str) -> ChatResult: ...
+
 
 @dataclass(frozen=True)
 class ChatProviderMessageSender:

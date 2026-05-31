@@ -22,11 +22,14 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("apps.cases")
 
+
 def _get_contact_role_choices() -> list[tuple[str, str]]:
     return [(str(k), str(v)) for k, v in ContactRole.choices]
 
+
 def _get_case_stage_choices() -> list[tuple[str, str]]:
     return [(str(k), str(v)) for k, v in CaseStage.choices]
+
 
 def _has_court_filing_plugin() -> bool:
     try:
@@ -35,6 +38,7 @@ def _has_court_filing_plugin() -> bool:
         return has_court_automation_plugin()
     except ImportError:
         return False
+
 
 def _log_inline_formset(inline_formset: object, logger: logging.Logger) -> None:
     """记录 inline formset 的错误信息（仅记录有错误的表单）"""
@@ -56,6 +60,7 @@ def _log_inline_formset(inline_formset: object, logger: logging.Logger) -> None:
             formset.prefix,
             non_form,
         )
+
 
 class CaseAdminViewsMixin:
     """案件管理后台视图Mixin，提供自定义URL和视图方法"""
@@ -205,7 +210,7 @@ class CaseAdminViewsMixin:
         matched_folder_templates = (
             service.get_matched_folder_templates(case.case_type, our_legal_statuses)
             if case.case_type
-            else str("未设置案件类型")
+            else "未设置案件类型"
         )
 
         matched_case_file_templates, case_file_templates_missing_reason = service.get_case_file_templates_for_detail(
@@ -367,12 +372,12 @@ class CaseAdminViewsMixin:
         service = self._get_case_admin_service()  # type: ignore[attr-defined]
         matched = service.get_matched_folder_templates(case.case_type) if case.case_type else ""
         if not matched or "无匹配" in matched:
-            return str("无匹配的文件夹模板")
+            return "无匹配的文件夹模板"
         return ""
 
     def _get_folder_disabled_reason_v2(self, matched_folder_templates: str) -> str:
         if not matched_folder_templates or "无匹配" in matched_folder_templates:
-            return str("无匹配的文件夹模板")
+            return "无匹配的文件夹模板"
         return ""
 
     def changeform_view(
@@ -426,40 +431,40 @@ class CaseAdminViewsMixin:
 
     def contract_folder_path_display(self, obj: Case) -> str:
         if not obj or not obj.contract:
-            return str("未关联合同")
+            return "未关联合同"
 
         try:
             binding = getattr(obj.contract, "folder_binding", None)
             if binding and binding.folder_path:
                 return str(binding.folder_path)
-            return str("未绑定文件夹")
+            return "未绑定文件夹"
         except Exception:
             logger.exception("操作失败")
-            return str("未绑定文件夹")
+            return "未绑定文件夹"
 
     contract_folder_path_display.short_description = "合同文件夹路径"  # type: ignore[attr-defined]
 
     def filing_number_display(self, obj: Case) -> str:
         if obj and obj.filing_number:
             return str(obj.filing_number)
-        return str("未生成")
+        return "未生成"
 
     filing_number_display.short_description = "建档编号"  # type: ignore[attr-defined]
 
     def has_folder_binding(self, obj: Case) -> str:
         try:
             if hasattr(obj, "folder_binding") and obj.folder_binding:
-                return str("✓ 已绑定")
-            return str("未绑定")
+                return "✓ 已绑定"
+            return "未绑定"
         except Exception:
             logger.exception("操作失败")
-            return str("未绑定")
+            return "未绑定"
 
     has_folder_binding.short_description = "文件夹绑定"  # type: ignore[attr-defined]
 
     def get_matched_folder_templates_display(self, obj: Case) -> str:
         if not obj or not obj.case_type:
-            return str("未设置案件类型")
+            return "未设置案件类型"
         service = self._get_case_admin_service()  # type: ignore[attr-defined]
         return str(service.get_matched_folder_templates(obj.case_type))
 
@@ -706,7 +711,7 @@ class CaseAdminViewsMixin:
             return JsonResponse({"success": False, "error": "Method not allowed"}, status=405)
 
         if not self.has_view_permission(request):  # type: ignore[attr-defined]
-            return JsonResponse({"success": False, "error": str("无权限")}, status=403)
+            return JsonResponse({"success": False, "error": "无权限"}, status=403)
 
         try:
             from apps.cases.models.material import CaseFolderBinding
@@ -714,11 +719,11 @@ class CaseAdminViewsMixin:
             try:
                 binding = CaseFolderBinding.objects.get(case_id=object_id)
             except CaseFolderBinding.DoesNotExist:
-                return JsonResponse({"success": False, "error": str("未绑定文件夹")}, status=404)
+                return JsonResponse({"success": False, "error": "未绑定文件夹"}, status=404)
 
             folder_path = binding.resolved_folder_path
             if not folder_path:
-                return JsonResponse({"success": False, "error": str("文件夹路径为空")}, status=400)
+                return JsonResponse({"success": False, "error": "文件夹路径为空"}, status=400)
 
             folder = Path(folder_path).expanduser().resolve()
             if not folder.exists():
@@ -730,7 +735,7 @@ class CaseAdminViewsMixin:
             home = Path.home().resolve()
             folder_str = str(folder)
             if not (folder_str.startswith(str(home) + "/") or folder_str.startswith("/Volumes/")):
-                return JsonResponse({"success": False, "error": str("不允许打开该目录")}, status=403)
+                return JsonResponse({"success": False, "error": "不允许打开该目录"}, status=403)
 
             system = platform.system()
             if system == "Darwin":
@@ -753,14 +758,14 @@ class CaseAdminViewsMixin:
         from django.http import JsonResponse
 
         if not self.has_view_permission(request):  # type: ignore[attr-defined]
-            return JsonResponse({"success": False, "error": str("无权限")}, status=403)
+            return JsonResponse({"success": False, "error": "无权限"}, status=403)
 
         try:
             from apps.cases.models.material import CaseFolderBinding
 
             binding = CaseFolderBinding.objects.filter(case_id=object_id).first()
             if not binding or not binding.resolved_folder_path:
-                return JsonResponse({"success": False, "error": str("未绑定文件夹")}, status=404)
+                return JsonResponse({"success": False, "error": "未绑定文件夹"}, status=404)
 
             if request.method == "GET":
                 # 列出第一层级所有子文件夹，让用户自己选
@@ -768,7 +773,7 @@ class CaseAdminViewsMixin:
 
                 root = Path(binding.resolved_folder_path).expanduser().resolve()
                 if not root.exists():
-                    return JsonResponse({"success": False, "error": str("文件夹不存在")}, status=404)
+                    return JsonResponse({"success": False, "error": "文件夹不存在"}, status=404)
 
                 subfolders = []
                 for child in sorted(root.iterdir(), key=lambda item: item.name.lower()):
@@ -788,7 +793,7 @@ class CaseAdminViewsMixin:
                 body = json_mod.loads(request.body) if request.body else {}
                 subfolder = body.get("subfolder", "")
                 if not subfolder:
-                    return JsonResponse({"success": False, "error": str("请指定子文件夹")}, status=400)
+                    return JsonResponse({"success": False, "error": "请指定子文件夹"}, status=400)
 
                 from apps.cases.services.log.email_folder_scan_service import EmailFolderScanService
 
@@ -803,7 +808,7 @@ class CaseAdminViewsMixin:
 
                 log_count = len(result["logs"])
                 skipped = result["skipped_count"]
-                msg = str("导入完成：新增 %(count)s 条日志，跳过 %(skipped)s 条（已存在）") % {
+                msg = "导入完成：新增 %(count)s 条日志，跳过 %(skipped)s 条（已存在）" % {
                     "count": log_count,
                     "skipped": skipped,
                 }
@@ -875,5 +880,6 @@ class CaseAdminViewsMixin:
         if not value:
             return None
         return value
+
 
 __all__: list[str] = ["CaseAdminViewsMixin"]

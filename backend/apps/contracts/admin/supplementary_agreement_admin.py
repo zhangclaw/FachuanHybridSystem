@@ -12,6 +12,7 @@ from django.http import HttpRequest
 
 from apps.contracts.models import SupplementaryAgreement, SupplementaryAgreementParty
 
+
 class SupplementaryAgreementPartyInline(admin.TabularInline[SupplementaryAgreementParty, SupplementaryAgreementParty]):
     """补充协议当事人内联编辑"""
 
@@ -26,6 +27,7 @@ class SupplementaryAgreementPartyInline(admin.TabularInline[SupplementaryAgreeme
 
     class Media:
         js = ("contracts/js/party_role_auto.js",)
+
 
 @admin.register(SupplementaryAgreement)
 class SupplementaryAgreementAdmin(admin.ModelAdmin):

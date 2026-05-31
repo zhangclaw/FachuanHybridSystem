@@ -6,6 +6,7 @@ from typing import Any
 from apps.core.exceptions import ValidationException
 from apps.core.utils.path import Path
 
+
 class FolderPathValidator:
     def is_network_path(self, path: str) -> bool:
         value = (path or "").strip()

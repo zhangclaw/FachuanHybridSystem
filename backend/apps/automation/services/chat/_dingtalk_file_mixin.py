@@ -20,6 +20,7 @@ from .base import ChatResult
 
 logger = logging.getLogger(__name__)
 
+
 class DingtalkFileMixin:
     """负责钉钉文件上传和文件消息发送"""
 

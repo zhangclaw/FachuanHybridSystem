@@ -12,6 +12,7 @@ from .base import CalendarEvent
 
 logger = logging.getLogger(__name__)
 
+
 class WindowsOutlookProvider:
     """Read events from local Outlook via COM automation."""
 

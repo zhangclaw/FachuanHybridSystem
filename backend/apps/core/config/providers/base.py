@@ -7,6 +7,7 @@
 from abc import ABC, abstractmethod
 from typing import Any
 
+
 class ConfigProvider(ABC):
     """配置提供者抽象基类"""
 

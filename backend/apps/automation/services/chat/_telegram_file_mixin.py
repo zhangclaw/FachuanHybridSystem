@@ -19,6 +19,7 @@ from .base import ChatResult
 
 logger = logging.getLogger(__name__)
 
+
 class TelegramFileMixin:
     """负责 Telegram 文件上传和发送"""
 

@@ -7,6 +7,7 @@ from typing import Any
 
 from mcp_server.client import client
 
+
 def list_document_templates(
     template_type: str | None = None,
     case_type: str | None = None,

@@ -8,6 +8,7 @@ from apps.story_viz.schemas import ExtractedFacts, FactEvent
 
 logger = logging.getLogger("apps.story_viz")
 
+
 class FactExtractionService:
     def __init__(self, *, llm_service: Any, model: str | None = None) -> None:
         self._llm_service = llm_service

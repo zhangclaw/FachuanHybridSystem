@@ -5,16 +5,19 @@ from __future__ import annotations
 import logging
 from typing import cast
 
+
 def get_logger() -> logging.Logger:
     import importlib
 
     module = importlib.import_module("apps.automation.utils.logging")
     return cast(logging.Logger, module.logger)
 
+
 def utc_now_iso() -> str:
     from apps.core.telemetry.time import utc_now_iso as _utc_now_iso
 
     return _utc_now_iso()
+
 
 def stable_hash(value: str) -> str:
     import hashlib
@@ -26,6 +29,7 @@ def stable_hash(value: str) -> str:
     secret = (getattr(settings, "SECRET_KEY", "") or "").encode("utf-8")
     digest = hmac.new(secret, v, hashlib.sha256).hexdigest()
     return digest[:32]
+
 
 def mask_account(value: str, *, keep_last: int = 4) -> str:
     s = (value or "").strip()
@@ -43,6 +47,7 @@ def mask_account(value: str, *, keep_last: int = 4) -> str:
     tail = s[-keep_last:] if keep_last else ""
     return f"***{tail}"
 
+
 def sanitize_url(url: str, *, max_length: int = 200) -> str:
     if not url:
         return ""
@@ -53,6 +58,7 @@ def sanitize_url(url: str, *, max_length: int = 200) -> str:
     if len(safe_url) > max_length:
         return f"{safe_url[:max_length]}..."
     return safe_url
+
 
 def normalize_cache_key_component(value: str, *, max_len: int = 64) -> str:
     import re

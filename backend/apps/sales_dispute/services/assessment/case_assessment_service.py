@@ -24,6 +24,7 @@ from .litigation_strategy_service import LitigationStrategyService, StrategyPara
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class AssessmentInput:
     """综合评估输入"""
@@ -47,6 +48,7 @@ class AssessmentInput:
     principal_due_date: date | None = None
     remarks: str = ""
 
+
 @dataclass(frozen=True)
 class AssessmentOutput:
     """综合评估输出"""
@@ -68,6 +70,7 @@ class AssessmentOutput:
     jurisdiction: JurisdictionResult
     strategy: dict[str, Any]
     remarks: str
+
 
 class CaseAssessmentService:
     """综合评估编排服务"""

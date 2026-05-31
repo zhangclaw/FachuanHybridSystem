@@ -9,12 +9,14 @@ from typing import Any
 
 __all__ = ["HealthStatus", "ComponentHealth", "SystemHealth"]
 
+
 class HealthStatus(str, Enum):
     """健康状态枚举"""
 
     HEALTHY = "healthy"
     DEGRADED = "degraded"
     UNHEALTHY = "unhealthy"
+
 
 @dataclass
 class ComponentHealth:
@@ -26,6 +28,7 @@ class ComponentHealth:
     message: str | None = None
     details: dict[str, Any] = field(default_factory=dict)
     diagnostic_info: dict[str, Any] = field(default_factory=dict)
+
 
 @dataclass
 class SystemHealth:
@@ -55,6 +58,7 @@ class SystemHealth:
                 for c in self.components
             ],
         }
+
 
 # 记录启动时间
 _start_time = time.time()

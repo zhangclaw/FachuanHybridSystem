@@ -16,6 +16,7 @@ from .case import Case
 if TYPE_CHECKING:
     from django.db.models.fields.related_descriptors import RelatedManager
 
+
 class CaseChat(models.Model):
     """案件群聊"""
 
@@ -68,8 +69,8 @@ class CaseChat(models.Model):
     def get_owner_display(self) -> str:
         """获取群主显示信息"""
         if not self.owner_id:
-            return str("未设置群主")
-        status = str("已验证") if self.owner_verified else str("未验证")
+            return "未设置群主"
+        status = "已验证" if self.owner_verified else "未验证"
         return f"{self.owner_id} ({status})"
 
     def is_owner_verified_recently(self, hours: int = 24) -> bool:
@@ -87,6 +88,7 @@ class CaseChat(models.Model):
         if self.owner_verified:
             summary_parts.append("已验证")
         return " | ".join(summary_parts)
+
 
 class ChatAuditLog(models.Model):
     """群聊审计日志"""
@@ -124,9 +126,7 @@ class ChatAuditLog(models.Model):
     action = models.CharField(
         max_length=32, choices=ACTION_CHOICES, verbose_name="操作类型", help_text="执行的操作类型"
     )
-    details: Any = models.JSONField(
-        default=dict, verbose_name="操作详情", help_text="操作的详细信息,以JSON格式存储"
-    )
+    details: Any = models.JSONField(default=dict, verbose_name="操作详情", help_text="操作的详细信息,以JSON格式存储")
     timestamp = models.DateTimeField(auto_now_add=True, verbose_name="时间戳", help_text="操作发生的时间")
     success = models.BooleanField(default=True, verbose_name="操作成功", help_text="操作是否成功执行")
     error_message = models.TextField(blank=True, verbose_name="错误信息", help_text="操作失败时的错误信息")

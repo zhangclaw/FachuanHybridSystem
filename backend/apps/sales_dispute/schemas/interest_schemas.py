@@ -11,12 +11,14 @@ from datetime import date
 
 from ninja import Schema
 
+
 class BatchDeliveryItem(Schema):
     """分批交货条目"""
 
     delivery_date: date
     amount: float
     payment_date: date | None = None
+
 
 class InterestCalcRequest(Schema):
     """利息计算请求"""
@@ -35,6 +37,7 @@ class InterestCalcRequest(Schema):
     reasonable_period_days: int = 30
     batch_deliveries: list[BatchDeliveryItem] | None = None
 
+
 class SegmentDetailResponse(Schema):
     """利息分段明细"""
 
@@ -44,12 +47,14 @@ class SegmentDetailResponse(Schema):
     rate: float
     interest: float
 
+
 class InterestCalcResponse(Schema):
     """利息计算响应"""
 
     total_interest: float
     segments: list[SegmentDetailResponse]
     warnings: list[str]
+
 
 class CostBenefitRequest(Schema):
     """成本收益分析请求"""
@@ -67,6 +72,7 @@ class CostBenefitRequest(Schema):
     fee_transfer_rate: float = 0.95
     lawyer_transfer_rate: float = 0.60
 
+
 class CostBenefitResponse(Schema):
     """成本收益分析响应"""
 
@@ -77,6 +83,7 @@ class CostBenefitResponse(Schema):
     cost_details: dict[str, float]
     revenue_details: dict[str, float]
     risk_warning: str | None = None
+
 
 class LPRRateResponse(Schema):
     """LPR利率响应"""

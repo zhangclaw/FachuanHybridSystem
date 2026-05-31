@@ -13,6 +13,7 @@ from django.contrib.auth.models import AnonymousUser
 
 logger = logging.getLogger(__name__)
 
+
 class MockTrialConsumer(AsyncWebsocketConsumer):
     """模拟庭审 WebSocket 消费者."""
 

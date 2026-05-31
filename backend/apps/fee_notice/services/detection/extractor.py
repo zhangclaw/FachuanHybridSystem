@@ -31,6 +31,7 @@ FEE_NAME_MAPPING: dict[str, str] = {
 # 所有费用名称关键词
 FEE_KEYWORDS: list[str] = list(FEE_NAME_MAPPING.keys())
 
+
 class FeeAmountExtractor:
     """费用金额提取器"""
 

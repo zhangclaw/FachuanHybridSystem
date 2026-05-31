@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any, ClassVar, TypeVar
 
 _T = TypeVar("_T")
 
+
 class _ServiceLocatorStub:
     """Stub base so mypy knows mixins have get_or_create / get_*_service at class level."""
 
@@ -48,6 +49,7 @@ class _ServiceLocatorStub:
     @classmethod
     def get_document_processing_service(cls) -> Any: ...
 
+
 if TYPE_CHECKING:
     from apps.core.protocols import (
         IAccountSelectionStrategy,
@@ -71,6 +73,7 @@ if TYPE_CHECKING:
         ITokenService,
         IValidatorService,
     )
+
 
 class AutomationServiceLocatorMixin(_ServiceLocatorStub):
     @classmethod

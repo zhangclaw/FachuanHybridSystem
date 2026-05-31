@@ -19,13 +19,16 @@ from .data_classes import DocumentType
 
 logger = logging.getLogger("apps.document_recognition")
 
+
 def get_ollama_model() -> str:
     """兼容旧测试与调用方：保留模块级配置读取入口。"""
     return LLMConfig.get_ollama_model()
 
+
 def get_ollama_base_url() -> str:
     """兼容旧测试与调用方：保留模块级配置读取入口。"""
     return LLMConfig.get_ollama_base_url()
+
 
 def chat(
     *,
@@ -46,6 +49,7 @@ def chat(
         **kwargs,
     )
     return {"message": {"content": llm_response.content}}
+
 
 class DocumentClassifier:
     """

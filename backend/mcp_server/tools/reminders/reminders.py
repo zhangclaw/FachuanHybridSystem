@@ -6,6 +6,7 @@ from typing import Any
 
 from mcp_server.client import client
 
+
 def list_all_reminders(
     contract_id: int | None = None,
     case_log_id: int | None = None,

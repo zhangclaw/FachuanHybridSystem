@@ -7,11 +7,13 @@ from typing import Any
 
 PLACEHOLDER_FALLBACK_VALUE = "/"
 
+
 def normalize_placeholder_value(value: Any, *, fallback_value: str = PLACEHOLDER_FALLBACK_VALUE) -> Any:
     """将 None 和空字符串统一归一为兜底值。"""
     if value is None or (isinstance(value, str) and value.strip() == ""):
         return fallback_value
     return value
+
 
 def get_service_placeholder_keys(service: Any) -> list[str]:
     """兼容不同服务实现，提取服务声明的占位符键。"""
@@ -29,6 +31,7 @@ def get_service_placeholder_keys(service: Any) -> list[str]:
         if isinstance(key, str) and key.strip():
             result.append(key)
     return result
+
 
 def normalize_service_result(
     service_result: Mapping[str, Any] | None,
@@ -48,6 +51,7 @@ def normalize_service_result(
 
     return normalized
 
+
 def ensure_required_placeholders(
     context: Mapping[str, Any],
     required_placeholders: Iterable[str] | None,
@@ -66,6 +70,7 @@ def ensure_required_placeholders(
 
     return normalized
 
+
 def build_docx_render_context(
     *,
     doc: Any,
@@ -81,6 +86,7 @@ def build_docx_render_context(
 
     return normalized
 
+
 def resolve_render_variable(
     variables: Mapping[str, Any],
     key: str,
@@ -91,6 +97,7 @@ def resolve_render_variable(
     if key in variables and variables[key] is not None:
         return True, str(variables[key])
     return False, fallback_value
+
 
 def _get_undeclared_template_variables(*, doc: Any, context: Mapping[str, Any]) -> set[str]:
     getter = getattr(doc, "get_undeclared_template_variables", None)

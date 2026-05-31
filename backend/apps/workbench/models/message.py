@@ -6,6 +6,7 @@ from typing import ClassVar
 
 from django.db import models
 
+
 class WorkbenchMessage(models.Model):
     """工作台对话消息"""
 
