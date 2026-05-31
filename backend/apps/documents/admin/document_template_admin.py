@@ -455,7 +455,7 @@ class DocumentTemplateAdmin(admin.ModelAdmin):
     def get_fieldsets(self, request: Any, obj: Any = None) -> list[Any]:
         fieldsets = list(super().get_fieldsets(request, obj))
         if obj is not None:
-            fieldsets.insert(len(fieldsets) - 1, self._edit_fieldsets)
+            fieldsets.insert(len(fieldsets) - 1, self._edit_fieldsets)  # type: ignore[arg-type]
         return fieldsets
 
     change_list_template = "admin/documents/documenttemplate/change_list.html"

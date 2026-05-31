@@ -127,7 +127,7 @@ class InvoiceRecognitionTaskAdmin(admin.ModelAdmin):
     status_display.short_description = "状态"  # type: ignore[attr-defined]
 
     def record_count(self, obj: InvoiceRecognitionTask) -> int:
-        return obj._record_count  # type: ignore[attr-defined]
+        return obj._record_count  # type: ignore[attr-defined,no-any-return]
 
     record_count.short_description = "发票数量"  # type: ignore[attr-defined]
 

@@ -255,14 +255,14 @@ class DocumentDeliveryScheduleAdmin(admin.ModelAdmin):
     def activate_schedules_action(self, request: HttpRequest, queryset: QuerySet[DocumentDeliverySchedule]) -> None:
         """启用定时任务操作"""
         updated = queryset.update(is_active=True)
-        messages.success(request, _(f"成功启用 {updated} 个定时任务"))
+        messages.success(request, f"成功启用 {updated} 个定时任务")
         logger.info(f"管理员批量启用定时任务: Count={updated}, User={request.user}")
 
     @admin.action(description="✗ 禁用选中的定时任务")
     def deactivate_schedules_action(self, request: HttpRequest, queryset: QuerySet[DocumentDeliverySchedule]) -> None:
         """禁用定时任务操作"""
         updated = queryset.update(is_active=False)
-        messages.success(request, _(f"成功禁用 {updated} 个定时任务"))
+        messages.success(request, f"成功禁用 {updated} 个定时任务")
         logger.info(f"管理员批量禁用定时任务: Count={updated}, User={request.user}")
 
     def trigger_manual_query_view(self, request: HttpRequest, schedule_id: int) -> HttpResponse:
