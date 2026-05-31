@@ -512,80 +512,174 @@ class DocumentTemplateAdmin(admin.ModelAdmin):
                 self.admin_site.admin_view(self.extract_placeholders_view),
                 name="documents_documenttemplate_extract_placeholders",
             ),
+            path(
+                "smart-fill-preview/",
+                self.admin_site.admin_view(self.smart_fill_preview_view),
+                name="documents_documenttemplate_smart_fill_preview",
+            ),
+            path(
+                "smart-fill-render/",
+                self.admin_site.admin_view(self.smart_fill_render_view),
+                name="documents_documenttemplate_smart_fill_render",
+            ),
         ]
         return custom_urls + urls
 
-    def extract_placeholders_view(self, request: Any) -> Any:
-        """
-        从上传的文件或已有模板文件中提取占位符，返回 JSON。
+    def _resolve_template_path(self, request: Any) -> tuple[str | None, str | None]:
+        """从三种文件来源解析模板绝对路径。
 
-        支持三种方式:
-        1. POST file: 上传一个 docx 文件，提取占位符
-        2. POST existing_file: 从已有模板库中选择文件路径，提取占位符
-        3. POST file_path: 使用模板相对路径，提取占位符
+        Returns:
+            (path, error): path 为文件绝对路径（上传文件为临时路径，调用方负责清理），
+                          error 为错误信息（成功时为 None）。
         """
         import tempfile
 
+        uploaded_file = request.FILES.get("file")
+        if uploaded_file:
+            suffix = Path(str(uploaded_file.name)).suffix or ".docx"
+            with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
+                for chunk in uploaded_file.chunks():
+                    tmp.write(chunk)
+                return tmp.name, None
+
+        existing_file = request.POST.get("existing_file", "").strip()
+        file_path = request.POST.get("file_path", "").strip()
+        template_path = existing_file or file_path
+        if template_path:
+            from apps.documents.storage import resolve_docx_template_path
+
+            resolved = resolve_docx_template_path(template_path)
+            if resolved.exists():
+                return str(resolved), None
+            return None, f"文件不存在: {template_path}"
+
+        return None, "请提供 file、existing_file 或 file_path 参数"
+
+    def extract_placeholders_view(self, request: Any) -> Any:
+        """从上传的文件或已有模板文件中提取占位符，返回 JSON。"""
         from django.http import JsonResponse
 
         if request.method != "POST":
             return JsonResponse({"error": "仅支持 POST 请求"}, status=405)
 
+        tmp_path: str | None = None
         try:
-            placeholders: list[str] = []
-            source_label = ""
+            template_path, err = self._resolve_template_path(request)
+            if err:
+                return JsonResponse({"error": err}, status=400 if "请提供" in err else 404)
 
-            # 方式1：从上传的文件中提取
-            uploaded_file = request.FILES.get("file")
-            if uploaded_file:
-                suffix = Path(str(uploaded_file.name)).suffix or ".docx"
-                with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
-                    for chunk in uploaded_file.chunks():
-                        tmp.write(chunk)
-                    tmp_path = tmp.name
-                try:
-                    from apps.documents.services.document_template.placeholder_extractor import (
-                        extract_placeholders as extract_from_file,
-                    )
+            # 上传文件时 template_path 是临时路径，需要在 finally 中清理
+            if request.FILES.get("file"):
+                tmp_path = template_path
 
-                    placeholders = extract_from_file(tmp_path)
-                    source_label = f"上传文件: {uploaded_file.name}"
-                finally:
-                    Path(tmp_path).unlink(missing_ok=True)
-            else:
-                # 方式2/3：从已有模板文件路径或 file_path 提取
-                existing_file = request.POST.get("existing_file", "").strip()
-                file_path = request.POST.get("file_path", "").strip()
-                template_path = existing_file or file_path
+            from apps.documents.services.document_template.placeholder_extractor import (
+                extract_placeholders as extract_from_file,
+            )
 
-                if template_path:
-                    from apps.documents.services.document_template.placeholder_extractor import (
-                        extract_placeholders as extract_from_file,
-                    )
-                    from apps.documents.storage import resolve_docx_template_path
+            placeholders = extract_from_file(template_path)
 
-                    resolved = resolve_docx_template_path(template_path)
-                    if resolved.exists():
-                        placeholders = extract_from_file(str(resolved))
-                        source_label = f"模板文件: {template_path}"
-                    else:
-                        return JsonResponse({"error": f"文件不存在: {template_path}"}, status=404)
-                else:
-                    return JsonResponse({"error": "请提供 file、existing_file 或 file_path 参数"}, status=400)
-
-            # 查询哪些占位符已定义
             from apps.documents.models import Placeholder
 
             defined_keys = set(Placeholder.objects.filter(is_active=True).values_list("key", flat=True))
-            result = []
-            for p in placeholders:
-                result.append({"key": p, "defined": p in defined_keys})
+            result = [{"key": p, "defined": p in defined_keys} for p in placeholders]
 
+            source_label = "上传文件" if tmp_path else f"模板文件: {request.POST.get('existing_file') or request.POST.get('file_path')}"
             return JsonResponse({"placeholders": result, "source": source_label, "count": len(result)})
 
         except Exception as e:
             logger.exception("提取占位符失败")
             return JsonResponse({"error": str(e)}, status=500)
+        finally:
+            if tmp_path:
+                Path(tmp_path).unlink(missing_ok=True)
+
+    def smart_fill_preview_view(self, request: Any) -> Any:
+        """AI 智能填充预览：调用 LLM 生成占位符映射，返回 JSON。"""
+        from django.http import JsonResponse
+
+        if request.method != "POST":
+            return JsonResponse({"error": "仅支持 POST 请求"}, status=405)
+
+        user_input = request.POST.get("user_input", "").strip()
+        if not user_input:
+            return JsonResponse({"error": "请输入自然语言描述"}, status=400)
+
+        tmp_path: str | None = None
+        try:
+            template_path, err = self._resolve_template_path(request)
+            if err:
+                return JsonResponse({"error": err}, status=400 if "请提供" in err else 404)
+
+            if request.FILES.get("file"):
+                tmp_path = template_path
+
+            from apps.documents.services.infrastructure.wiring import get_smart_fill_service
+
+            service = get_smart_fill_service()
+            result = service.preview(template_path, user_input)
+
+            if result.error:
+                return JsonResponse({"error": result.error}, status=400)
+
+            return JsonResponse({
+                "placeholders": [{"key": p.key, "value": p.value, "source": p.source} for p in result.placeholders]
+            })
+
+        except Exception as e:
+            logger.exception("智能填充预览失败")
+            return JsonResponse({"error": str(e)}, status=500)
+        finally:
+            if tmp_path:
+                Path(tmp_path).unlink(missing_ok=True)
+
+    def smart_fill_render_view(self, request: Any) -> Any:
+        """AI 智能填充渲染：根据用户编辑后的映射值渲染 docx 并返回下载。"""
+        import json
+
+        from django.http import HttpResponse, JsonResponse
+
+        if request.method != "POST":
+            return JsonResponse({"error": "仅支持 POST 请求"}, status=405)
+
+        placeholders_json = request.POST.get("placeholders", "[]")
+        try:
+            placeholders_data = json.loads(placeholders_json)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "无效的占位符数据"}, status=400)
+
+        tmp_path: str | None = None
+        try:
+            template_path, err = self._resolve_template_path(request)
+            if err:
+                return JsonResponse({"error": err}, status=400 if "请提供" in err else 404)
+
+            if request.FILES.get("file"):
+                tmp_path = template_path
+
+            from apps.documents.services.infrastructure.wiring import get_smart_fill_service
+            from apps.documents.services.smart_fill.service import PlaceholderResult
+
+            placeholders = [
+                PlaceholderResult(key=p["key"], value=p["value"], source=p.get("source", "llm"))
+                for p in placeholders_data
+            ]
+
+            service = get_smart_fill_service()
+            rendered_bytes = service.render(template_path, placeholders)
+
+            response = HttpResponse(
+                rendered_bytes,
+                content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            )
+            response["Content-Disposition"] = 'attachment; filename="smart_fill_output.docx"'
+            return response
+
+        except Exception as e:
+            logger.exception("智能填充渲染失败")
+            return JsonResponse({"error": str(e)}, status=500)
+        finally:
+            if tmp_path:
+                Path(tmp_path).unlink(missing_ok=True)
 
     def download_view(self, request: Any, pk: int) -> Any:
         """下载文件视图"""
