@@ -366,6 +366,8 @@ class ExecutorQueryMixin:
         r"(?:案由|法律关系|争议焦点|损失类型|关键事实)"
         r"[（(]?(?:如[：:].+?|[0-9]+)[）)]?$"
     )
+    # 去掉括号后只剩字段名的通用标签
+    _GENERIC_LABELS = frozenset({"案由", "法律关系", "争议焦点", "损失类型", "关键事实"})
 
     @classmethod
     def _sanitize_elements(cls, elements: dict[str, Any]) -> dict[str, Any]:
@@ -379,6 +381,9 @@ class ExecutorQueryMixin:
                 return ""
             # 过滤含"如："的残留
             if "如：" in text or "如:" in text:
+                return ""
+            # 过滤只剩字段名的通用标签
+            if text in cls._GENERIC_LABELS:
                 return ""
             return text.strip()
 
