@@ -166,36 +166,11 @@
     margin-top: 6px;
 }
 
-/* AI 智能填充区域样式 */
-.smart-fill-section {
-    margin-top: 20px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    overflow: hidden;
-}
-.smart-fill-section h2 {
-    background: #f8f9fa;
-    padding: 12px 16px;
-    margin: 0;
-    font-size: 14px;
-    border-bottom: 1px solid #ddd;
-}
-.smart-fill-body {
-    padding: 16px;
-}
+/* AI 智能填充区域样式 — 沿用 Django .module 风格 */
 .smart-fill-desc {
     color: #666;
     font-size: 13px;
-    margin: 0 0 16px;
-}
-.smart-fill-body .form-row {
-    margin-bottom: 12px;
-}
-.smart-fill-body .form-row label {
-    display: block;
-    font-weight: 600;
-    margin-bottom: 4px;
-    font-size: 13px;
+    margin: 0 0 12px;
 }
 .smart-fill-actions {
     display: flex;
@@ -210,12 +185,12 @@
 }
 .smart-fill-preview-table th,
 .smart-fill-preview-table td {
-    padding: 8px 12px;
+    padding: 6px 10px;
     border: 1px solid #ddd;
     text-align: left;
 }
 .smart-fill-preview-table th {
-    background: #f5f5f5;
+    background: #f8f8f8;
     font-weight: 600;
 }
 .smart-fill-preview-table td input[type="text"] {
@@ -228,12 +203,11 @@
 }
 .smart-fill-source-auto { color: #28a745; font-weight: 600; }
 .smart-fill-source-llm { color: #417690; font-weight: 600; }
-.smart-fill-source-fallback { color: #dc3545; font-weight: 600; }
+.smart-fill-source-fallback { color: #999; }
 #smart-fill-error {
     margin-top: 8px;
     padding: 8px 12px;
-    background: #fff5f5;
-    border-radius: 4px;
+    color: #ba2121;
     font-size: 13px;
 }
 </style>
@@ -245,46 +219,44 @@
 
 {% block after_related_objects %}
 {{ block.super }}
-<div class="smart-fill-section">
+<div class="module">
     <h2>AI 智能填充</h2>
-    <div class="smart-fill-body">
-        <p class="smart-fill-desc">输入自然语言描述，AI 自动将信息映射到模板占位符并填充。支持在预览后修改值再下载。</p>
-        <div class="form-row">
-            <label for="id_smart_fill_llm_model">LLM 模型</label>
-            <select id="id_smart_fill_llm_model" class="vLargeTextField">
-                {% for value, label in smart_fill_llm_models %}
-                <option value="{{ value }}">{{ label }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="form-row">
-            <label for="id_smart_fill_input">自然语言描述</label>
-            <textarea id="id_smart_fill_input" rows="4" class="vLargeTextField"
-                placeholder="例如：委托人是张三，案件编号是(2026)京01民初123号，被申请人是李四"></textarea>
-        </div>
-        <div class="smart-fill-actions">
-            <button type="button" id="smart-fill-preview-btn" class="button">AI 填充预览</button>
-        </div>
-        <div id="smart-fill-loading" style="display:none;">
-            <div class="preview-loading"><span class="spinner"></span>AI 正在分析...</div>
-        </div>
-        <div id="smart-fill-error" style="display:none;"></div>
-        <div id="smart-fill-result" style="display:none;">
-            <table class="smart-fill-preview-table">
-                <thead>
-                    <tr>
-                        <th>占位符</th>
-                        <th>填充值</th>
-                        <th>来源</th>
-                    </tr>
-                </thead>
-                <tbody id="smart-fill-tbody"></tbody>
-            </table>
-            <div class="smart-fill-actions" style="margin-top:12px;">
-                <button type="button" id="smart-fill-download-btn" class="button" style="background:#28a745;color:#fff;border-color:#28a745;">
-                    下载填充后的文件
-                </button>
-            </div>
+    <div class="smart-fill-desc">输入自然语言描述，AI 自动将信息映射到模板占位符并填充。支持在预览后修改值再下载。</div>
+    <div class="form-row">
+        <label for="id_smart_fill_llm_model">LLM 模型</label>
+        <select id="id_smart_fill_llm_model" class="vLargeTextField">
+            {% for value, label in smart_fill_llm_models %}
+            <option value="{{ value }}">{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-row">
+        <label for="id_smart_fill_input">自然语言描述</label>
+        <textarea id="id_smart_fill_input" rows="4" class="vLargeTextField"
+            placeholder="例如：委托人是张三，案件编号是(2026)京01民初123号，被申请人是李四"></textarea>
+    </div>
+    <div class="smart-fill-actions">
+        <button type="button" id="smart-fill-preview-btn" class="button">AI 填充预览</button>
+    </div>
+    <div id="smart-fill-loading" style="display:none;">
+        <div class="preview-loading"><span class="spinner"></span>AI 正在分析...</div>
+    </div>
+    <div id="smart-fill-error" style="display:none;"></div>
+    <div id="smart-fill-result" style="display:none;">
+        <table class="smart-fill-preview-table">
+            <thead>
+                <tr>
+                    <th>占位符</th>
+                    <th>填充值</th>
+                    <th>来源</th>
+                </tr>
+            </thead>
+            <tbody id="smart-fill-tbody"></tbody>
+        </table>
+        <div class="smart-fill-actions" style="margin-top:12px;">
+            <button type="button" id="smart-fill-download-btn" class="button default" style="background:#28a745;color:#fff;border-color:#28a745;">
+                下载填充后的文件
+            </button>
         </div>
     </div>
 </div>
