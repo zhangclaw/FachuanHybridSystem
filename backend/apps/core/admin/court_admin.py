@@ -92,6 +92,8 @@ class CourtAdmin(admin.ModelAdmin):
         ),
     )
 
+    autocomplete_fields = ["parent"]
+
     list_select_related = ["parent"]
 
     ordering = ["province", "level", "name"]

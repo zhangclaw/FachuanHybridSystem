@@ -10,6 +10,7 @@ import logging
 from typing import TYPE_CHECKING, Any, ClassVar
 
 from django.contrib import admin, messages
+from django.db.models import Count, Q, QuerySet
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.urls import URLPattern, path, reverse
 from django.utils.html import format_html
@@ -22,11 +23,13 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+
 def _get_initialization_service() -> CauseCourtInitializationService:
     """工厂函数:创建初始化服务实例"""
     from apps.core.services.cause_court_initialization_service import CauseCourtInitializationService
 
     return CauseCourtInitializationService()
+
 
 @admin.register(CauseOfAction)
 class CauseOfActionAdmin(admin.ModelAdmin):
@@ -111,6 +114,18 @@ class CauseOfActionAdmin(admin.ModelAdmin):
 
     change_list_template = "admin/core/causeofaction/change_list.html"
 
+    def formfield_for_foreignkey(self, db_field: Any, request: HttpRequest, **kwargs: Any) -> Any:
+        """优化 parent FK 字段的查询集，只加载非叶子节点作为可选父级"""
+        if db_field.name == "parent":
+            kwargs["queryset"] = (
+                CauseOfAction.objects.filter(children__isnull=False).distinct().order_by("case_type", "code")
+            )
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+    def get_queryset(self, request: HttpRequest) -> QuerySet[CauseOfAction]:
+        """预加载 parent 及 parent.parent，避免 list_display 中 N+1 查询"""
+        return super().get_queryset(request).select_related("parent", "parent__parent", "parent__parent__parent")
+
     @admin.display(description="案件类型", ordering="case_type")
     def case_type_display(self, obj: CauseOfAction) -> SafeString:
         """带颜色的案件类型显示"""
@@ -163,24 +178,17 @@ class CauseOfActionAdmin(admin.ModelAdmin):
         """自定义列表页面"""
         extra_context = extra_context or {}
 
-        # 统计信息
-        total_count = CauseOfAction.objects.count()
-        active_count = CauseOfAction.objects.filter(is_active=True, is_deprecated=False).count()
-        deprecated_count = CauseOfAction.objects.filter(is_deprecated=True).count()
+        # 单条聚合查询替代 6 条 COUNT 查询
+        stats = CauseOfAction.objects.aggregate(
+            total_count=Count("id"),
+            active_count=Count("id", filter=Q(is_active=True, is_deprecated=False)),
+            deprecated_count=Count("id", filter=Q(is_deprecated=True)),
+            civil_count=Count("id", filter=Q(case_type=CauseOfAction.CaseType.CIVIL)),
+            criminal_count=Count("id", filter=Q(case_type=CauseOfAction.CaseType.CRIMINAL)),
+            administrative_count=Count("id", filter=Q(case_type=CauseOfAction.CaseType.ADMINISTRATIVE)),
+        )
 
-        # 按类型统计
-        civil_count = CauseOfAction.objects.filter(case_type=CauseOfAction.CaseType.CIVIL).count()
-        criminal_count = CauseOfAction.objects.filter(case_type=CauseOfAction.CaseType.CRIMINAL).count()
-        administrative_count = CauseOfAction.objects.filter(case_type=CauseOfAction.CaseType.ADMINISTRATIVE).count()
-
-        extra_context["statistics"] = {
-            "total_count": total_count,
-            "active_count": active_count,
-            "deprecated_count": deprecated_count,
-            "civil_count": civil_count,
-            "criminal_count": criminal_count,
-            "administrative_count": administrative_count,
-        }
+        extra_context["statistics"] = stats
         extra_context["show_initialize_button"] = True
 
         return super().changelist_view(request, extra_context=extra_context)
