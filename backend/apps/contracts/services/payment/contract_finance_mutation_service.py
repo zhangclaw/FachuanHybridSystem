@@ -177,7 +177,7 @@ class ContractFinanceMutationService(DjangoPermsMixin):
                 contract_id=contract_id,
                 action=action,
                 level=level,
-                actor_id=user_id,  # type: ignore[arg-type]
+                actor_id=user_id,  # type: ignore[misc]
                 payload=payload,
             )
         except Exception:
