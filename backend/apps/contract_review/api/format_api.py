@@ -67,7 +67,18 @@ def normalize_format(
         output_filename = f"{original_path.stem}_规范化{original_path.suffix}"
         output_path = output_dir / output_filename
 
-        normalizer = DocxFormatNormalizer(original_path, output_path)
+        # 获取参考文档路径
+        reference_path = None
+        if payload.reference_file:
+            reference_path = Path(payload.reference_file)
+            if not reference_path.exists():
+                return {
+                    "task_id": task.id,
+                    "status": "failed",
+                    "message": f"参考文档不存在: {reference_path}",
+                }
+
+        normalizer = DocxFormatNormalizer(original_path, output_path, reference_path)
         result_path = normalizer.normalize()
 
         # 更新任务的输出文件

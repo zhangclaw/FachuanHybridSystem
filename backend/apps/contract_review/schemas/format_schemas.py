@@ -8,6 +8,7 @@ from ninja import Schema
 class FormatNormalizeIn(Schema):
     """格式规范化输入"""
     task_id: UUID  # 关联的审查任务 ID
+    reference_file: str | None = None  # 参考文档路径（可选）
 
 
 class FormatNormalizeOut(Schema):
