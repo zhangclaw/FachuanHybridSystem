@@ -13,47 +13,11 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-def _get_nutstore_config_from_system_config() -> dict[str, str] | None:
-    """Read Nutstore WebDAV credentials from SystemConfig (DB)."""
-    try:
-        from apps.core.services.system_config_service import SystemConfigService
-
-        service = SystemConfigService()
-        username = service.get_value("NUTSTORE_WEBDAV_USERNAME", "")
-        password = service.get_value("NUTSTORE_WEBDAV_PASSWORD", "")
-        if not username or not password:
-            return None
-        return {
-            "username": username,
-            "app_password": password,
-            "root_path": service.get_value("NUTSTORE_WEBDAV_ROOT_PATH", "/"),
-        }
-    except Exception:
-        logger.exception("Failed to read Nutstore config from SystemConfig")
-        return None
-
-
-def _get_onedrive_config_from_system_config() -> dict[str, str] | None:
-    """Read OneDrive config from SystemConfig (DB)."""
-    try:
-        from apps.core.services.system_config_service import SystemConfigService
-
-        service = SystemConfigService()
-        client_id = service.get_value("ONEDRIVE_CLIENT_ID", "")
-        if not client_id:
-            return None
-        return {
-            "client_id": client_id,
-            "tenant_id": service.get_value("ONEDRIVE_TENANT_ID", "consumers"),
-            "root_path": service.get_value("ONEDRIVE_ROOT_PATH", "/"),
-        }
-    except Exception:
-        logger.exception("Failed to read OneDrive config from SystemConfig")
-        return None
-
-
 def create_provider_for_binding(binding) -> CloudStorageProvider:
-    """Create a provider based on the binding's storage_type and storage_account."""
+    """Create a provider based on the binding's storage_type and storage_account.
+
+    CloudStorageAccount is the single source of truth for credentials.
+    """
     storage_type = getattr(binding, "storage_type", "local")
     storage_account = getattr(binding, "storage_account", None)
 
@@ -63,7 +27,6 @@ def create_provider_for_binding(binding) -> CloudStorageProvider:
     if storage_type == "webdav":
         from .webdav_provider import JianguoyunProvider
 
-        # Prefer CloudStorageAccount if linked
         if storage_account is not None:
             return JianguoyunProvider(
                 username=storage_account.webdav_username,
@@ -72,16 +35,7 @@ def create_provider_for_binding(binding) -> CloudStorageProvider:
                 webdav_url=getattr(storage_account, "webdav_url", ""),
             )
 
-        # Fallback to SystemConfig
-        config = _get_nutstore_config_from_system_config()
-        if config:
-            return JianguoyunProvider(
-                username=config["username"],
-                app_password=config["app_password"],
-                root_path=config.get("root_path", "/"),
-            )
-
-        logger.warning("No Nutstore WebDAV credentials configured")
+        logger.warning("No Nutstore WebDAV account linked to binding")
         return LocalProvider()
 
     if storage_type == "onedrive":
@@ -94,15 +48,7 @@ def create_provider_for_binding(binding) -> CloudStorageProvider:
                 root_path=getattr(storage_account, "onedrive_root_path", "/"),
             )
 
-        # Fallback to SystemConfig (client_id only; token still needs CloudStorageAccount)
-        config = _get_onedrive_config_from_system_config()
-        if config:
-            logger.info(
-                "OneDrive has SystemConfig but no CloudStorageAccount linked; "
-                "token authorization required via Admin → 云存储账号"
-            )
-
-        logger.warning("No OneDrive account linked")
+        logger.warning("No OneDrive account linked to binding")
         return LocalProvider()
 
     logger.warning("Unknown storage_type %r, falling back to local", storage_type)

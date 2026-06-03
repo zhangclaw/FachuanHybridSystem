@@ -80,6 +80,7 @@ def create_folder_binding(request: HttpRequest, contract_id: int, data: FolderBi
         ).first()
         if storage_account is None:
             from apps.core.exceptions import ValidationException
+
             raise ValidationException(
                 message="指定的云存储账号不存在或已禁用",
                 code="STORAGE_ACCOUNT_NOT_FOUND",

@@ -56,9 +56,7 @@ def _poll_device_code(account_id: int, device_code: str, interval: int, max_atte
                 codec = SecretCodec()
                 account.onedrive_access_token = codec.encrypt(data["access_token"])
                 account.onedrive_refresh_token = codec.encrypt(data.get("refresh_token", ""))
-                account.onedrive_token_expires_at = datetime.now(UTC) + timedelta(
-                    seconds=data.get("expires_in", 3600)
-                )
+                account.onedrive_token_expires_at = datetime.now(UTC) + timedelta(seconds=data.get("expires_in", 3600))
                 account.save(
                     update_fields=[
                         "onedrive_access_token",
@@ -175,7 +173,7 @@ class CloudStorageAccountAdmin(admin.ModelAdmin):
             messages.success(
                 request,
                 format_html(
-                    '设备码已生成！请在浏览器打开下方链接，输入设备码完成授权，授权后刷新此页面：<br><br>'
+                    "设备码已生成！请在浏览器打开下方链接，输入设备码完成授权，授权后刷新此页面：<br><br>"
                     '验证地址：<a href="{url}" target="_blank">{url}</a><br>'
                     '设备码：<b style="font-size:18px; background:#f0f0f0; padding:4px 12px; border-radius:4px;">{code}</b>',
                     url=result["verification_uri"],
