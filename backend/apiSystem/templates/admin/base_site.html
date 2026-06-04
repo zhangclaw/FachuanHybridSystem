@@ -298,8 +298,8 @@
       if (!link) return;
       const href = link.getAttribute('href') || '';
       if (favSet.has(href)) {
-        // 允许的行：清除 CSS 的 opacity 隐藏
-        row.style.opacity = '';
+        // 允许的行：显式设为 1 覆盖 CSS 的 opacity: 0
+        row.style.opacity = '1';
       } else {
         // 不允许的行：额外设置 display: none（从布局中移除）
         row.style.display = 'none';
@@ -338,8 +338,8 @@
       // 匹配不带参数和带参数的 URL（如 /admin/cases/case/ 和 /admin/cases/case/?status__exact=active）
       const basePath = href.split('?')[0];
       if (allowedSet.has(basePath)) {
-        // 允许的行：清除 CSS 的 opacity 隐藏
-        row.style.opacity = '';
+        // 允许的行：显式设为 1 覆盖 CSS 的 opacity: 0
+        row.style.opacity = '1';
       } else {
         // 不允许的行：额外设置 display: none
         row.style.display = 'none';
