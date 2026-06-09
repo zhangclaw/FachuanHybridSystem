@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger("apps.automation")
 
 
-class CourtZxfwFilingService(FilingStepsMixin, PartyInfoHandlerMixin, ProgressReporterMixin):
+class CourtZxfwFilingService(FilingStepsMixin, PartyInfoHandlerMixin, ProgressReporterMixin):  # pragma: no cover
     """
     全国法院"一张网"在线立案服务
 

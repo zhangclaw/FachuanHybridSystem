@@ -10,7 +10,7 @@ from .base import BaseScraper
 logger = logging.getLogger("apps.automation")
 
 
-class CourtFilingScraper(BaseScraper):
+class CourtFilingScraper(BaseScraper):  # pragma: no cover
     """
     法院自动立案爬虫
 

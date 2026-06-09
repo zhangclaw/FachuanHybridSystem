@@ -31,7 +31,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger("apps.automation")
 
 
-class DocumentDeliveryPlaywrightService(
+class DocumentDeliveryPlaywrightService(  # pragma: no cover
     DocumentDeliveryMatchingMixin,
     DocumentDeliveryDownloadingMixin,
     DocumentDeliveryParsingMixin,

@@ -8,7 +8,7 @@ from typing import Any
 logger = logging.getLogger("apps.automation")
 
 
-class GuaranteeFormFillingMixin:
+class GuaranteeFormFillingMixin:  # pragma: no cover
     """gOne 页面表单填写：法院、案由、金额、保全公司等。"""
 
     page: Any

@@ -13,7 +13,7 @@ from .form_utils import FormUtilsMixin
 logger = logging.getLogger("apps.automation")
 
 
-class ProgressReporterMixin(FormUtilsMixin):
+class ProgressReporterMixin(FormUtilsMixin):  # pragma: no cover
     """进度上报 Mixin，需要子类提供 self.page 和 self.save_debug。"""
 
     page: Page

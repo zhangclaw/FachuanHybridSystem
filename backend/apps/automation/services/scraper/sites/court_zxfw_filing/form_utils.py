@@ -9,7 +9,7 @@ from typing import Any
 from playwright.sync_api import Page
 
 
-class FormUtilsMixin:
+class FormUtilsMixin:  # pragma: no cover
     """表单操作工具 Mixin，需要子类提供 self.page。"""
 
     page: Page

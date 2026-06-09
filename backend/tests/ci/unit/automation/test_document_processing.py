@@ -144,3 +144,263 @@ class TestDocumentRenamerFilename:
         renamer.title_extraction_limit = 50
         with pytest.raises(ValidationException):
             renamer.rename(str(tmp_path / "nonexistent.pdf"), "案件名", __import__("datetime").date(2025, 1, 1))
+
+
+# ============================================================
+# Extended coverage tests
+# ============================================================
+
+
+class TestSaveUploadedDocument:
+    def test_save_file(self, tmp_path) -> None:
+        from apps.automation.services.document.document_processing import save_uploaded_document
+
+        upload = MagicMock()
+        upload.name = "test_upload.pdf"
+        upload.chunks.return_value = [b"chunk1", b"chunk2"]
+
+        with patch("apps.automation.services.document.document_processing.settings") as mock_settings:
+            mock_settings.MEDIA_ROOT = str(tmp_path)
+            result = save_uploaded_document(upload)
+
+        assert result.exists()
+        assert result.suffix == ".pdf"
+        assert "test_upload" in result.name
+        result.unlink(missing_ok=True)
+
+    def test_unique_filenames(self, tmp_path) -> None:
+        from apps.automation.services.document.document_processing import save_uploaded_document
+
+        upload1 = MagicMock()
+        upload1.name = "same.pdf"
+        upload1.chunks.return_value = [b"data1"]
+
+        upload2 = MagicMock()
+        upload2.name = "same.pdf"
+        upload2.chunks.return_value = [b"data2"]
+
+        with patch("apps.automation.services.document.document_processing.settings") as mock_settings:
+            mock_settings.MEDIA_ROOT = str(tmp_path)
+            r1 = save_uploaded_document(upload1)
+            r2 = save_uploaded_document(upload2)
+
+        assert r1.name != r2.name
+        r1.unlink(missing_ok=True)
+        r2.unlink(missing_ok=True)
+
+
+class TestRenderPdfPageToImage:
+    def test_basic_render(self, tmp_path) -> None:
+        import fitz
+
+        from apps.automation.services.document.document_processing import render_pdf_page_to_image
+
+        pdf_path = tmp_path / "test.pdf"
+        doc = fitz.open()
+        page = doc.new_page()
+        page.insert_text((72, 72), "Test Content")
+        doc.save(str(pdf_path))
+        doc.close()
+
+        with patch("apps.automation.services.document.document_processing.settings") as mock_settings:
+            mock_settings.MEDIA_ROOT = str(tmp_path / "media")
+            mock_settings.MEDIA_URL = "/media/"
+            url = render_pdf_page_to_image(str(pdf_path), page_num=0)
+
+        assert "/media/" in url
+        assert url.endswith(".png")
+
+    def test_negative_page_clamped(self, tmp_path) -> None:
+        import fitz
+
+        from apps.automation.services.document.document_processing import render_pdf_page_to_image
+
+        pdf_path = tmp_path / "test.pdf"
+        doc = fitz.open()
+        doc.new_page()
+        doc.save(str(pdf_path))
+        doc.close()
+
+        with patch("apps.automation.services.document.document_processing.settings") as mock_settings:
+            mock_settings.MEDIA_ROOT = str(tmp_path / "media")
+            mock_settings.MEDIA_URL = "/media/"
+            url = render_pdf_page_to_image(str(pdf_path), page_num=-5)
+
+        assert url  # negative clamped to 0
+
+    def test_page_exceeds_count(self, tmp_path) -> None:
+        import fitz
+
+        from apps.automation.services.document.document_processing import render_pdf_page_to_image
+
+        pdf_path = tmp_path / "test.pdf"
+        doc = fitz.open()
+        doc.new_page()
+        doc.save(str(pdf_path))
+        doc.close()
+
+        with patch("apps.automation.services.document.document_processing.settings") as mock_settings:
+            mock_settings.MEDIA_ROOT = str(tmp_path / "media")
+            mock_settings.MEDIA_URL = "/media/"
+            url = render_pdf_page_to_image(str(pdf_path), page_num=999)
+
+        assert url  # clamped to last page
+
+    def test_render_first_page_alias(self, tmp_path) -> None:
+        import fitz
+
+        from apps.automation.services.document.document_processing import render_pdf_first_page_to_image
+
+        pdf_path = tmp_path / "test.pdf"
+        doc = fitz.open()
+        doc.new_page()
+        doc.save(str(pdf_path))
+        doc.close()
+
+        with patch("apps.automation.services.document.document_processing.settings") as mock_settings:
+            mock_settings.MEDIA_ROOT = str(tmp_path / "media")
+            mock_settings.MEDIA_URL = "/media/"
+            url = render_pdf_first_page_to_image(str(pdf_path))
+
+        assert url
+
+
+class TestExtractDocumentContentExtended:
+    def test_pdf_content(self, tmp_path) -> None:
+        import fitz
+
+        from apps.automation.services.document.document_processing import extract_pdf_text
+
+        pdf_path = tmp_path / "test.pdf"
+        doc = fitz.open()
+        page = doc.new_page()
+        page.insert_text((72, 72), "Hello World PDF Test 12345")
+        doc.save(str(pdf_path))
+        doc.close()
+
+        text = extract_pdf_text(str(pdf_path))
+        assert "Hello World" in text
+
+    def test_docx_content(self, tmp_path) -> None:
+        try:
+            from docx import Document
+        except ImportError:
+            pytest.skip("python-docx not installed")
+
+        from apps.automation.services.document.document_processing import extract_document_content
+
+        docx_path = tmp_path / "test.docx"
+        doc = Document()
+        doc.add_paragraph("DOCX提取内容")
+        doc.save(str(docx_path))
+
+        result = extract_document_content(str(docx_path))
+        assert result.kind == "docx"
+        assert "DOCX提取内容" in result.text
+
+    def test_image_content(self, tmp_path) -> None:
+        from apps.automation.services.document.document_processing import extract_document_content
+
+        img_path = tmp_path / "test.jpg"
+        img_path.write_bytes(b"\xff\xd8\xff\xe0" + b"\x00" * 100)  # minimal JPEG header
+
+        with patch(
+            "apps.automation.services.document.document_processing.extract_text_from_image_with_rapidocr"
+        ) as mock_ocr:
+            mock_ocr.return_value = "图片OCR文字"
+            result = extract_document_content(str(img_path))
+
+        assert result.kind == "image"
+        assert "图片OCR文字" in result.text
+
+
+class TestOcrPdfPage:
+    def test_ocr_with_valid_pdf(self, tmp_path) -> None:
+        import fitz
+
+        from apps.automation.services.document.document_processing import _ocr_pdf_page
+
+        pdf_path = tmp_path / "test.pdf"
+        doc = fitz.open()
+        page = doc.new_page()
+        page.insert_text((72, 72), "OCR测试文字")
+        doc.save(str(pdf_path))
+        doc.close()
+
+        with patch("apps.automation.services.document.document_processing.settings") as mock_settings:
+            mock_settings.MEDIA_ROOT = str(tmp_path / "media")
+            with patch(
+                "apps.automation.services.document.document_processing.extract_text_from_image_with_rapidocr"
+            ) as mock_ocr:
+                mock_ocr.return_value = "OCR识别结果"
+                result = _ocr_pdf_page(str(pdf_path), 1, 500)
+
+        assert result == "OCR识别结果"
+
+    def test_ocr_page_out_of_range(self, tmp_path) -> None:
+        import fitz
+
+        from apps.automation.services.document.document_processing import _ocr_pdf_page
+
+        pdf_path = tmp_path / "test.pdf"
+        doc = fitz.open()
+        doc.new_page()
+        doc.save(str(pdf_path))
+        doc.close()
+
+        with patch("apps.automation.services.document.document_processing.settings") as mock_settings:
+            mock_settings.MEDIA_ROOT = str(tmp_path / "media")
+            with patch(
+                "apps.automation.services.document.document_processing.extract_text_from_image_with_rapidocr"
+            ) as mock_ocr:
+                mock_ocr.return_value = "text"
+                result = _ocr_pdf_page(str(pdf_path), 999, 500)
+
+        # Should still return text since page_num is clamped
+        assert result == "text"
+
+    def test_ocr_exception_returns_none(self, tmp_path) -> None:
+        from apps.automation.services.document.document_processing import _ocr_pdf_page
+
+        result = _ocr_pdf_page("/nonexistent/file.pdf", 1, 500)
+        assert result is None
+
+
+class TestProcessPdfExtended:
+    def test_text_pdf_returns_text(self, tmp_path) -> None:
+        import fitz
+
+        from apps.automation.services.document.document_processing import extract_pdf_text
+
+        pdf_path = tmp_path / "text.pdf"
+        doc = fitz.open()
+        page = doc.new_page()
+        page.insert_text((72, 72), "Extractable Text Content")
+        doc.save(str(pdf_path))
+        doc.close()
+
+        text = extract_pdf_text(str(pdf_path))
+        assert "Extractable Text Content" in text
+
+    def test_empty_pdf_falls_back_to_ocr(self, tmp_path) -> None:
+        import fitz
+
+        from apps.automation.services.document.document_processing import process_pdf
+
+        pdf_path = tmp_path / "empty.pdf"
+        doc = fitz.open()
+        doc.new_page()  # Empty page - no text
+        doc.save(str(pdf_path))
+        doc.close()
+
+        with patch("apps.automation.services.document.document_processing.settings") as mock_settings:
+            mock_settings.MEDIA_ROOT = str(tmp_path / "media")
+            mock_settings.MEDIA_URL = "/media/"
+            with patch(
+                "apps.automation.services.document.document_processing.extract_text_from_image_with_rapidocr"
+            ) as mock_ocr:
+                mock_ocr.return_value = "OCR结果"
+                image_url, text = process_pdf(str(pdf_path))
+
+        # Should get OCR text or image URL
+        assert text is not None or image_url is not None

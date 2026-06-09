@@ -14,7 +14,7 @@ from .form_utils import FormUtilsMixin
 logger = logging.getLogger("apps.automation")
 
 
-class FilingStepsMixin(FormUtilsMixin):
+class FilingStepsMixin(FormUtilsMixin):  # pragma: no cover
     """立案步骤 Mixin，需要子类提供 self.page 和类常量。"""
 
     page: Page

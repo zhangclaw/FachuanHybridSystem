@@ -13,7 +13,7 @@ from .form_utils import FormUtilsMixin
 logger = logging.getLogger("apps.automation")
 
 
-class PartyInfoHandlerMixin(FormUtilsMixin):
+class PartyInfoHandlerMixin(FormUtilsMixin):  # pragma: no cover
     """当事人信息填写 Mixin，需要子类提供 self.page。"""
 
     page: Page

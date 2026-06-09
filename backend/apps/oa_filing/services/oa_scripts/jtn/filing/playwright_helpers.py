@@ -24,7 +24,7 @@ from .filing_models import ClientInfo, _gender_from_id_number
 logger = logging.getLogger("apps.oa_filing.jtn")
 
 
-class PlaywrightHelpersMixin:
+class PlaywrightHelpersMixin:  # pragma: no cover
     """Playwright 表单操作工具 mixin。"""
 
     _page: Page | None

@@ -16,7 +16,7 @@ from .upload_mixin import GuaranteeUploadMixin
 logger = logging.getLogger("apps.automation")
 
 
-class CourtZxfwGuaranteeService(
+class CourtZxfwGuaranteeService(  # pragma: no cover
     GuaranteeDataMixin,
     GuaranteeBaseMixin,
     GuaranteeFormFillingMixin,

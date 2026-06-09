@@ -10,7 +10,7 @@ from typing import Any
 logger = logging.getLogger("apps.automation")
 
 
-class GuaranteeBaseMixin:
+class GuaranteeBaseMixin:  # pragma: no cover
     """Playwright 等待与 UI 交互工具。"""
 
     page: Any

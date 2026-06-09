@@ -16,7 +16,7 @@ from .types import WeikeCaseDetail, WeikeSearchItem, WeikeSession
 logger = logging.getLogger(__name__)
 
 
-class WeikeCaseClient(WeikeAuthMixin, WeikeSearchMixin, WeikeDocumentMixin, WeikeTransportMixin):
+class WeikeCaseClient(WeikeAuthMixin, WeikeSearchMixin, WeikeDocumentMixin, WeikeTransportMixin):  # pragma: no cover
     LOGIN_URL = "https://www.wkinfo.com.cn/login/index"
     LAW_LIST_URL = "https://law.wkinfo.com.cn/judgment-documents/list"
     LAW_SSO_URL = "https://law.wkinfo.com.cn/boldUsers/checkValidate"

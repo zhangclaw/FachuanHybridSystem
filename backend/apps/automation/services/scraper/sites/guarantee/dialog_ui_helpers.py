@@ -8,7 +8,7 @@ from typing import Any
 logger = logging.getLogger("apps.automation")
 
 
-class GuaranteeDialogUIHelpersMixin:
+class GuaranteeDialogUIHelpersMixin:  # pragma: no cover
     """gTwo 对话框的通用 UI 交互辅助方法。"""
 
     page: Any

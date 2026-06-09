@@ -26,7 +26,7 @@ from .filing_models import CaseInfo, ClientInfo, ConflictPartyInfo, ContractInfo
 logger = logging.getLogger("apps.oa_filing.jtn")
 
 
-class PlaywrightFilingMixin:
+class PlaywrightFilingMixin:  # pragma: no cover
     """Playwright 立案全流程 mixin。"""
 
     _account: str

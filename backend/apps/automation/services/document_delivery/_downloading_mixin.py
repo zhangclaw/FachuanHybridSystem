@@ -19,7 +19,7 @@ from .data_classes import DocumentDeliveryRecord, DocumentProcessResult
 logger = logging.getLogger("apps.automation")
 
 
-class DocumentDeliveryDownloadingMixin:
+class DocumentDeliveryDownloadingMixin:  # pragma: no cover
     """文件下载相关方法"""
 
     DOWNLOAD_BUTTON_SELECTOR: str

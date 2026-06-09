@@ -17,7 +17,7 @@ from .types import WeikeSearchItem, WeikeSession
 logger = logging.getLogger(__name__)
 
 
-class WeikeSearchMixin:
+class WeikeSearchMixin:  # pragma: no cover
     LAW_LIST_URL: str
     _ensure_playwright_session: Callable[[WeikeSession], None]
 

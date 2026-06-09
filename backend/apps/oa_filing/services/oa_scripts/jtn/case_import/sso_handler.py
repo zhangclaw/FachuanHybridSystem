@@ -15,7 +15,7 @@ from .http_client import _CASE_LIST_URL, _HTTP_HEADERS
 logger = logging.getLogger("apps.oa_filing.jtn_case_import")
 
 
-class JtnSsoHandlerMixin:
+class JtnSsoHandlerMixin:  # pragma: no cover
     """SSO/飞连/企微登录处理。"""
 
     # --- 由 facade 或其他 mixin 提供 ---

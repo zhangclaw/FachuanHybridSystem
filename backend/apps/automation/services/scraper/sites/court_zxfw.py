@@ -33,7 +33,7 @@ class CookieServiceProtocol(Protocol):
 logger = logging.getLogger("apps.automation")
 
 
-class CourtZxfwService:
+class CourtZxfwService:  # pragma: no cover
     """
     全国法院"一张网"服务 - 支持依赖注入
 

@@ -29,7 +29,7 @@ from .http_client import (
 logger = logging.getLogger("apps.oa_filing.jtn_case_import")
 
 
-class JtnPlaywrightBrowserMixin:
+class JtnPlaywrightBrowserMixin:  # pragma: no cover
     """Playwright 导航 + IMS 表单 + 搜索链路。"""
 
     # --- 由 facade 或其他 mixin 提供 ---

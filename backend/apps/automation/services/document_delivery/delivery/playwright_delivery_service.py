@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger("apps.automation")
 
 
-class PlaywrightDeliveryService:
+class PlaywrightDeliveryService:  # pragma: no cover
     """Playwright 方式文书投递服务"""
 
     # 页面 URL

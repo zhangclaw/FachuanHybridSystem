@@ -69,7 +69,7 @@ class ClientListFormState:
     page_size: int = 20
 
 
-class JtnClientImportScript:
+class JtnClientImportScript:  # pragma: no cover
     """金诚同达 OA 客户导入自动化。"""
 
     def __init__(

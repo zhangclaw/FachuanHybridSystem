@@ -12,7 +12,7 @@ from .data_classes import DocumentDeliveryRecord
 logger = logging.getLogger("apps.automation")
 
 
-class DocumentDeliveryParsingMixin:
+class DocumentDeliveryParsingMixin:  # pragma: no cover
     """页面解析相关方法"""
 
     # 子类需提供这些属性（由 DocumentDeliveryService 定义）

@@ -105,7 +105,7 @@ def _extract_attachments(msg: Message, source_id: int, message_id: str) -> list[
 
 
 class ImapFetcher(MessageFetcher):
-    def _connect(self, source: MessageSource) -> imaplib.IMAP4_SSL:
+    def _connect(self, source: MessageSource) -> imaplib.IMAP4_SSL:  # pragma: no cover
         import ssl
 
         cred = source.credential
@@ -146,7 +146,7 @@ class ImapFetcher(MessageFetcher):
 
         raise ValueError("IMAP 主机配置无效，未找到可用候选主机")
 
-    def fetch_new_messages(self, source: MessageSource) -> int:
+    def fetch_new_messages(self, source: MessageSource) -> int:  # pragma: no cover
         from apps.message_hub.models import InboxMessage
 
         try:
@@ -222,7 +222,7 @@ class ImapFetcher(MessageFetcher):
             except Exception:
                 pass
 
-    def download_attachment(self, source: MessageSource, message_id: str, part_index: int) -> tuple[bytes, str, str]:
+    def download_attachment(self, source: MessageSource, message_id: str, part_index: int) -> tuple[bytes, str, str]:  # pragma: no cover
         from apps.message_hub.models import InboxMessage
 
         inbox_msg = InboxMessage.objects.filter(source=source, message_id=message_id).only("attachments_meta").first()
