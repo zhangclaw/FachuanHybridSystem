@@ -88,3 +88,76 @@ class TestStoryVizServices:
         from apps.story_viz.services import animation_script_service
 
         assert animation_script_service is not None
+
+
+# ---------------------------------------------------------------------------
+# StoryAnimationJobService extended tests
+# ---------------------------------------------------------------------------
+
+class TestStoryAnimationJobServiceExtended:
+    def _make_service(self):
+        from apps.story_viz.services.job_service import StoryAnimationJobService
+        return StoryAnimationJobService()
+
+    def test_build_suggested_questions_empty(self):
+        from apps.story_viz.services.job_service import StoryAnimationJobService
+        assert StoryAnimationJobService._build_suggested_questions(facts={}) == []
+
+    def test_build_suggested_questions_with_parties(self):
+        from apps.story_viz.services.job_service import StoryAnimationJobService
+        facts = {"parties": [{"name": "张三", "role": "原告"}], "events": [], "relationships": []}
+        questions = StoryAnimationJobService._build_suggested_questions(facts=facts)
+        assert len(questions) >= 1
+
+    def test_build_suggested_questions_with_judgment(self):
+        from apps.story_viz.services.job_service import StoryAnimationJobService
+        facts = {"parties": [], "events": [], "relationships": [], "judgment_result": "胜诉"}
+        questions = StoryAnimationJobService._build_suggested_questions(facts=facts)
+        assert any("判决" in q for q in questions)
+
+    def test_stage_index(self):
+        from apps.story_viz.services.job_service import StoryAnimationJobService
+        assert StoryAnimationJobService._stage_index("extracting_facts") >= 0
+        assert StoryAnimationJobService._stage_index("nonexistent") == -1
+
+    def test_summarize_facts_empty(self):
+        from apps.story_viz.services.job_service import StoryAnimationJobService
+        result = StoryAnimationJobService._summarize_facts({})
+        assert result["parties"] == []
+        assert result["events"] == []
+        assert result["relationships"] == []
+
+    def test_summarize_facts_with_data(self):
+        from apps.story_viz.services.job_service import StoryAnimationJobService
+        facts = {
+            "parties": [{"name": "张三", "role": "原告"}],
+            "events": [{"sequence": 1, "time_label": "2024", "summary": "起诉"}],
+            "relationships": [{"source": "张三", "target": "李四", "relation_type": "借贷"}],
+        }
+        result = StoryAnimationJobService._summarize_facts(facts)
+        assert len(result["parties"]) == 1
+        assert len(result["events"]) == 1
+
+    def test_summarize_script_empty(self):
+        from apps.story_viz.services.job_service import StoryAnimationJobService
+        result = StoryAnimationJobService._summarize_script({})
+        assert result["timeline_nodes_count"] == 0
+
+    def test_summarize_render_empty(self):
+        from apps.story_viz.services.job_service import StoryAnimationJobService
+        result = StoryAnimationJobService._summarize_render({})
+        assert result["node_count"] == 0
+
+
+
+    def test_build_preview_payload(self):
+        from apps.story_viz.services.job_service import StoryAnimationJobService
+        from apps.story_viz.models import StoryAnimationStatus
+        svc = StoryAnimationJobService()
+        animation = MagicMock()
+        animation.id = "test-id"
+        animation.animation_html = "<html>test</html>"
+        animation.status = StoryAnimationStatus.COMPLETED
+        payload = svc.build_preview_payload(animation=animation)
+        assert payload["has_html"] is True
+        assert payload["animation_html"] == "<html>test</html>"

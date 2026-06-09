@@ -321,3 +321,8 @@ class TestAutoRenameService:
         result = svc._fallback_regex_extraction('"date": "null", "amount": "null"')
         assert result.date is None
         assert result.amount is None
+
+
+# ---------------------------------------------------------------------------
+# Extended image rotation tests
+# ---------------------------------------------------------------------------

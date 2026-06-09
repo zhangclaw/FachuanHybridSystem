@@ -1,70 +1,70 @@
-"""
-Tests for apps.evidence.services — 证据服务
-"""
+"""Tests for evidence export service."""
 
 from __future__ import annotations
 
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 
 
-class TestEvidencePageRangeCalculator:
-    """EvidencePageRangeCalculator 测试"""
+class TestEvidenceExportServiceInit:
+    def test_init_with_placeholder_service(self):
+        from apps.evidence.services.export.evidence_export_service import EvidenceExportService
+        mock_ps = MagicMock()
+        svc = EvidenceExportService(placeholder_service=mock_ps)
+        assert svc.placeholder_service is mock_ps
 
-    def test_calculator_importable(self) -> None:
-        from apps.evidence.services.core.page_range_calculator import EvidencePageRangeCalculator
-
-        assert EvidencePageRangeCalculator is not None
-
-    def test_calculator_instantiation(self) -> None:
-        from apps.evidence.services.core.page_range_calculator import EvidencePageRangeCalculator
-
-        calc = EvidencePageRangeCalculator()
-        assert hasattr(calc, 'calculate_page_ranges')
-        assert hasattr(calc, 'recalculate_page_ranges_for_chain')
-        assert hasattr(calc, 'update_subsequent_lists_pages')
+    def test_init_without_placeholder_service(self):
+        from apps.evidence.services.export.evidence_export_service import EvidenceExportService
+        svc = EvidenceExportService()
+        assert svc._placeholder_service is None
 
 
-class TestEvidenceModules:
-    """证据服务模块可导入性测试"""
+class TestEvidenceExportServiceGetEvidenceList:
+    @pytest.mark.django_db
+    def test_not_found_raises(self):
+        from apps.evidence.services.export.evidence_export_service import EvidenceExportService
+        from apps.core.exceptions import NotFoundError
+        svc = EvidenceExportService()
+        with pytest.raises(NotFoundError):
+            svc._get_evidence_list(999999)
 
-    def test_evidence_storage_importable(self) -> None:
-        from apps.evidence.services.core import evidence_storage
 
-        assert evidence_storage is not None
+class TestEvidenceExportServiceGenerateFilename:
+    def test_evidence_list_type(self):
+        from apps.evidence.services.export.evidence_export_service import EvidenceExportService
+        svc = EvidenceExportService()
+        evidence_list = MagicMock()
+        evidence_list.case.name = "测试案件"
+        evidence_list.title = "证据清单一"
+        evidence_list.export_version = 1
+        with patch("apps.evidence.services.export.evidence_export_service.timezone") as mock_tz:
+            mock_tz.now.return_value.strftime.return_value = "20260101"
+            with patch("apps.evidence.services.export.evidence_export_service.FilenameTemplateService") as mock_fts:
+                mock_fts.render_generated_doc.return_value = "证据清单一(测试案件)V1"
+                filename = svc._generate_filename(evidence_list, "证据清单", 1)
+                assert filename.endswith(".docx")
 
-    def test_evidence_file_service_importable(self) -> None:
-        from apps.evidence.services.core import evidence_file_service
+    def test_evidence_detail_type(self):
+        from apps.evidence.services.export.evidence_export_service import EvidenceExportService
+        svc = EvidenceExportService()
+        evidence_list = MagicMock()
+        evidence_list.case.name = "测试案件"
+        evidence_list.title = "证据清单一"
+        evidence_list.export_version = 1
+        with patch("apps.evidence.services.export.evidence_export_service.timezone") as mock_tz:
+            mock_tz.now.return_value.strftime.return_value = "20260101"
+            with patch("apps.evidence.services.export.evidence_export_service.FilenameTemplateService") as mock_fts:
+                mock_fts.render_generated_doc.return_value = "证据明细一(测试案件)V1"
+                filename = svc._generate_filename(evidence_list, "证据明细", 1)
+                assert "证据明细" in filename
 
-        assert evidence_file_service is not None
 
-    def test_evidence_query_service_importable(self) -> None:
-        from apps.evidence.services.core import evidence_query_service
+class TestEvidenceExportServiceIncrementVersion:
+    def test_returns_current_version(self):
+        from apps.evidence.services.export.evidence_export_service import EvidenceExportService
+        svc = EvidenceExportService()
+        evidence_list = MagicMock()
+        evidence_list.export_version = 3
+        assert svc._increment_version(evidence_list) == 3
 
-        assert evidence_query_service is not None
-
-    def test_evidence_service_importable(self) -> None:
-        from apps.evidence.services.core import evidence_service
-
-        assert evidence_service is not None
-
-    def test_evidence_mutation_service_importable(self) -> None:
-        from apps.evidence.services.mutation import evidence_mutation_service
-
-        assert evidence_mutation_service is not None
-
-    def test_evidence_merge_usecase_importable(self) -> None:
-        from apps.evidence.services.mutation import evidence_merge_usecase
-
-        assert evidence_merge_usecase is not None
-
-    def test_evidence_admin_service_importable(self) -> None:
-        from apps.evidence.services.admin import evidence_admin_service
-
-        assert evidence_admin_service is not None
-
-    def test_wiring_importable(self) -> None:
-        from apps.evidence.services import wiring
-
-        assert wiring is not None

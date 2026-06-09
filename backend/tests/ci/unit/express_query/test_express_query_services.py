@@ -111,3 +111,7 @@ class TestTrackingExtractionService:
 
         result = svc.extract(test_path)
         assert result.tracking_number == ""
+
+# ---------------------------------------------------------------------------
+# EMS auth handler extended tests
+# ---------------------------------------------------------------------------

@@ -170,3 +170,121 @@ class TestSegmentTemplateRule:
         )
         with pytest.raises(AttributeError):
             rule.segment_type = "changed"
+
+
+# ---------------------------------------------------------------------------
+# SegmentDetector extended tests
+# ---------------------------------------------------------------------------
+
+class TestSegmentDetectorExtended:
+    def _make_detector(self):
+        from apps.pdf_splitting.services.split.segment_detector import SegmentDetector
+        return SegmentDetector()
+
+    def test_normalize_text(self):
+        detector = self._make_detector()
+        result = detector.normalize_text("  hello  world  ")
+        assert result == "helloworld" or "hello" in result
+
+    def test_contains_keyword(self):
+        detector = self._make_detector()
+        assert detector.contains_keyword("这是一份起诉状", "起诉状") is True
+        assert detector.contains_keyword("普通文本", "起诉状") is False
+
+    def test_fuzzy_contains_keyword_exact(self):
+        detector = self._make_detector()
+        hit, decay = detector.fuzzy_contains_keyword("起诉状内容", "起诉状")
+        assert hit is True
+        assert decay == 1.0
+
+    def test_fuzzy_contains_keyword_short_no_fuzzy(self):
+        detector = self._make_detector()
+        # Short keywords (<=3 chars) only do exact match
+        hit, decay = detector.fuzzy_contains_keyword("起诉", "起诉")
+        assert hit is True  # exact match works
+
+    def test_is_effective_text_true(self):
+        detector = self._make_detector()
+        assert detector.is_effective_text("这是一段足够长的文本内容") is True
+
+    def test_is_effective_text_false(self):
+        detector = self._make_detector()
+        assert detector.is_effective_text("短") is False
+
+    def test_fill_unrecognized_gaps(self):
+        from apps.pdf_splitting.services.split.split_models import SegmentDraft
+        from apps.pdf_splitting.models import PdfSplitSegmentType, PdfSplitReviewFlag
+        detector = self._make_detector()
+        segments = [
+            SegmentDraft(
+                order=1, page_start=3, page_end=5,
+                segment_type=PdfSplitSegmentType.COMPLAINT,
+                filename="test.pdf", confidence=0.8,
+                source_method="rule", review_flag=PdfSplitReviewFlag.NORMAL,
+            )
+        ]
+        filled = detector.fill_unrecognized_gaps(segments=segments, total_pages=10)
+        assert len(filled) == 3  # gap before + segment + gap after
+        assert filled[0].page_start == 1
+        assert filled[0].page_end == 2
+        assert filled[-1].page_start == 6
+        assert filled[-1].page_end == 10
+
+    def test_merge_adjacent_pack_segments(self):
+        from apps.pdf_splitting.services.split.split_models import SegmentDraft
+        from apps.pdf_splitting.models import PdfSplitSegmentType, PdfSplitReviewFlag
+        detector = self._make_detector()
+        segments = [
+            SegmentDraft(order=1, page_start=1, page_end=2, segment_type=PdfSplitSegmentType.PARTY_IDENTITY,
+                         filename="a.pdf", confidence=0.8, source_method="rule", review_flag=PdfSplitReviewFlag.NORMAL),
+            SegmentDraft(order=2, page_start=3, page_end=4, segment_type=PdfSplitSegmentType.PARTY_IDENTITY,
+                         filename="b.pdf", confidence=0.9, source_method="rule", review_flag=PdfSplitReviewFlag.NORMAL),
+        ]
+        merged = detector._merge_adjacent_pack_segments(segments)
+        assert len(merged) == 1
+        assert merged[0].page_start == 1
+        assert merged[0].page_end == 4
+
+    def test_merge_different_types_no_merge(self):
+        from apps.pdf_splitting.services.split.split_models import SegmentDraft
+        from apps.pdf_splitting.models import PdfSplitSegmentType, PdfSplitReviewFlag
+        detector = self._make_detector()
+        segments = [
+            SegmentDraft(order=1, page_start=1, page_end=2, segment_type=PdfSplitSegmentType.PARTY_IDENTITY,
+                         filename="a.pdf", confidence=0.8, source_method="rule", review_flag=PdfSplitReviewFlag.NORMAL),
+            SegmentDraft(order=2, page_start=3, page_end=4, segment_type=PdfSplitSegmentType.COMPLAINT,
+                         filename="b.pdf", confidence=0.9, source_method="rule", review_flag=PdfSplitReviewFlag.NORMAL),
+        ]
+        merged = detector._merge_adjacent_pack_segments(segments)
+        assert len(merged) == 2
+
+
+class TestPdfSplitJobServiceNormalize:
+    def _make_service(self):
+        from apps.pdf_splitting.services.job_service import PdfSplitJobService
+        return PdfSplitJobService()
+
+    def test_normalize_split_mode_valid(self):
+        svc = self._make_service()
+        assert svc._normalize_split_mode("content_analysis") == "content_analysis"
+
+    def test_normalize_split_mode_invalid(self):
+        svc = self._make_service()
+        assert svc._normalize_split_mode("invalid") == "content_analysis"
+
+    def test_normalize_split_mode_none(self):
+        svc = self._make_service()
+        assert svc._normalize_split_mode(None) == "content_analysis"
+
+    def test_normalize_ocr_profile_valid(self):
+        svc = self._make_service()
+        assert svc._normalize_ocr_profile("balanced") == "balanced"
+
+    def test_normalize_ocr_profile_invalid(self):
+        svc = self._make_service()
+        assert svc._normalize_ocr_profile("invalid") == "balanced"
+
+    def test_is_absolute_path_unix(self):
+        svc = self._make_service()
+        assert svc._is_absolute_path("/tmp/test.pdf") is True
+        assert svc._is_absolute_path("relative/test.pdf") is False

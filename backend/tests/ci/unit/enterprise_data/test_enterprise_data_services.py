@@ -291,3 +291,131 @@ class TestEnterpriseProviderRegistry:
         assert registry.get_alert_success_rate_threshold() == 0.9
         assert registry.get_alert_fallback_rate_threshold() == 0.35
         assert registry.get_alert_avg_latency_ms_threshold() == 3000
+
+
+# ============================================================
+# McpToolClient 补充测试
+# ============================================================
+
+class TestMcpToolClientExtended:
+    def test_headers_streamable_http_lowercase_bearer(self):
+        from apps.enterprise_data.services.clients.mcp_tool_client import McpToolClient
+        client = McpToolClient(
+            provider_name="test", transport="streamable_http",
+            base_url="https://api.example.com", sse_url="", api_key="mykey"
+        )
+        headers = client._headers(transport="streamable_http", api_key="mykey")
+        assert headers["Authorization"] == "bearer mykey"
+
+    def test_headers_sse_capital_bearer(self):
+        from apps.enterprise_data.services.clients.mcp_tool_client import McpToolClient
+        client = McpToolClient(
+            provider_name="test", transport="sse", base_url="", sse_url="", api_key="mykey"
+        )
+        headers = client._headers(transport="sse", api_key="mykey")
+        assert headers["Authorization"] == "Bearer mykey"
+
+    def test_transport_attempts_primary_only(self):
+        from apps.enterprise_data.services.clients.mcp_tool_client import McpToolClient
+        client = McpToolClient(
+            provider_name="test", transport="streamable_http",
+            base_url="https://api.example.com", sse_url="", api_key="k"
+        )
+        attempts = client._transport_attempts()
+        assert attempts == ["streamable_http"]
+
+    def test_transport_attempts_with_sse_fallback(self):
+        from apps.enterprise_data.services.clients.mcp_tool_client import McpToolClient
+        client = McpToolClient(
+            provider_name="test", transport="streamable_http",
+            base_url="https://api.example.com", sse_url="https://api.example.com/sse", api_key="k"
+        )
+        attempts = client._transport_attempts()
+        assert "streamable_http" in attempts
+        assert "sse" in attempts
+
+    def test_should_retry_timeout(self):
+        import httpx
+        from apps.enterprise_data.services.clients.mcp_tool_client import McpToolClient
+        client = McpToolClient(provider_name="t", transport="sse", base_url="", sse_url="", api_key="k")
+        assert client._should_retry(httpx.TimeoutException("t")) is True
+
+    def test_should_retry_connect_error(self):
+        import httpx
+        from apps.enterprise_data.services.clients.mcp_tool_client import McpToolClient
+        client = McpToolClient(provider_name="t", transport="sse", base_url="", sse_url="", api_key="k")
+        assert client._should_retry(httpx.ConnectError("c")) is True
+
+    def test_should_retry_500(self):
+        import httpx
+        from apps.enterprise_data.services.clients.mcp_tool_client import McpToolClient
+        client = McpToolClient(provider_name="t", transport="sse", base_url="", sse_url="", api_key="k")
+        resp = MagicMock(); resp.status_code = 500
+        exc = httpx.HTTPStatusError("s", request=MagicMock(), response=resp)
+        assert client._should_retry(exc) is True
+
+    def test_should_not_retry_429(self):
+        import httpx
+        from apps.enterprise_data.services.clients.mcp_tool_client import McpToolClient
+        client = McpToolClient(provider_name="t", transport="sse", base_url="", sse_url="", api_key="k")
+        resp = MagicMock(); resp.status_code = 429
+        exc = httpx.HTTPStatusError("r", request=MagicMock(), response=resp)
+        assert client._should_retry(exc) is False
+
+    def test_should_switch_api_key_auth_error(self):
+        from apps.core.exceptions import AuthenticationError
+        from apps.enterprise_data.services.clients.mcp_tool_client import McpToolClient
+        client = McpToolClient(provider_name="t", transport="sse", base_url="", sse_url="", api_key="k")
+        assert client._should_switch_api_key(AuthenticationError("auth")) is True
+
+    def test_extract_payload_structured(self):
+        from apps.enterprise_data.services.clients.mcp_tool_client import McpToolClient
+        client = McpToolClient(provider_name="t", transport="sse", base_url="", sse_url="", api_key="k")
+        result = MagicMock(); result.structuredContent = {"a": 1}; result.content = []
+        assert client._extract_payload(result) == {"a": 1}
+
+    def test_extract_payload_single_text_json(self):
+        from apps.enterprise_data.services.clients.mcp_tool_client import McpToolClient
+        client = McpToolClient(provider_name="t", transport="sse", base_url="", sse_url="", api_key="k")
+        result = MagicMock(); result.structuredContent = None
+        item = MagicMock(); item.type = "text"; item.text = '{"a": 1}'
+        result.content = [item]
+        assert client._extract_payload(result) == {"a": 1}
+
+    def test_try_parse_json_valid(self):
+        from apps.enterprise_data.services.clients.mcp_tool_client import McpToolClient
+        assert McpToolClient._try_parse_json('{"a": 1}') == {"a": 1}
+
+    def test_try_parse_json_invalid(self):
+        from apps.enterprise_data.services.clients.mcp_tool_client import McpToolClient
+        assert McpToolClient._try_parse_json("not json") is None
+
+    def test_contains_auth_token(self):
+        from apps.enterprise_data.services.clients.mcp_tool_client import McpToolClient
+        assert McpToolClient._contains_auth_token("unauthorized") is True
+        assert McpToolClient._contains_auth_token("timeout") is False
+
+    def test_flatten_error_payload(self):
+        from apps.enterprise_data.services.clients.mcp_tool_client import McpToolClient
+        result = McpToolClient._flatten_error_payload_text({"error": "unauthorized", "code": 401})
+        assert "unauthorized" in result
+
+    def test_collect_related_exceptions(self):
+        from apps.enterprise_data.services.clients.mcp_tool_client import McpToolClient
+        exc = ValueError("test")
+        collected = McpToolClient._collect_related_exceptions(exc)
+        assert collected[0] is exc
+
+    def test_is_auth_like_http_error_401(self):
+        import httpx
+        from apps.enterprise_data.services.clients.mcp_tool_client import McpToolClient
+        resp = MagicMock(); resp.status_code = 401; resp.text = ""; resp.json.side_effect = Exception()
+        exc = httpx.HTTPStatusError("u", request=MagicMock(), response=resp)
+        assert McpToolClient._is_auth_like_http_error(exc) is True
+
+    def test_is_auth_like_http_error_500(self):
+        import httpx
+        from apps.enterprise_data.services.clients.mcp_tool_client import McpToolClient
+        resp = MagicMock(); resp.status_code = 500; resp.text = "err"; resp.json.side_effect = Exception()
+        exc = httpx.HTTPStatusError("s", request=MagicMock(), response=resp)
+        assert McpToolClient._is_auth_like_http_error(exc) is False

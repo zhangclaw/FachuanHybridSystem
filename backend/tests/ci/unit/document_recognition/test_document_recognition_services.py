@@ -225,3 +225,8 @@ class TestMessageHubServices:
         from apps.message_hub.services.imap import imap_fetcher
 
         assert imap_fetcher is not None
+
+
+# ---------------------------------------------------------------------------
+# Extended document recognition tests
+# ---------------------------------------------------------------------------
