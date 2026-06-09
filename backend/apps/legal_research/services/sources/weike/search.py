@@ -17,6 +17,39 @@ from .types import WeikeSearchItem, WeikeSession
 logger = logging.getLogger(__name__)
 
 
+# ── 模块级纯函数 ────────────────────────────────────────────
+
+
+def parse_detail_url(url: str) -> WeikeSearchItem | None:
+    """解析 WKInfo 详情页 URL，提取 docId/searchId/module。"""
+    parsed_url = urlparse(url)
+    path_match = re.search(r"/judgment-documents/detail/([^/?#]+)", parsed_url.path)
+    if not path_match:
+        return None
+
+    doc_id_raw = path_match.group(1)
+    query = parse_qs(parsed_url.query)
+    search_id = (query.get("searchId") or [""])[0]
+    module = (query.get("module") or [""])[0]
+
+    return WeikeSearchItem(
+        doc_id_raw=doc_id_raw,
+        doc_id_unquoted=unquote(doc_id_raw),
+        detail_url=urljoin("https://law.wkinfo.com.cn", url),
+        title_hint="",
+        search_id=search_id,
+        module=module,
+    )
+
+
+def compact_error_message(exc: Exception, *, max_len: int = 200) -> str:
+    """压缩异常信息到指定长度。"""
+    text = str(exc or "").strip() or exc.__class__.__name__
+    if len(text) <= max_len:
+        return text
+    return f"{text[:max_len - 3]}..."
+
+
 class WeikeSearchMixin:  # pragma: no cover
     LAW_LIST_URL: str
     _ensure_playwright_session: Callable[[WeikeSession], None]
@@ -508,24 +541,7 @@ class WeikeSearchMixin:  # pragma: no cover
 
     @staticmethod
     def _parse_detail_url(url: str) -> WeikeSearchItem | None:  # pragma: no cover
-        parsed_url = urlparse(url)
-        path_match = re.search(r"/judgment-documents/detail/([^/?#]+)", parsed_url.path)
-        if not path_match:
-            return None
-
-        doc_id_raw = path_match.group(1)
-        query = parse_qs(parsed_url.query)
-        search_id = (query.get("searchId") or [""])[0]
-        module = (query.get("module") or [""])[0]
-
-        return WeikeSearchItem(
-            doc_id_raw=doc_id_raw,
-            doc_id_unquoted=unquote(doc_id_raw),
-            detail_url=urljoin("https://law.wkinfo.com.cn", url),
-            title_hint="",
-            search_id=search_id,
-            module=module,
-        )
+        return parse_detail_url(url)
 
     @staticmethod
     def _go_next_page(page: Page) -> bool:  # pragma: no cover
@@ -656,10 +672,7 @@ class WeikeSearchMixin:  # pragma: no cover
 
     @staticmethod
     def _compact_error_message(exc: Exception, *, max_len: int = 200) -> str:
-        text = str(exc or "").strip() or exc.__class__.__name__
-        if len(text) <= max_len:
-            return text
-        return f"{text[: max_len - 3]}..."
+        return compact_error_message(exc, max_len=max_len)
 
     @staticmethod
     def _record_search_event(

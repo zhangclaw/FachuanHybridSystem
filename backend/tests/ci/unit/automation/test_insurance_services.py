@@ -155,16 +155,16 @@ class TestInsuranceHttpMixin:
         assert result is None
 
     def test_parse_premium_from_response_invalid_value(self) -> None:
-        """无效金额值抛出异常（Decimal 不捕获 InvalidOperation）。"""
+        """无效金额值返回 None（不抛出异常）。"""
         data = {"data": {"minPremium": "not-a-number"}}
-        with pytest.raises(Exception):
-            self.mixin._parse_premium_from_response(data, "PICC", 0.5)
+        result = self.mixin._parse_premium_from_response(data, "PICC", 0.5)
+        assert result is None
 
     def test_parse_premium_from_response_non_dict_data(self) -> None:
-        """非 dict 的 data 抛出 AttributeError。"""
+        """非 dict 的 data 返回 None（不抛出异常）。"""
         data = {"data": "invalid"}
-        with pytest.raises(AttributeError):
-            self.mixin._parse_premium_from_response(data, "PICC", 0.5)
+        result = self.mixin._parse_premium_from_response(data, "PICC", 0.5)
+        assert result is None
 
     def test_make_failed_result(self) -> None:
         """构建失败结果。"""

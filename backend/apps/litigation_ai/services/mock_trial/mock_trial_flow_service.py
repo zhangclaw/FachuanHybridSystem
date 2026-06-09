@@ -20,6 +20,92 @@ if TYPE_CHECKING:
 logger = logging.getLogger("apps.litigation_ai")
 
 
+# ── 模块级纯函数 ────────────────────────────────────────────
+
+
+def parse_mode(user_input: str) -> str | None:
+    """解析用户输入的模拟庭审模式。"""
+    text = (user_input or "").strip()
+    mapping: dict[str, str] = {
+        "1": MockTrialMode.JUDGE,
+        "法官": MockTrialMode.JUDGE,
+        "法官视角": MockTrialMode.JUDGE,
+        "2": MockTrialMode.CROSS_EXAM,
+        "质证": MockTrialMode.CROSS_EXAM,
+        "质证模拟": MockTrialMode.CROSS_EXAM,
+        "3": MockTrialMode.DEBATE,
+        "辩论": MockTrialMode.DEBATE,
+        "辩论模拟": MockTrialMode.DEBATE,
+        "4": MockTrialMode.ADVERSARIAL,
+        "对抗": MockTrialMode.ADVERSARIAL,
+        "多agent对抗": MockTrialMode.ADVERSARIAL,
+        "多agent": MockTrialMode.ADVERSARIAL,
+    }
+    return mapping.get(text)
+
+
+def format_judge_report(report: dict[str, Any]) -> str:
+    """格式化法官视角分析报告为 Markdown。"""
+    lines: list[str] = ["# ⚖️ 法官视角分析报告\n"]
+
+    focuses = report.get("dispute_focuses", [])
+    if focuses:
+        lines.append("## 争议焦点\n")
+        for i, f in enumerate(focuses, 1):
+            lines.append(f"**焦点{i}：{f.get('description', '')}**")
+            lines.append(f"- 类型：{f.get('focus_type', '')}")
+            lines.append(f"- 原告立场：{f.get('plaintiff_position', '')}")
+            lines.append(f"- 被告可能立场：{f.get('defendant_position', '')}")
+            lines.append(f"- 举证责任：{f.get('burden_of_proof', '')}")
+            evidence = f.get("key_evidence", [])
+            if evidence:
+                lines.append(f"- 关键证据：{'、'.join(evidence)}")
+            lines.append("")
+
+    comparisons = report.get("evidence_strength_comparison", [])
+    if comparisons:
+        lines.append("## 证据强弱对比\n")
+        for c in comparisons:
+            lines.append(f"**{c.get('focus', '')}**")
+            lines.append(
+                f"- 原告证据：{c.get('plaintiff_strength', '')} | 被告证据：{c.get('defendant_strength', '')}"
+            )
+            lines.append(f"- 分析：{c.get('analysis', '')}")
+            lines.append("")
+
+    questions = report.get("judge_questions", [])
+    if questions:
+        lines.append("## 法官可能提问\n")
+        for q in questions:
+            lines.append(f"- {q}")
+        lines.append("")
+
+    lines.append(f"## 风险评估\n\n{report.get('risk_assessment', '')}\n")
+    lines.append(f"## 胜诉概率\n\n{report.get('overall_win_probability', '')}\n")
+    lines.append(f"## 建议策略\n\n{report.get('recommended_strategy', '')}")
+
+    return "\n".join(lines)
+
+
+def format_cross_exam_opinion(ev: dict[str, Any], opinion: dict[str, Any]) -> str:
+    """格式化质证意见为 Markdown。"""
+    name = ev.get("name", "未命名")
+    lines = [f"# 🔍 质证意见 — {name}\n"]
+    for dim, label in [
+        ("authenticity", "真实性"),
+        ("legality", "合法性"),
+        ("relevance", "关联性"),
+        ("proof_power", "证明力"),
+    ]:
+        d = opinion.get(dim, {})
+        strength = d.get("challenge_strength", "")
+        icon = {"strong": "🔴", "moderate": "🟡", "weak": "🟢"}.get(strength, "⚪")
+        lines.append(f"## {label} {icon}\n{d.get('opinion', '')}\n")
+    lines.append(f"## 风险等级\n{opinion.get('risk_level', '')}\n")
+    lines.append(f"## 建议回应策略\n{opinion.get('suggested_response', '')}")
+    return "\n".join(lines)
+
+
 class MockTrialFlowService:
     """模拟庭审主流程."""
 
@@ -214,45 +300,7 @@ class MockTrialFlowService:
             )
 
     def _format_judge_report(self, report: dict[str, Any]) -> str:
-        lines: list[str] = ["# ⚖️ 法官视角分析报告\n"]
-
-        focuses = report.get("dispute_focuses", [])
-        if focuses:
-            lines.append("## 争议焦点\n")
-            for i, f in enumerate(focuses, 1):
-                lines.append(f"**焦点{i}：{f.get('description', '')}**")
-                lines.append(f"- 类型：{f.get('focus_type', '')}")
-                lines.append(f"- 原告立场：{f.get('plaintiff_position', '')}")
-                lines.append(f"- 被告可能立场：{f.get('defendant_position', '')}")
-                lines.append(f"- 举证责任：{f.get('burden_of_proof', '')}")
-                evidence = f.get("key_evidence", [])
-                if evidence:
-                    lines.append(f"- 关键证据：{'、'.join(evidence)}")
-                lines.append("")
-
-        comparisons = report.get("evidence_strength_comparison", [])
-        if comparisons:
-            lines.append("## 证据强弱对比\n")
-            for c in comparisons:
-                lines.append(f"**{c.get('focus', '')}**")
-                lines.append(
-                    f"- 原告证据：{c.get('plaintiff_strength', '')} | 被告证据：{c.get('defendant_strength', '')}"
-                )
-                lines.append(f"- 分析：{c.get('analysis', '')}")
-                lines.append("")
-
-        questions = report.get("judge_questions", [])
-        if questions:
-            lines.append("## 法官可能提问\n")
-            for q in questions:
-                lines.append(f"- {q}")
-            lines.append("")
-
-        lines.append(f"## 风险评估\n\n{report.get('risk_assessment', '')}\n")
-        lines.append(f"## 胜诉概率\n\n{report.get('overall_win_probability', '')}\n")
-        lines.append(f"## 建议策略\n\n{report.get('recommended_strategy', '')}")
-
-        return "\n".join(lines)
+        return format_judge_report(report)
 
     # ---- Cross exam ----
 
@@ -359,21 +407,7 @@ class MockTrialFlowService:
             )
 
     def _format_cross_exam_opinion(self, ev: dict[str, Any], opinion: dict[str, Any]) -> str:
-        name = ev.get("name", "未命名")
-        lines = [f"# 🔍 质证意见 — {name}\n"]
-        for dim, label in [
-            ("authenticity", "真实性"),
-            ("legality", "合法性"),
-            ("relevance", "关联性"),
-            ("proof_power", "证明力"),
-        ]:
-            d = opinion.get(dim, {})
-            strength = d.get("challenge_strength", "")
-            icon = {"strong": "🔴", "moderate": "🟡", "weak": "🟢"}.get(strength, "⚪")
-            lines.append(f"## {label} {icon}\n{d.get('opinion', '')}\n")
-        lines.append(f"## 风险等级\n{opinion.get('risk_level', '')}\n")
-        lines.append(f"## 建议回应策略\n{opinion.get('suggested_response', '')}")
-        return "\n".join(lines)
+        return format_cross_exam_opinion(ev, opinion)
 
     async def _handle_cross_exam_response(
         self, ctx: MockTrialContext, user_input: str, send_cb: Callable[..., Any]
@@ -589,23 +623,7 @@ class MockTrialFlowService:
     # ---- Helpers ----
 
     def _parse_mode(self, user_input: str) -> str | None:
-        text = (user_input or "").strip()
-        mapping: dict[str, str] = {
-            "1": MockTrialMode.JUDGE,
-            "法官": MockTrialMode.JUDGE,
-            "法官视角": MockTrialMode.JUDGE,
-            "2": MockTrialMode.CROSS_EXAM,
-            "质证": MockTrialMode.CROSS_EXAM,
-            "质证模拟": MockTrialMode.CROSS_EXAM,
-            "3": MockTrialMode.DEBATE,
-            "辩论": MockTrialMode.DEBATE,
-            "辩论模拟": MockTrialMode.DEBATE,
-            "4": MockTrialMode.ADVERSARIAL,
-            "对抗": MockTrialMode.ADVERSARIAL,
-            "多agent对抗": MockTrialMode.ADVERSARIAL,
-            "多agent": MockTrialMode.ADVERSARIAL,
-        }
-        return mapping.get(text)
+        return parse_mode(user_input)
 
     async def _set_step(self, session_id: str, step: MockTrialStep) -> None:
         await self.session_repo.set_step(session_id, step.value)

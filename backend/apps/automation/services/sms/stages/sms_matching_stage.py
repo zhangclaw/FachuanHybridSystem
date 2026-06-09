@@ -27,6 +27,18 @@ if TYPE_CHECKING:
 logger = logging.getLogger("apps.automation")
 
 
+def filter_valid_case_numbers(case_numbers: list[str]) -> list[str]:
+    """过滤掉日期格式等无效案号（纯函数，不依赖 self 或数据库）"""
+    valid = []
+    for n in case_numbers:
+        if "年" in n and "月" in n and "日" in n:
+            continue
+        if "年" in n and "月" in n and n.endswith("号") and re.match(r"^\d{4}年\d{1,2}月\d{1,2}号?$", n):
+            continue
+        valid.append(n)
+    return valid
+
+
 class SMSMatchingStage(BaseSMSStage):
     """
     SMS 匹配阶段处理器
@@ -305,14 +317,7 @@ class SMSMatchingStage(BaseSMSStage):
 
     def _filter_valid_case_numbers(self, case_numbers: list[str]) -> list[str]:
         """过滤掉日期格式等无效案号"""
-        valid = []
-        for n in case_numbers:
-            if "年" in n and "月" in n and "日" in n:
-                continue
-            if "年" in n and "月" in n and n.endswith("号") and re.match(r"^\d{4}年\d{1,2}月\d{1,2}号?$", n):
-                continue
-            valid.append(n)
-        return valid
+        return filter_valid_case_numbers(case_numbers)
 
 
 def create_sms_matching_stage(

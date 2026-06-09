@@ -12,6 +12,148 @@ from apps.core.interfaces import ServiceLocator
 logger = logging.getLogger(__name__)
 
 
+# ── 模块级纯函数 ────────────────────────────────────────────
+
+_PLACEHOLDER_RE = re.compile(
+    r"(?:案由|法律关系|争议焦点|损失类型|关键事实)"
+    r"[（(]?(?:如[：:].+?|[0-9]+)[）)]?$"
+)
+_GENERIC_LABELS = frozenset({"案由", "法律关系", "争议焦点", "损失类型", "关键事实"})
+
+
+def sanitize_elements(elements: dict[str, Any]) -> dict[str, Any]:
+    """过滤 LLM 返回的占位符文本，只保留真实提取的要素。"""
+
+    def _clean_str(value: str) -> str:
+        text = value.strip()
+        text = re.sub(r"[（(]如[：:].+?[）)]", "", text)
+        if _PLACEHOLDER_RE.match(text):
+            return ""
+        if "如：" in text or "如:" in text:
+            return ""
+        if text in _GENERIC_LABELS:
+            return ""
+        return text.strip()
+
+    def _clean_list(values: list[str]) -> list[str]:
+        cleaned = []
+        for v in values:
+            text = _clean_str(str(v))
+            if text:
+                cleaned.append(text)
+        return cleaned
+
+    result: dict[str, Any] = {}
+    for key, value in elements.items():
+        if isinstance(value, str):
+            result[key] = _clean_str(value)
+        elif isinstance(value, list):
+            result[key] = _clean_list(value)
+        else:
+            result[key] = value
+    return result
+
+
+def build_element_based_queries(elements: dict[str, Any]) -> list[str]:
+    """从法律要素字典构建候选检索式列表。"""
+    if not elements:
+        return []
+    cause = str(elements.get("cause_of_action", "") or "").strip()
+    relation = str(elements.get("legal_relation", "") or "").strip()
+    disputes = [str(d).strip() for d in (elements.get("dispute_focus") or []) if str(d).strip()]
+    damages = [str(d).strip() for d in (elements.get("damage_type") or []) if str(d).strip()]
+    facts = [str(f).strip() for f in (elements.get("key_facts") or []) if str(f).strip()]
+
+    queries: list[str] = []
+    if cause and disputes:
+        queries.append(f"{cause} {' '.join(disputes[:2])}")
+    if relation and damages:
+        queries.append(f"{relation} {' '.join(damages[:2])}")
+    if cause and facts:
+        queries.append(f"{cause} {' '.join(facts[:2])}")
+    all_terms = [t for t in [cause, relation, *disputes[:1], *damages[:1]] if t]
+    if len(all_terms) >= 2:
+        queries.append(" ".join(all_terms[:5]))
+    return queries
+
+
+def build_field_queries_from_elements(elements: dict[str, Any]) -> list[dict[str, str]]:
+    """将法律要素转换为 WKInfo advanced_query 结构化格式。"""
+    if not elements:
+        return []
+
+    cause = str(elements.get("cause_of_action", "") or "").strip()
+    disputes = [str(d).strip() for d in (elements.get("dispute_focus") or []) if str(d).strip()]
+    damages = [str(d).strip() for d in (elements.get("damage_type") or []) if str(d).strip()]
+    facts = [str(f).strip() for f in (elements.get("key_facts") or []) if str(f).strip()]
+
+    field_queries: list[dict[str, str]] = []
+    if cause:
+        field_queries.append({"field": "causeOfAction", "keyword": cause, "op": "AND"})
+    if disputes:
+        field_queries.append({"field": "disputeFocus", "keyword": " ".join(disputes[:3]), "op": "AND"})
+    if damages:
+        field_queries.append({"field": "courtOpinion", "keyword": " ".join(damages[:3]), "op": "AND"})
+    if facts:
+        field_queries.append({"field": "fullText", "keyword": " ".join(facts[:3]), "op": "AND"})
+
+    return field_queries
+
+
+def merge_query_candidates(
+    base_queries: list[str], extra_queries: list[str], *, max_queries: int = 14
+) -> list[str]:
+    """合并并去重候选检索式列表。"""
+    merged: list[str] = []
+    seen: set[str] = set()
+    for query in [*base_queries, *extra_queries]:
+        normalized = re.sub(r"\s+", " ", (query or "")).strip()
+        if not normalized:
+            continue
+        key = normalized.lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        merged.append(normalized)
+        if len(merged) >= max(1, max_queries):
+            break
+    return merged
+
+
+def parse_llm_variant_json(content: str) -> list[str]:
+    """从 LLM 返回的 JSON 字符串中解析检索式候选列表。"""
+    payload: Any = None
+    raw = (content or "").strip()
+    if not raw:
+        return []
+    try:
+        payload = json.loads(raw)
+    except json.JSONDecodeError:
+        match = re.search(r"\{.*\}", raw, flags=re.S)
+        if match:
+            try:
+                payload = json.loads(match.group(0))
+            except json.JSONDecodeError:
+                payload = None
+
+    candidates: list[str] = []
+    if isinstance(payload, dict):
+        values = payload.get("queries", [])
+        if isinstance(values, list):
+            candidates = [str(item or "") for item in values]
+        elif isinstance(values, str):
+            candidates = [values]
+
+    if not candidates:
+        for part in re.split(r"[\n\r]+|[;；]+", raw):
+            value = re.sub(r"^[\-\*\d\.\)\s]+", "", part or "").strip()
+            if not value:
+                continue
+            candidates.append(value)
+
+    return candidates
+
+
 class ExecutorQueryMixin:  # pragma: no cover
     LEGAL_SYNONYM_GROUPS: tuple[tuple[str, ...], ...] = (
         ("买卖合同纠纷", "买卖合同", "货物买卖纠纷"),
@@ -170,20 +312,7 @@ class ExecutorQueryMixin:  # pragma: no cover
     def _merge_query_candidates(  # pragma: no cover
         cls, base_queries: list[str], extra_queries: list[str], *, max_queries: int = 14
     ) -> list[str]:
-        merged: list[str] = []
-        seen: set[str] = set()
-        for query in [*base_queries, *extra_queries]:
-            normalized = re.sub(r"\s+", " ", (query or "")).strip()
-            if not normalized:
-                continue
-            key = normalized.lower()
-            if key in seen:
-                continue
-            seen.add(key)
-            merged.append(normalized)
-            if len(merged) >= max(1, max_queries):
-                break
-        return merged
+        return merge_query_candidates(base_queries, extra_queries, max_queries=max_queries)
 
     # ── LLM 变体生成 ─────────────────────────────────────────
 
@@ -246,35 +375,7 @@ class ExecutorQueryMixin:  # pragma: no cover
 
     @classmethod
     def _parse_query_variants(cls, *, content: str, max_variants: int) -> list[str]:  # pragma: no cover
-        payload: Any = None
-        raw = (content or "").strip()
-        if not raw:
-            return []
-        try:
-            payload = json.loads(raw)
-        except json.JSONDecodeError:
-            match = re.search(r"\{.*\}", raw, flags=re.S)
-            if match:
-                try:
-                    payload = json.loads(match.group(0))
-                except json.JSONDecodeError:
-                    payload = None
-
-        candidates: list[str] = []
-        if isinstance(payload, dict):
-            values = payload.get("queries", [])
-            if isinstance(values, list):
-                candidates = [str(item or "") for item in values]
-            elif isinstance(values, str):
-                candidates = [values]
-
-        if not candidates:
-            for part in re.split(r"[\n\r]+|[;；]+", raw):
-                value = re.sub(r"^[\-\*\d\.\)\s]+", "", part or "").strip()
-                if not value:
-                    continue
-                candidates.append(value)
-
+        candidates = parse_llm_variant_json(content)
         out: list[str] = []
         seen: set[str] = set()
         for candidate in candidates:
@@ -373,60 +474,11 @@ class ExecutorQueryMixin:  # pragma: no cover
     @classmethod
     def _sanitize_elements(cls, elements: dict[str, Any]) -> dict[str, Any]:  # pragma: no cover
         """过滤 LLM 返回的占位符文本，只保留真实提取的要素。"""
-
-        def _clean_str(value: str) -> str:  # pragma: no cover
-            text = value.strip()
-            # 移除括号说明：案由（如：买卖合同纠纷） → 案由
-            text = re.sub(r"[（(]如[：:].+?[）)]", "", text)
-            if cls._PLACEHOLDER_RE.match(text):
-                return ""
-            # 过滤含"如："的残留
-            if "如：" in text or "如:" in text:
-                return ""
-            # 过滤只剩字段名的通用标签
-            if text in cls._GENERIC_LABELS:
-                return ""
-            return text.strip()
-
-        def _clean_list(values: list[str]) -> list[str]:  # pragma: no cover
-            cleaned = []
-            for v in values:
-                text = _clean_str(str(v))
-                if text:
-                    cleaned.append(text)
-            return cleaned
-
-        result: dict[str, Any] = {}
-        for key, value in elements.items():
-            if isinstance(value, str):
-                result[key] = _clean_str(value)
-            elif isinstance(value, list):
-                result[key] = _clean_list(value)
-            else:
-                result[key] = value
-        return result
+        return sanitize_elements(elements)
 
     @classmethod
     def _build_element_based_queries(cls, elements: dict[str, Any]) -> list[str]:  # pragma: no cover
-        if not elements:
-            return []
-        cause = str(elements.get("cause_of_action", "") or "").strip()
-        relation = str(elements.get("legal_relation", "") or "").strip()
-        disputes = [str(d).strip() for d in (elements.get("dispute_focus") or []) if str(d).strip()]
-        damages = [str(d).strip() for d in (elements.get("damage_type") or []) if str(d).strip()]
-        facts = [str(f).strip() for f in (elements.get("key_facts") or []) if str(f).strip()]
-
-        queries: list[str] = []
-        if cause and disputes:
-            queries.append(f"{cause} {' '.join(disputes[:2])}")
-        if relation and damages:
-            queries.append(f"{relation} {' '.join(damages[:2])}")
-        if cause and facts:
-            queries.append(f"{cause} {' '.join(facts[:2])}")
-        all_terms = [t for t in [cause, relation, *disputes[:1], *damages[:1]] if t]
-        if len(all_terms) >= 2:
-            queries.append(" ".join(all_terms[:5]))
-        return queries
+        return build_element_based_queries(elements)
 
     @classmethod
     def _build_field_queries_from_elements(cls, elements: dict[str, Any]) -> list[dict[str, str]]:  # pragma: no cover
@@ -438,25 +490,7 @@ class ExecutorQueryMixin:  # pragma: no cover
         - damage_type → courtOpinion 字段（损害赔偿通常出现在"本院认为"）
         - key_facts → fullText 字段（事实在全文中出现）
         """
-        if not elements:
-            return []
-
-        cause = str(elements.get("cause_of_action", "") or "").strip()
-        disputes = [str(d).strip() for d in (elements.get("dispute_focus") or []) if str(d).strip()]
-        damages = [str(d).strip() for d in (elements.get("damage_type") or []) if str(d).strip()]
-        facts = [str(f).strip() for f in (elements.get("key_facts") or []) if str(f).strip()]
-
-        field_queries: list[dict[str, str]] = []
-        if cause:
-            field_queries.append({"field": "causeOfAction", "keyword": cause, "op": "AND"})
-        if disputes:
-            field_queries.append({"field": "disputeFocus", "keyword": " ".join(disputes[:3]), "op": "AND"})
-        if damages:
-            field_queries.append({"field": "courtOpinion", "keyword": " ".join(damages[:3]), "op": "AND"})
-        if facts:
-            field_queries.append({"field": "fullText", "keyword": " ".join(facts[:3]), "op": "AND"})
-
-        return field_queries
+        return build_field_queries_from_elements(elements)
 
     # ── 同义词扩展 ───────────────────────────────────────────
 
