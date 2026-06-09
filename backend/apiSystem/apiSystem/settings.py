@@ -266,6 +266,11 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
 }
 
+# Session 安全配置
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 7  # 7 天
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_SAVE_EVERY_REQUEST = False
+
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
