@@ -14,7 +14,6 @@ if TYPE_CHECKING:
     from apps.automation.services.sms.sms_notification_service import SMSNotificationService
 
     from .court_document_api_client import CourtDocumentApiClient
-    from .repo.document_history_repo import DocumentHistoryRepo
     from .token.document_delivery_token_service import DocumentDeliveryTokenService
 
 
@@ -25,7 +24,6 @@ def build_document_delivery_coordinator(  # pragma: no cover
     notification_service: SMSNotificationService | None = None,
     api_client: CourtDocumentApiClient | None = None,
     token_service: DocumentDeliveryTokenService | None = None,
-    history_repo: DocumentHistoryRepo | None = None,
 ) -> DocumentDeliveryCoordinator:
     from apps.automation.services.sms.case_matcher import CaseMatcher
     from apps.automation.services.sms.document_renamer import DocumentRenamer
@@ -37,7 +35,6 @@ def build_document_delivery_coordinator(  # pragma: no cover
     from .court_document_api_client import CourtDocumentApiClient
     from .playwright.document_delivery_playwright_service import DocumentDeliveryPlaywrightService
     from .processor.document_delivery_processor import DocumentDeliveryProcessor
-    from .repo.document_history_repo import DocumentHistoryRepo
     from .token.document_delivery_token_service import DocumentDeliveryTokenService
 
     case_service = ServiceLocator.get_case_service()
@@ -46,11 +43,9 @@ def build_document_delivery_coordinator(  # pragma: no cover
     case_chat_service = ServiceLocator.get_case_chat_service()
     case_log_service = ServiceLocator.get_caselog_service()
     case_number_service = ServiceLocator.get_case_number_service()
-    organization_service = ServiceLocator.get_organization_service()
     browser_service = ServiceLocator.get_browser_service()
     auto_token_service = ServiceLocator.get_auto_token_acquisition_service()
 
-    history_repo = history_repo or DocumentHistoryRepo()
     api_client = api_client or CourtDocumentApiClient()
     token_service = token_service or DocumentDeliveryTokenService(
         cache_manager=cache_manager,
@@ -90,8 +85,9 @@ def build_document_delivery_coordinator(  # pragma: no cover
 
     api_service = DocumentDeliveryApiService(
         api_client=api_client,
-        processor=processor,
-        history_repo=history_repo,
+        case_matcher=case_matcher,
+        document_renamer=document_renamer,
+        notification_service=notification_service,
     )
 
     playwright_service = DocumentDeliveryPlaywrightService(
@@ -99,9 +95,6 @@ def build_document_delivery_coordinator(  # pragma: no cover
         case_matcher=case_matcher,
         document_renamer=document_renamer,
         notification_service=notification_service,
-        organization_service=organization_service,
-        processor=processor,
-        history_repo=history_repo,
     )
 
     return DocumentDeliveryCoordinator(
