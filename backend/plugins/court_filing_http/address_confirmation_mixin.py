@@ -118,6 +118,16 @@ class AddressConfirmationMixin:
             items = []
         return items[0] if items else None
 
+    @staticmethod
+    def _sanitize(val: str | None) -> str | None:
+        """Return None for null-ish string values returned by the API."""
+        if val is None:
+            return None
+        s = str(val).strip()
+        if not s or s.lower() in ("null", "undefined", "none"):
+            return None
+        return s
+
     async def _fetch_signature_info(self: Any) -> tuple[str | None, str | None]:
         """获取用户级电子签名，返回 (下载URL, OSS路径)。"""
         data = await self._post(
@@ -133,12 +143,23 @@ class AddressConfirmationMixin:
         if not items:
             return None, None
         item = items[0]
-        download_url = item.get("url") or item.get("qmPath") or item.get("path") or item.get("qmUrl")
-        oss_path = item.get("osspath") or item.get("qmPath") or item.get("path")
+        download_url = (
+            self._sanitize(item.get("url"))
+            or self._sanitize(item.get("qmPath"))
+            or self._sanitize(item.get("path"))
+            or self._sanitize(item.get("qmUrl"))
+        )
+        oss_path = (
+            self._sanitize(item.get("osspath"))
+            or self._sanitize(item.get("qmPath"))
+            or self._sanitize(item.get("path"))
+        )
         return download_url, oss_path
 
     async def _download_signature_image(self: Any, signature_path: str) -> str:
         """从 OSS 下载签名图片到临时文件。"""
+        if self._sanitize(signature_path) is None:
+            raise ValueError(f"签名路径无效: {signature_path!r}")
         if signature_path.startswith("http"):
             url = signature_path
         else:
