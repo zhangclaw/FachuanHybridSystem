@@ -34,9 +34,9 @@ def _get_domain_service() -> Any:
 
 
 def _get_access_policy() -> Any:
-    from apps.contracts.services.contract.wiring import get_contract_service
+    from apps.contracts.services.contract.wiring import get_contract_domain_service
 
-    return get_contract_service().access_policy
+    return get_contract_domain_service().access_policy
 
 
 @router.get("/contracts", response=list[ContractOut])
