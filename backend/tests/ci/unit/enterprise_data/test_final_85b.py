@@ -212,9 +212,9 @@ class TestMcpToolClient:
 
 class TestImageRotationOrientation:
     def test_module_imports(self):
-        from apps.image_rotation.services.orientation.service import ImageOrientationService
+        from apps.image_rotation.services.orientation.service import OrientationDetectionService
 
-        assert ImageOrientationService is not None
+        assert OrientationDetectionService is not None
 
 
 # ============================================================================
@@ -224,9 +224,9 @@ class TestImageRotationOrientation:
 
 class TestImageRotationFacade:
     def test_module_imports(self):
-        from apps.image_rotation.services.facade import ImageRotationFacade
+        from apps.image_rotation.services.facade import ImageRotationService
 
-        assert ImageRotationFacade is not None
+        assert ImageRotationService is not None
 
 
 # ============================================================================
@@ -236,9 +236,9 @@ class TestImageRotationFacade:
 
 class TestLegalSolutionGenerator:
     def test_module_imports(self):
-        from apps.legal_solution.services.solution_generator import LegalSolutionGenerator
+        from apps.legal_solution.services.solution_generator import SolutionGenerator
 
-        assert LegalSolutionGenerator is not None
+        assert SolutionGenerator is not None
 
 
 # ============================================================================
@@ -274,9 +274,9 @@ class TestLawyerImportService:
 
 class TestCaseBindingService:
     def test_module_imports(self):
-        from apps.document_recognition.services.case_binding_service import DocumentCaseBindingService
+        from apps.document_recognition.services.case_binding_service import CaseBindingService
 
-        assert DocumentCaseBindingService is not None
+        assert CaseBindingService is not None
 
 
 # ============================================================================
@@ -286,9 +286,9 @@ class TestCaseBindingService:
 
 class TestInfoExtractor:
     def test_module_imports(self):
-        from apps.document_recognition.services.info_extractor import DocumentInfoExtractor
+        from apps.document_recognition.services.info_extractor import InfoExtractor
 
-        assert DocumentInfoExtractor is not None
+        assert InfoExtractor is not None
 
 
 # ============================================================================
@@ -298,9 +298,15 @@ class TestInfoExtractor:
 
 class TestEvidenceSortingReconciler:
     def test_module_imports(self):
-        from apps.evidence_sorting.services.reconciler import EvidenceReconciler
+        from apps.evidence_sorting.services.reconciler import ReconcilerService
 
-        assert EvidenceReconciler is not None
+        assert ReconcilerService is not None
+
+    def test_line_item_dataclass(self):
+        from apps.evidence_sorting.services.reconciler import LineItem
+
+        item = LineItem.__new__(LineItem)
+        assert item is not None
 
 
 # ============================================================================
@@ -310,9 +316,9 @@ class TestEvidenceSortingReconciler:
 
 class TestIdCardMergeFacade:
     def test_module_imports(self):
-        from apps.client.services.id_card_merge.facade import IdCardMergeFacade
+        from apps.client.services.id_card_merge.facade import IdCardMergeService
 
-        assert IdCardMergeFacade is not None
+        assert IdCardMergeService is not None
 
 
 # ============================================================================
