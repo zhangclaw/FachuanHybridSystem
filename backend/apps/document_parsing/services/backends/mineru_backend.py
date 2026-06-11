@@ -228,12 +228,11 @@ class MineruBackend:
             upload_url = urls[0]
             file_size = file_path_obj.stat().st_size
 
-            # 上传文件到预签名 URL
+            # 上传文件到预签名 URL（不要设置 Content-Type，签名不包含此 header）
             with open(file_path, "rb") as f:
                 upload_response = client.put(
                     upload_url,
                     content=f.read(),
-                    headers={"Content-Type": "application/octet-stream"},
                     timeout=self.timeout,
                 )
                 logger.debug(
