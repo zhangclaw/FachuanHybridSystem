@@ -94,13 +94,14 @@ class MineruBackend:
 
         try:
             # 1. 上传文件到 MinerU
-            file_url = self._upload_file(file_path)
+            upload_info = self._upload_file(file_path)
 
             # 2. 创建解析任务
             task_id = self._create_task(
-                file_url=file_url,
+                file_url=upload_info["upload_url"],
                 file_type=file_type,
                 extract_images=extract_images,
+                batch_id=upload_info["batch_id"],
             )
 
             # 3. 轮询获取结果
@@ -177,14 +178,14 @@ class MineruBackend:
         """获取支持的文件格式"""
         return ["pdf", "doc", "docx", "ppt", "pptx", "xls", "xlsx", "jpg", "jpeg", "png"]
 
-    def _upload_file(self, file_path: str) -> str:
-        """上传文件到 MinerU，获取文件 URL
+    def _upload_file(self, file_path: str) -> dict:
+        """上传文件到 MinerU，获取文件引用
 
         Args:
             file_path: 本地文件路径
 
         Returns:
-            文件 URL
+            包含 batch_id 和 upload_url 的字典
         """
         file_path_obj = Path(file_path)
         file_name = file_path_obj.name
@@ -210,6 +211,8 @@ class MineruBackend:
             )
             response.raise_for_status()
             result = response.json()
+
+            logger.debug("batch API 响应: %s", result)
 
             if result.get("code") != 0:
                 raise MineruAPIError(
@@ -243,8 +246,7 @@ class MineruBackend:
 
             logger.info("文件上传成功: %s (batch_id=%s)", file_name, batch_id)
 
-            # 返回 MinerU 内部文件 URL（用于创建任务）
-            return upload_url
+            return {"batch_id": batch_id, "upload_url": upload_url}
 
         except httpx.HTTPError as e:
             raise MineruAPIError(f"HTTP 请求失败: {e}") from e
@@ -254,13 +256,15 @@ class MineruBackend:
         file_url: str,
         file_type: str = "pdf",
         extract_images: bool = False,
+        batch_id: str = None,
     ) -> str:
         """创建 MinerU 解析任务
 
         Args:
-            file_url: 文件 URL
+            file_url: 文件 URL（当 batch_id 存在时作为备用）
             file_type: 文件类型
             extract_images: 是否提取图片
+            batch_id: 批次 ID（从 _upload_file 获取）
 
         Returns:
             任务 ID
@@ -271,12 +275,20 @@ class MineruBackend:
             "Authorization": f"Bearer {self.api_key}",
         }
 
-        payload = {
-            "url": file_url,
-            "model_version": self.MODEL_VERSION,
-        }
+        # 优先使用 batch_id，因为预签名 URL 可能无法被 MinerU 处理服务访问
+        if batch_id:
+            payload = {
+                "batch_id": batch_id,
+                "model_version": self.MODEL_VERSION,
+            }
+        else:
+            payload = {
+                "url": file_url,
+                "model_version": self.MODEL_VERSION,
+            }
 
         try:
+            logger.debug("创建任务 payload: %s", payload)
             response = client.post(
                 self.API_URL,
                 json=payload,
@@ -285,6 +297,8 @@ class MineruBackend:
             )
             response.raise_for_status()
             result = response.json()
+
+            logger.debug("创建任务响应: %s", result)
 
             if result.get("code") != 0:
                 raise MineruAPIError(
