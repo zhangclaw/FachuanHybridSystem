@@ -2,7 +2,12 @@
 
 from __future__ import annotations
 
+from django.core.cache import cache
+
 from apps.client.models import Client, ClientIdentityDoc, PropertyClue
+
+_CLIENT_CACHE_KEY = "internal:clients:all"
+_CLIENT_CACHE_TTL = 300  # 缓存有效期 5 分钟（可调）
 
 
 class ClientInternalQueryService:
@@ -20,7 +25,12 @@ class ClientInternalQueryService:
         return Client.objects.prefetch_related("identity_docs").filter(name=name).first()
 
     def list_all_clients(self) -> list[Client]:  # pragma: no cover
-        return list(Client.objects.prefetch_related("identity_docs").order_by("id"))
+        cached = cache.get(_CLIENT_CACHE_KEY)
+        if cached is not None:
+            return cached  # type: ignore[no-any-return]
+        result = list(Client.objects.prefetch_related("identity_docs").order_by("id"))
+        cache.set(_CLIENT_CACHE_KEY, result, _CLIENT_CACHE_TTL)
+        return result
 
     def search_clients_by_name(self, *, name: str, exact_match: bool = False) -> list[Client]:
         if not name:
