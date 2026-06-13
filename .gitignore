@@ -206,7 +206,6 @@ media/
 
 # API 结构快照（含接口细节，不应公开）
 backend/tests/structure/snapshots/*
-!backend/tests/structure/snapshots/openapi_v1.json
 
 # legal_research 私有 API 检索实现（本地保留，不入库）
 backend/apps/legal_research/services/sources/weike/api_private/
