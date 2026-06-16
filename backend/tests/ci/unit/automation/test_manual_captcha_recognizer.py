@@ -2,11 +2,8 @@
 
 from __future__ import annotations
 
-import time
 from types import SimpleNamespace
-from unittest.mock import MagicMock, patch, call
-
-import pytest
+from unittest.mock import MagicMock, patch
 
 
 # ======================================================================
