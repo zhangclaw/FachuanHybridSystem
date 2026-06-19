@@ -49,6 +49,12 @@ def _make_service(**kwargs: Any) -> ContractFolderScanService:
     return ContractFolderScanService(**kwargs)
 
 
+def _make_processor(**kwargs: Any) -> Any:
+    from apps.contracts.services.contract.integrations._candidate_post_processor import CandidatePostProcessor
+    kwargs.setdefault("scan_service", MagicMock())
+    return CandidatePostProcessor(**kwargs)
+
+
 def _make_contract(id: int = 1, name: str = "Test Contract") -> MagicMock:
     c = MagicMock()
     c.id = id
@@ -241,7 +247,7 @@ class TestNormalizeDocxName:
 
 class TestRelativePathStr:
     def test_nested(self, tmp_path: Path) -> None:
-        svc = _make_service()
+        svc = _make_processor()
         sub = tmp_path / "sub"
         sub.mkdir()
         f = sub / "test.pdf"
@@ -250,14 +256,14 @@ class TestRelativePathStr:
         assert result == "sub"
 
     def test_direct(self, tmp_path: Path) -> None:
-        svc = _make_service()
+        svc = _make_processor()
         f = tmp_path / "test.pdf"
         f.touch()
         result = svc._relative_path_str(source_path=str(f), scan_root=tmp_path)
         assert result == ""
 
     def test_error(self) -> None:
-        svc = _make_service()
+        svc = _make_processor()
         result = svc._relative_path_str(source_path="/other/path", scan_root=Path("/tmp/root"))
         assert result == ""
 
@@ -302,7 +308,7 @@ class TestRunContractFolderScanTask:
 
 class TestPostProcessCandidates:
     def test_archive_document_category(self) -> None:
-        svc = _make_service()
+        svc = _make_processor()
         candidates = [
             {
                 "filename": "contract.pdf",
@@ -334,7 +340,7 @@ class TestPostProcessCandidates:
         assert result[0]["archive_item_code"] == "lt_4"
 
     def test_skip_category(self) -> None:
-        svc = _make_service()
+        svc = _make_processor()
         candidates = [
             {
                 "filename": "skip.pdf",
@@ -362,7 +368,7 @@ class TestPostProcessCandidates:
         assert "skip_reason" in result[0]
 
     def test_insurance_keyword_deselected(self) -> None:
-        svc = _make_service()
+        svc = _make_processor()
         candidates = [
             {
                 "filename": "保单.pdf",
@@ -380,7 +386,7 @@ class TestPostProcessCandidates:
 
 class TestMarkAlreadyImported:
     def test_no_hashes(self) -> None:
-        svc = _make_service()
+        svc = _make_processor()
         candidates = [{"filename": "a.pdf", "source_path": "/tmp/a.pdf"}]
         with patch(
             "apps.contracts.services.contract.integrations._candidate_post_processor.FinalizedMaterial"
