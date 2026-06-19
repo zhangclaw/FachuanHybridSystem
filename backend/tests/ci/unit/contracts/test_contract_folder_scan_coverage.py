@@ -144,8 +144,8 @@ class TestEnsureContractExists:
 
 class TestRelativePathStr:
     def _make_service(self):
-        from apps.contracts.services.contract.integrations.folder_scan_service import ContractFolderScanService
-        return ContractFolderScanService()
+        from apps.contracts.services.contract.integrations._candidate_post_processor import CandidatePostProcessor
+        return CandidatePostProcessor(scan_service=MagicMock())
 
     def test_unresolvable_path(self):
         svc = self._make_service()
