@@ -438,7 +438,7 @@
 
 .folder-browser-btn:hover {
     background: var(--fc-border);
-    border-color: #cfcfcf;
+    border-color: var(--fc-border);
 }
 
 .folder-browser-btn:disabled {
@@ -519,8 +519,8 @@
 }
 
 .folder-browser-sideitem:hover {
-    background: #f3f6f8;
-    border-color: #e6eef3;
+    background: var(--fc-bg-muted-light);
+    border-color: var(--fc-border);
 }
 
 .folder-browser-main {
@@ -560,8 +560,8 @@
 }
 
 .folder-browser-crumb:hover {
-    background: #f3f6f8;
-    border-color: #e6eef3;
+    background: var(--fc-bg-muted-light);
+    border-color: var(--fc-border);
 }
 
 .folder-browser-hint {
@@ -599,11 +599,11 @@
 }
 
 .folder-browser-row:hover {
-    background: #f7fafc;
+    background: var(--fc-bg-muted-light);
 }
 
 .folder-browser-row.is-selected {
-    background: #e8f0f6;
+    background: var(--fc-primary-subtle);
 }
 
 .folder-browser-row-name {
@@ -637,7 +637,7 @@
 
 .folder-browser-mini:hover {
     background: var(--fc-border);
-    border-color: #cfcfcf;
+    border-color: var(--fc-border);
 }
 
 .folder-browser-empty {

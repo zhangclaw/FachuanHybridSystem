@@ -207,7 +207,7 @@
 
 .quick-path-btn:hover {
     background: var(--fc-border);
-    border-color: #adb5bd;
+    border-color: var(--fc-border);
 }
 
 .quick-path-btn:active {
@@ -267,7 +267,7 @@
     margin-top: 8px;
     padding: 8px 12px;
     background: var(--fc-error-bg);
-    border: 1px solid #f44336;
+    border: 1px solid var(--fc-error-text);
     border-radius: 4px;
     color: var(--fc-error-text);
     font-size: 13px;
@@ -305,7 +305,7 @@
 
 #cancel_folder_dialog:hover {
     background: var(--fc-border);
-    border-color: #adb5bd;
+    border-color: var(--fc-border);
 }
 
 #confirm_folder_binding {
@@ -343,7 +343,7 @@
     position: fixed;
     top: 20px;
     right: 20px;
-    background: #4caf50;
+    background: var(--fc-success-text);
     color: var(--fc-text-on-primary);
     padding: 12px 20px;
     border-radius: 6px;
@@ -364,7 +364,7 @@
     position: fixed;
     top: 20px;
     right: 20px;
-    background: #f44336;
+    background: var(--fc-error-text);
     color: var(--fc-text-on-primary);
     padding: 12px 20px;
     border-radius: 6px;
@@ -393,7 +393,7 @@
 
 .folder-browser {
     margin-top: 12px;
-    border: 1px solid #e6e6e6;
+    border: 1px solid var(--fc-border);
     border-radius: 8px;
     background: var(--fc-bg-card);
     overflow: hidden;
@@ -437,7 +437,7 @@
 
 .folder-browser-btn:hover {
     background: var(--fc-border);
-    border-color: #cfcfcf;
+    border-color: var(--fc-border);
 }
 
 .folder-browser-btn:disabled {
@@ -489,7 +489,7 @@
 .folder-browser-sidebar {
     width: 210px;
     border-right: 1px solid var(--fc-bg-muted-light);
-    background: #fcfcfc;
+    background: var(--fc-bg-muted-light);
     padding: 10px;
     overflow: auto;
 }
@@ -518,8 +518,8 @@
 }
 
 .folder-browser-sideitem:hover {
-    background: #f3f6f8;
-    border-color: #e6eef3;
+    background: var(--fc-bg-muted-light);
+    border-color: var(--fc-border);
 }
 
 .folder-browser-main {
@@ -559,8 +559,8 @@
 }
 
 .folder-browser-crumb:hover {
-    background: #f3f6f8;
-    border-color: #e6eef3;
+    background: var(--fc-bg-muted-light);
+    border-color: var(--fc-border);
 }
 
 .folder-browser-hint {
@@ -598,11 +598,11 @@
 }
 
 .folder-browser-row:hover {
-    background: #f7fafc;
+    background: var(--fc-bg-muted-light);
 }
 
 .folder-browser-row.is-selected {
-    background: #e8f0f6;
+    background: var(--fc-primary-subtle);
 }
 
 .folder-browser-row-name {
@@ -636,7 +636,7 @@
 
 .folder-browser-mini:hover {
     background: var(--fc-border);
-    border-color: #cfcfcf;
+    border-color: var(--fc-border);
 }
 
 .folder-browser-empty {

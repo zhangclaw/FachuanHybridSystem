@@ -8,13 +8,13 @@
 
 /* Upload Zone */
 .ir-upload-zone {
-    border: 2px dashed #c5d5e0;
+    border: 2px dashed var(--fc-border-input);
     border-radius: 10px;
     padding: 36px 20px;
     text-align: center;
     cursor: pointer;
     transition: border-color 0.2s, background 0.2s;
-    background: #f8fbfd;
+    background: var(--fc-bg-muted-light);
     margin-bottom: 24px;
 }
 
@@ -25,7 +25,7 @@
 
 .ir-upload-zone.dragging {
     border-color: var(--fc-admin-blue);
-    background: #e3eef5;
+    background: var(--fc-primary-subtle);
     border-style: solid;
 }
 
@@ -58,7 +58,7 @@
 
 .ir-progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--fc-admin-blue), #5a9ab5);
+    background: linear-gradient(90deg, var(--fc-admin-blue), var(--fc-admin-blue-hover));
     border-radius: 4px;
     transition: width 0.3s ease;
 }
@@ -70,13 +70,13 @@
     color: var(--fc-admin-blue);
     margin: 24px 0 12px;
     padding-bottom: 6px;
-    border-bottom: 2px solid #d0e4ed;
+    border-bottom: 2px solid var(--fc-border);
     letter-spacing: 0.02em;
 }
 
 /* Category Group */
 .ir-category-group {
-    border: 1px solid #dde8ee;
+    border: 1px solid var(--fc-border);
     border-radius: 8px;
     margin-bottom: 10px;
     overflow: hidden;
@@ -88,19 +88,19 @@
     align-items: center;
     justify-content: space-between;
     padding: 11px 16px;
-    background: #f0f6fa;
+    background: var(--fc-primary-subtle);
     cursor: pointer;
     user-select: none;
     transition: background 0.15s;
 }
 
 .ir-category-header:hover {
-    background: #e4eff6;
+    background: var(--fc-primary-hover);
 }
 
 .ir-category-header .category-title {
     font-weight: 600;
-    color: #2c5f78;
+    color: var(--fc-admin-blue);
     font-size: 0.9rem;
 }
 
@@ -114,7 +114,7 @@
 
 .ir-category-header .category-subtotal {
     font-weight: 700;
-    color: #2c7a4b;
+    color: var(--fc-success-text);
     font-size: 0.95rem;
 }
 
@@ -136,12 +136,12 @@
 }
 
 .ir-invoice-table th {
-    background: #f7fafb;
+    background: var(--fc-bg-muted-light);
     padding: 8px 12px;
     text-align: left;
     font-weight: 600;
     color: var(--fc-text-muted);
-    border-bottom: 1px solid #e5edf2;
+    border-bottom: 1px solid var(--fc-border);
     white-space: nowrap;
     font-size: 0.8rem;
     text-transform: uppercase;
@@ -150,7 +150,7 @@
 
 .ir-invoice-table td {
     padding: 9px 12px;
-    border-bottom: 1px solid #f2f5f7;
+    border-bottom: 1px solid var(--fc-border);
     color: var(--fc-text-secondary);
     vertical-align: middle;
 }
@@ -160,14 +160,14 @@
 }
 
 .ir-invoice-table tr:hover td {
-    background: #f5f9fb;
+    background: var(--fc-bg-muted-light);
 }
 
 /* Category Download Buttons */
 .ir-category-download {
     padding: 8px 14px;
-    background: #f7fafb;
-    border-top: 1px solid #e5edf2;
+    background: var(--fc-bg-muted-light);
+    border-top: 1px solid var(--fc-border);
     display: flex;
     gap: 8px;
     justify-content: flex-end;
@@ -189,23 +189,23 @@
 .btn-pdf {
     background: var(--fc-error-bg);
     color: var(--fc-error-text);
-    border-color: #f5c6c6;
+    border-color: var(--fc-error-border);
 }
 
 .btn-pdf:hover {
-    background: #fde0e0;
-    border-color: #e8a0a0;
+    background: var(--fc-error-bg);
+    border-color: var(--fc-error-border);
 }
 
 .btn-zip {
-    background: #eef4f8;
-    color: #2c5f78;
-    border-color: #c5d8e4;
+    background: var(--fc-primary-subtle);
+    color: var(--fc-admin-blue);
+    border-color: var(--fc-border);
 }
 
 .btn-zip:hover {
-    background: #ddeaf3;
-    border-color: #a8c5d6;
+    background: var(--fc-primary-hover);
+    border-color: var(--fc-border);
 }
 
 /* Duplicate Section */
@@ -233,8 +233,8 @@
 
 /* Total Section */
 .ir-total-section {
-    background: linear-gradient(135deg, #f0f8f4, #e8f4f0);
-    border: 1px solid #b8dece;
+    background: linear-gradient(135deg, var(--fc-success-bg), var(--fc-success-bg));
+    border: 1px solid var(--fc-success-border);
     border-radius: 8px;
     padding: 14px 20px;
     margin: 16px 0;
@@ -245,7 +245,7 @@
 
 .ir-total-section .total-label {
     font-size: 0.9rem;
-    color: #4a7a5e;
+    color: var(--fc-success-text);
     font-weight: 500;
     flex-shrink: 0;
 }
@@ -253,13 +253,13 @@
 .ir-total-section .total-amount {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #1a6b3c;
+    color: var(--fc-success-text);
     letter-spacing: -0.02em;
 }
 
 .ir-total-section .total-amount-cn {
     font-size: 1rem;
-    color: #3d6b52;
+    color: var(--fc-success-text);
     margin-left: auto;
     font-weight: 500;
 }
@@ -284,7 +284,7 @@
 }
 
 .ir-download-btns .btn-pdf:hover {
-    background: #c82333;
+    background: var(--fc-error-text);
 }
 
 .ir-download-btns .btn-zip {
@@ -294,7 +294,7 @@
 }
 
 .ir-download-btns .btn-zip:hover {
-    background: #2d5a6e;
+    background: var(--fc-admin-blue-hover);
 }
 
 /* Record Status Badge */
@@ -353,22 +353,22 @@
 .ir-invoice-table .button {
     padding: 3px 10px;
     font-size: 0.78rem;
-    background: #eef4f8;
-    color: #2c5f78;
-    border: 1px solid #c5d8e4;
+    background: var(--fc-primary-subtle);
+    color: var(--fc-admin-blue);
+    border: 1px solid var(--fc-border);
     border-radius: 4px;
     cursor: pointer;
     transition: background 0.15s;
 }
 
 .ir-invoice-table .button:hover {
-    background: #ddeaf3;
+    background: var(--fc-primary-hover);
 }
 
 /* Merge Panel */
 .btn-merge-toggle {
     background: none;
-    border: 1px solid #c5d8e4;
+    border: 1px solid var(--fc-border);
     border-radius: 5px;
     padding: 4px 12px;
     font-size: 0.82rem;
@@ -376,11 +376,11 @@
     cursor: pointer;
     transition: background 0.15s;
 }
-.btn-merge-toggle:hover { background: #eef4f8; }
+.btn-merge-toggle:hover { background: var(--fc-primary-subtle); }
 
 .ir-merge-panel {
-    background: #f8fbfd;
-    border: 1px solid #d0e4ed;
+    background: var(--fc-bg-muted-light);
+    border: 1px solid var(--fc-border);
     border-radius: 8px;
     padding: 14px 16px;
     margin-bottom: 16px;
@@ -401,7 +401,7 @@
 
 .ir-merge-group {
     background: var(--fc-bg-card);
-    border: 2px dashed #c5d8e4;
+    border: 2px dashed var(--fc-border);
     border-radius: 8px;
     padding: 10px 12px;
     min-width: 160px;
@@ -443,7 +443,7 @@
     padding: 0 2px;
     line-height: 1;
 }
-.ir-merge-remove-btn:hover { color: #e74c3c; }
+.ir-merge-remove-btn:hover { color: var(--fc-error-text); }
 
 .ir-merge-tags {
     display: flex;
@@ -456,8 +456,8 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    background: #e3eef5;
-    color: #2c5f78;
+    background: var(--fc-primary-subtle);
+    color: var(--fc-admin-blue);
     border-radius: 12px;
     padding: 3px 8px;
     font-size: 0.78rem;
@@ -472,7 +472,7 @@
     font-size: 0.9rem;
     line-height: 1;
 }
-.ir-merge-tag-remove:hover { color: #e74c3c; }
+.ir-merge-tag-remove:hover { color: var(--fc-error-text); }
 
 .ir-merge-drop-hint {
     font-size: 0.78rem;
@@ -483,14 +483,14 @@
 .ir-merge-group-total {
     margin-top: 8px;
     font-size: 0.82rem;
-    color: #2c7a4b;
+    color: var(--fc-success-text);
     font-weight: 600;
     text-align: right;
 }
 
 .ir-merge-add-btn {
     background: none;
-    border: 2px dashed #c5d8e4;
+    border: 2px dashed var(--fc-border);
     border-radius: 8px;
     padding: 10px 16px;
     color: var(--fc-text-muted);
@@ -505,7 +505,7 @@
 /* Merged badge */
 .ir-merged-badge {
     display: inline-block;
-    background: #e3eef5;
+    background: var(--fc-primary-subtle);
     color: var(--fc-admin-blue);
     border-radius: 10px;
     padding: 1px 7px;
@@ -516,8 +516,8 @@
 }
 
 .btn-jtn {
-    background: #eef7ee;
-    border-color: #a8d5a8;
-    color: #2d6a2d;
+    background: var(--fc-success-bg);
+    border-color: var(--fc-success-border);
+    color: var(--fc-success-text);
 }
-.btn-jtn:hover { background: #ddf0dd; }
+.btn-jtn:hover { background: var(--fc-success-bg); }

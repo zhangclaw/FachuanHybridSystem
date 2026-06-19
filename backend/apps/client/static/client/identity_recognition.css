@@ -144,7 +144,7 @@
    ======================================== */
 
 .identity-upload-zone {
-    border: 3px dashed #b8d4e3;
+    border: 3px dashed var(--fc-border-input);
     border-radius: 16px;
     padding: 60px 20px;
     text-align: center;
@@ -314,7 +314,7 @@
     display: flex;
     align-items: center;
     padding: 12px 0;
-    border-bottom: 1px solid #f0f3f5;
+    border-bottom: 1px solid var(--fc-border);
 }
 
 .result-field:last-child {
@@ -346,7 +346,7 @@
     gap: 12px;
     padding: 20px 24px;
     background: var(--fc-bg-muted);
-    border-top: 1px solid #e8eef3;
+    border-top: 1px solid var(--fc-border);
 }
 
 .btn {
@@ -421,7 +421,7 @@
 .error-icon {
     font-size: 48px;
     margin-bottom: 16px;
-    color: #f44336;
+    color: var(--fc-error-text);
 }
 
 .identity-error-state h4 {
@@ -444,7 +444,7 @@
     margin-top: 20px;
     padding: 16px;
     background: var(--fc-bg-muted-light);
-    border: 1px solid #b8d4e3;
+    border: 1px solid var(--fc-border-input);
     border-radius: 10px;
     text-align: center;
 }
@@ -564,5 +564,5 @@
 }
 
 .text-warning {
-    color: #ffc107 !important;
+    color: var(--fc-warning-text) !important;
 }

@@ -98,9 +98,9 @@
     background: var(--fc-admin-blue);
     border-radius: 50%;
     border: 2px solid var(--fc-text-on-primary);
-    box-shadow: 0 0 0 1px #417690;
+    box-shadow: 0 0 0 1px var(--fc-admin-blue);
 }
-.case-log-item.new::before { background: var(--fc-success-text); box-shadow: 0 0 0 1px #28a745; }
+.case-log-item.new::before { background: var(--fc-success-text); box-shadow: 0 0 0 1px var(--fc-success-text); }
 
 /* 日志卡片样式 */
 .log-card {
@@ -124,7 +124,7 @@
 .log-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .log-time { color: var(--fc-text-muted); font-size: 11px; font-weight: 500; }
 .log-author { color: var(--fc-admin-blue); font-size: 11px; font-weight: 600; padding: 1px 6px; background: var(--fc-info-bg); border-radius: 8px; }
-.log-reminder-badge { font-size: 10px; padding: 1px 6px; background: #fff3e0; color: #e65100; border-radius: 8px; }
+.log-reminder-badge { font-size: 10px; padding: 1px 6px; background: var(--fc-warning-bg); color: var(--fc-warning-text); border-radius: 8px; }
 
 .log-actions { display: flex; gap: 6px; }
 .log-expand-btn, .log-edit-link {

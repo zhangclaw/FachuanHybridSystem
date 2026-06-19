@@ -116,7 +116,7 @@
 
 /* 选中/高亮状态 */
 .ac-item.ac-active {
-    background: linear-gradient(135deg, #417690 0%, #4a8db0 100%);
+    background: linear-gradient(135deg, var(--fc-admin-blue) 0%, var(--fc-admin-blue-hover) 100%);
     color: var(--fc-text-on-primary);
 }
 
@@ -127,7 +127,7 @@
 
 /* ========== 关键词高亮 ========== */
 .ac-highlight {
-    background: #fef08a;
+    background: var(--fc-warning-bg);
     color: var(--fc-warning-text);
     padding: 1px 3px;
     border-radius: 2px;

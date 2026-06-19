@@ -78,7 +78,7 @@
     border-radius: 6px;
     font-size: 12px;
     background: var(--fc-bg-muted-light);
-    color: #374151;
+    color: var(--fc-text-secondary);
 }
 
 /* 建档状态 */
@@ -132,7 +132,7 @@
 
 .btn-secondary {
     background: var(--fc-bg-muted-light);
-    color: #374151;
+    color: var(--fc-text-secondary);
 }
 
 .btn-secondary:hover {
@@ -186,7 +186,7 @@
 }
 
 .tab-nav button:hover {
-    color: #374151;
+    color: var(--fc-text-secondary);
 }
 
 .tab-nav button.active {
@@ -254,7 +254,7 @@
 .card-title {
     font-size: 14px;
     font-weight: 600;
-    color: #374151;
+    color: var(--fc-text-secondary);
     margin: 0;
 }
 
@@ -381,7 +381,7 @@
     padding: 2px 8px;
     border-radius: 4px;
     font-size: 12px;
-    color: #374151;
+    color: var(--fc-text-secondary);
 }
 
 .authority-name {
@@ -503,7 +503,7 @@
 
 .timeline-actor {
     font-weight: 500;
-    color: #374151;
+    color: var(--fc-text-secondary);
 }
 
 .timeline-time {
@@ -541,7 +541,7 @@
 }
 
 .reminder-time {
-    color: #b45309;
+    color: var(--fc-warning-text);
     margin-left: 8px;
 }
 
@@ -597,7 +597,7 @@
     padding: 2px 8px;
     border-radius: 4px;
     font-size: 12px;
-    color: #374151;
+    color: var(--fc-text-secondary);
 }
 
 .chat-name {
@@ -878,7 +878,7 @@
 .action-group-title {
     font-size: 13px;
     font-weight: 600;
-    color: #374151;
+    color: var(--fc-text-secondary);
     margin: 0 0 12px 0;
 }
 
@@ -966,7 +966,7 @@
 }
 
 .drawer-close:hover {
-    color: #374151;
+    color: var(--fc-text-secondary);
 }
 
 .drawer-body {
@@ -1078,7 +1078,7 @@
 
 .court-guarantee-form-row > select.court-guarantee-control {
     padding-right: 34px !important;
-    background-image: linear-gradient(45deg, transparent 50%, #64748b 50%), linear-gradient(135deg, #64748b 50%, transparent 50%);
+    background-image: linear-gradient(45deg, transparent 50%, var(--fc-text-muted) 50%), linear-gradient(135deg, var(--fc-text-muted) 50%, transparent 50%);
     background-position: calc(100% - 16px) 18px, calc(100% - 11px) 18px;
     background-size: 5px 5px, 5px 5px;
     background-repeat: no-repeat;
@@ -1247,7 +1247,7 @@
 .data-table th {
     background: var(--fc-bg-muted-light);
     font-weight: 600;
-    color: #374151;
+    color: var(--fc-text-secondary);
     font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 0.025em;
@@ -1262,7 +1262,7 @@
     font-size: 11px;
     font-weight: 500;
     background: var(--fc-border);
-    color: #374151;
+    color: var(--fc-text-secondary);
 }
 .table-responsive {
     overflow-x: auto;
@@ -1316,7 +1316,7 @@
     margin-bottom: 4px;
     font-size: 13px;
     font-weight: 500;
-    color: #374151;
+    color: var(--fc-text-secondary);
 }
 .form-control {
     width: 100%;

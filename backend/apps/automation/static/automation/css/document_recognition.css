@@ -37,12 +37,12 @@
 
 .drop-zone:hover {
     border-color: var(--fc-admin-blue);
-    background: linear-gradient(135deg, var(--fc-primary-subtle) 0%, #bbdefb 100%);
+    background: linear-gradient(135deg, var(--fc-primary-subtle) 0%, var(--fc-primary-light) 100%);
 }
 
 .drop-zone.drag-over {
     border-color: var(--fc-admin-blue);
-    background: linear-gradient(135deg, #bbdefb 0%, var(--fc-primary-light) 100%);
+    background: linear-gradient(135deg, var(--fc-primary-light) 0%, var(--fc-primary-light) 100%);
     transform: scale(1.02);
 }
 

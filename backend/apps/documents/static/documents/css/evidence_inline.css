@@ -6,7 +6,7 @@
 
 /* 内联表格基础样式 */
 .inline-group {
-    border: 1px solid #e6edf3;
+    border: 1px solid var(--fc-border);
     border-radius: 10px;
     background: var(--fc-bg-card);
     overflow: hidden;
@@ -19,7 +19,7 @@
     color: var(--fc-text-heading);
     padding: 10px 12px;
     margin: 0;
-    border-bottom: 1px solid #e6edf3;
+    border-bottom: 1px solid var(--fc-border);
     font-weight: 600;
     letter-spacing: normal;
     font-family: inherit;
@@ -34,13 +34,13 @@
 }
 
 .inline-group .tabular thead th {
-    background: linear-gradient(180deg, #2b6a85 0%, #205b74 100%);
+    background: linear-gradient(180deg, var(--fc-admin-blue) 0%, var(--fc-admin-blue-hover) 100%);
     color: var(--fc-text-on-primary);
     padding: 9px 10px;
     text-align: left;
     font-weight: 600;
     font-size: 13px;
-    border-bottom: 1px solid #1a4a5f;
+    border-bottom: 1px solid var(--fc-admin-blue-hover);
     font-family: inherit;
 }
 
@@ -62,17 +62,17 @@
 }
 
 .inline-group .tabular tbody tr:nth-child(even) {
-    background: #fbfdff;
+    background: var(--fc-bg-card);
 }
 
 .inline-group .tabular tbody tr:hover {
-    background-color: #f1f7ff;
+    background-color: var(--fc-primary-subtle);
 }
 
 .inline-group .tabular td {
     padding: 12px 10px;
     vertical-align: top;
-    border-bottom: 1px solid #eef2f6;
+    border-bottom: 1px solid var(--fc-border);
 }
 
 /* 序号字段（order）：完全隐藏，只用于拖拽排序 */
@@ -138,7 +138,7 @@
 .inline-group .tabular input:focus,
 .inline-group .tabular textarea:focus {
     outline: none;
-    border-color: #60a5fa;
+    border-color: var(--fc-primary-light);
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
 
@@ -151,7 +151,7 @@
 }
 
 .inline-group .tabular td.field-file a {
-    color: #0369a1;
+    color: var(--fc-info-text);
     text-decoration: none;
     font-weight: 500;
     word-break: break-all;
@@ -178,8 +178,8 @@
     font-family: inherit;
     font-variant-numeric: tabular-nums;
     background: var(--fc-bg-muted-light);
-    border-left: 1px solid #eef2f6;
-    border-right: 1px solid #eef2f6;
+    border-left: 1px solid var(--fc-border);
+    border-right: 1px solid var(--fc-border);
     font-size: 12px;
 }
 

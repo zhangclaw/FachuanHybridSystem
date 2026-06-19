@@ -46,7 +46,7 @@
 
 .folder-editor-actions .btn:hover {
     background: var(--fc-border);
-    border-color: #adb5bd;
+    border-color: var(--fc-border);
 }
 
 .folder-editor-actions .add-root-folder {
@@ -251,7 +251,7 @@
 }
 
 .add-folder-input .cancel-add:hover {
-    background: #545b62;
+    background: var(--fc-text-muted);
 }
 
 /* 保存状态 */
@@ -277,7 +277,7 @@
 /* SortableJS 拖拽样式 */
 .sortable-ghost {
     opacity: 0.4;
-    background: #c8ebfb;
+    background: var(--fc-primary-light);
 }
 
 .sortable-chosen {

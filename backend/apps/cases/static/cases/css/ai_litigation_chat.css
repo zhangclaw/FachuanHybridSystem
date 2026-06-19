@@ -79,7 +79,7 @@
 
 .session-item.active {
     background: var(--fc-info-bg);
-    border-color: #bbdefb;
+    border-color: var(--fc-info-border);
     box-shadow: none;
 }
 

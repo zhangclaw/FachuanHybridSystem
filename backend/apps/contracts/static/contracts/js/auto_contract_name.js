@@ -38,7 +38,7 @@
         // 鼠标悬停效果
         btn.addEventListener('mouseenter', function() {
             if (!btn.disabled) {
-                btn.style.background = '#e8f4fd';
+                btn.style.background = 'var(--fc-primary-subtle)';
                 btn.style.borderColor = 'var(--fc-admin-blue)';
                 btn.style.color = 'var(--fc-admin-blue)';
             }

@@ -7,7 +7,7 @@
   --cm-primary: var(--fc-primary);
   --cm-success: var(--fc-success-text);
   --cm-danger: var(--fc-error-text);
-  --cm-warn-bg: #fff7ed;
+  --cm-warn-bg: var(--fc-warning-bg);
   padding: 16px 12px;
   background: var(--cm-bg);
   border-radius: 12px;

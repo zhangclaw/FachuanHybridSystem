@@ -12,7 +12,7 @@
     margin: 0 0 15px 0;
     font-size: 14px;
     font-weight: 600;
-    color: #374151;
+    color: var(--fc-text-secondary);
 }
 
 .binding-status {
@@ -30,7 +30,7 @@
 }
 
 .binding-status .status-badge.bound {
-    background: #d1fae5;
+    background: var(--fc-success-bg);
     color: var(--fc-success-text);
 }
 
@@ -60,7 +60,7 @@
     border: 1px solid var(--fc-border-input);
     border-radius: 4px;
     background: var(--fc-bg-card);
-    color: #374151;
+    color: var(--fc-text-secondary);
     font-size: 13px;
     cursor: pointer;
     transition: all 0.2s;
@@ -83,9 +83,9 @@
 }
 
 .btn-folder.danger {
-    background: #ef4444;
-    color: white;
-    border-color: #ef4444;
+    background: var(--fc-error-text);
+    color: var(--fc-text-on-primary);
+    border-color: var(--fc-error-text);
 }
 
 .btn-folder.danger:hover {
@@ -132,7 +132,7 @@
     margin: 0 0 15px 0;
     font-size: 18px;
     font-weight: 600;
-    color: #111827;
+    color: var(--fc-text-heading);
 }
 
 .folder-browser-close {
@@ -155,7 +155,7 @@
 
 .folder-browser-close:hover {
     background: var(--fc-bg-muted-light);
-    color: #111827;
+    color: var(--fc-text-heading);
 }
 
 /* 手动输入路径 */
@@ -346,7 +346,7 @@
     border-radius: 4px;
     font-size: 13px;
     background: var(--fc-bg-card);
-    color: #374151;
+    color: var(--fc-text-secondary);
 }
 
 .storage-type-select:focus,

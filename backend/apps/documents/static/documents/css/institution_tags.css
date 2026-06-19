@@ -34,11 +34,11 @@
     align-items: center;
     gap: 4px;
     padding: 3px 8px;
-    background: linear-gradient(135deg, #e8f4f8 0%, #d5eef6 100%);
-    border: 1px solid #b8dce8;
+    background: linear-gradient(135deg, var(--fc-primary-subtle) 0%, var(--fc-primary-subtle) 100%);
+    border: 1px solid var(--fc-border);
     border-radius: 4px;
     font-size: 13px;
-    color: #1a5276;
+    color: var(--fc-primary-dark);
     line-height: 1.4;
 }
 
@@ -51,7 +51,7 @@
     padding: 0;
     border: none;
     background: transparent;
-    color: #7fb3c8;
+    color: var(--fc-text-muted);
     font-size: 14px;
     line-height: 1;
     cursor: pointer;
