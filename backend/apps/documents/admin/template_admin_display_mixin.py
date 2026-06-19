@@ -178,23 +178,23 @@ class TemplateAdminDisplayMixin:
         """批量启用模板"""
         service = _get_admin_service()
         updated: int = service.batch_activate(queryset)
-        self.message_user(request, "已启用 %(count)d 个模板" % {"count": updated})
+        self.message_user(request, "已启用 %(count)d 个模板" % {"count": updated})  # type: ignore[attr-defined]
 
     def deactivate_templates(self, request: Any, queryset: Any) -> None:  # pragma: no cover
         """批量禁用模板"""
         service = _get_admin_service()
         updated: int = service.batch_deactivate(queryset)
-        self.message_user(request, "已禁用 %(count)d 个模板" % {"count": updated})
+        self.message_user(request, "已禁用 %(count)d 个模板" % {"count": updated})  # type: ignore[attr-defined]
 
     @admin.action(description="刷新占位符信息")
     def refresh_placeholders(self, request: Any, queryset: Any) -> None:  # pragma: no cover
         """刷新占位符信息(触发重新解析)"""
         count = queryset.count()
-        self.message_user(request, "已刷新 %(count)d 个模板的占位符信息" % {"count": count})
+        self.message_user(request, "已刷新 %(count)d 个模板的占位符信息" % {"count": count})  # type: ignore[attr-defined]
 
     @admin.action(description="复制选中的模板")
     def duplicate_templates(self, request: Any, queryset: Any) -> None:  # pragma: no cover
         """批量复制文书模板"""
         admin_service = _get_admin_service()
         count = admin_service.batch_duplicate_templates(queryset)
-        self.message_user(request, "已复制 %(count)d 个模板" % {"count": count})
+        self.message_user(request, "已复制 %(count)d 个模板" % {"count": count})  # type: ignore[attr-defined]

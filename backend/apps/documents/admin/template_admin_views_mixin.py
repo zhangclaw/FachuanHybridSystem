@@ -69,40 +69,40 @@ class TemplateAdminViewsMixin:
         """添加自定义URL"""
         from django.urls import path
 
-        urls = super().get_urls()
+        urls = super().get_urls()  # type: ignore[misc]
         custom_urls = [
             path(
                 "<int:pk>/download/",
-                self.admin_site.admin_view(self.download_view),
+                self.admin_site.admin_view(self.download_view,  # type: ignore[attr-defined]
                 name="documents_documenttemplate_download",
             ),
             path(
                 "initialize-defaults/",
-                self.admin_site.admin_view(self.initialize_defaults_view),
+                self.admin_site.admin_view(self.initialize_defaults_view,  # type: ignore[attr-defined]
                 name="documents_documenttemplate_initialize",
             ),
             path(
                 "set-docx-root/",
-                self.admin_site.admin_view(self.set_docx_root_view),
+                self.admin_site.admin_view(self.set_docx_root_view,  # type: ignore[attr-defined]
                 name="documents_documenttemplate_set_docx_root",
             ),
             path(
                 "extract-placeholders/",
-                self.admin_site.admin_view(self.extract_placeholders_view),
+                self.admin_site.admin_view(self.extract_placeholders_view,  # type: ignore[attr-defined]
                 name="documents_documenttemplate_extract_placeholders",
             ),
             path(
                 "smart-fill-preview/",
-                self.admin_site.admin_view(self.smart_fill_preview_view),
+                self.admin_site.admin_view(self.smart_fill_preview_view,  # type: ignore[attr-defined]
                 name="documents_documenttemplate_smart_fill_preview",
             ),
             path(
                 "smart-fill-render/",
-                self.admin_site.admin_view(self.smart_fill_render_view),
+                self.admin_site.admin_view(self.smart_fill_render_view,  # type: ignore[attr-defined]
                 name="documents_documenttemplate_smart_fill_render",
             ),
         ]
-        return custom_urls + urls
+        return custom_urls + urls  # type: ignore[no-any-return]
 
     def _resolve_template_path(self, request: Any) -> tuple[str | None, str | None]:  # pragma: no cover
         """从三种文件来源解析模板绝对路径。
@@ -270,7 +270,7 @@ class TemplateAdminViewsMixin:
 
         from apps.core.exceptions import NotFoundError
 
-        obj = self.get_object(request, str(pk))
+        obj = self.get_object(request, str(pk))  # type: ignore[attr-defined]
         if not obj:
             raise Http404("模板不存在")
 
