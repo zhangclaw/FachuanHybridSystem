@@ -345,10 +345,10 @@ def upload_archive_item(request: HttpRequest, contract_id: int) -> Any:  # pragm
     if not uploaded_file:
         return HttpResponse(status=400)
 
-    from apps.core.services.storage_service import validate_file
+    from apps.core.services.file_upload_service import FileUploadService
 
     try:
-        validate_file(uploaded_file)  # type: ignore[arg-type]
+        FileUploadService().validate_file(uploaded_file)  # type: ignore[arg-type]
     except Exception as exc:
         return HttpResponse(str(exc), status=400)
 

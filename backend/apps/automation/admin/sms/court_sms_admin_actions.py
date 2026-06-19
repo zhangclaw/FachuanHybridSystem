@@ -334,7 +334,7 @@ class CourtSMSAdminActions:  # pragma: no cover
                     process_options["sfdw_phone_tail6"] = sfdw_phone_tail6
 
                 task_id = submit_task(
-                    "apps.automation.services.sms.court_sms_service.process_sms_async",
+                    "apps.automation.workers.court_sms_tasks.process_sms",
                     obj.id,
                     process_options,
                     task_name=f"court_sms_processing_{obj.id}",
