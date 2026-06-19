@@ -4,6 +4,7 @@ import logging
 from pathlib import Path
 from typing import Optional
 
+from django.conf import settings
 from ninja import File, Router, UploadedFile
 
 from apps.core.security.auth import JWTOrSessionAuth
@@ -33,7 +34,7 @@ def parse_document(request: object, file: UploadedFile = File(...), body: ParseD
     """
     try:
         # 保存上传的文件
-        upload_dir = Path("media/document_parsing/uploads")
+        upload_dir = Path(settings.MEDIA_ROOT) / "document_parsing" / "uploads"
         upload_dir.mkdir(parents=True, exist_ok=True)
 
         file_name = file.name or "uploaded"
@@ -84,7 +85,7 @@ def extract_text(request: object, file: UploadedFile = File(...), body: ExtractT
     """提取文档的纯文本内容"""
     try:
         # 保存上传的文件
-        upload_dir = Path("media/document_parsing/uploads")
+        upload_dir = Path(settings.MEDIA_ROOT) / "document_parsing" / "uploads"
         upload_dir.mkdir(parents=True, exist_ok=True)
 
         file_name = file.name or "uploaded"

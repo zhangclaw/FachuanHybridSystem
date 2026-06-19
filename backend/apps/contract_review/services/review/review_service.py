@@ -6,6 +6,8 @@ from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 from django.conf import settings
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import UploadedFile
 from docx import Document
 from docx.document import Document as DocumentType
@@ -26,12 +28,6 @@ from .party_identifier import PartyIdentifier
 from .typo_checker import TypoChecker
 
 logger = logging.getLogger(__name__)
-
-
-def _upload_dir() -> Path:  # pragma: no cover
-    d = Path(settings.MEDIA_ROOT) / "contract_review" / "uploads"
-    d.mkdir(parents=True, exist_ok=True)
-    return d
 
 
 def _output_dir() -> Path:  # pragma: no cover
@@ -59,10 +55,9 @@ class ReviewService:  # pragma: no cover
 
         # 保存文件
         task_id = uuid.uuid4()
-        save_path = _upload_dir() / f"{task_id}_{filename}"
-        with open(save_path, "wb") as f:
-            for chunk in file.chunks():
-                f.write(chunk)
+        rel_path = f"contract_review/uploads/{task_id}_{filename}"
+        saved_name = default_storage.save(rel_path, file)
+        save_path = Path(settings.MEDIA_ROOT) / saved_name
 
         # 提取内容 + 识别甲乙方
         extractor = ContentExtractor()

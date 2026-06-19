@@ -58,8 +58,10 @@ class ContractFormatService:
 
         # 4. 保存格式化后的文件
         output_filename = f"{task.contract_title}_formatted.docx"
-        output_path = original_file_path.parent / output_filename
-        output_path.write_bytes(formatted_bytes)
+        rel_dir = str(original_file_path.parent.relative_to(settings.MEDIA_ROOT))
+        rel_output = f"{rel_dir}/{output_filename}"
+        saved_name = default_storage.save(rel_output, ContentFile(formatted_bytes))
+        output_path = Path(settings.MEDIA_ROOT) / saved_name
 
         # 更新任务的输出文件（相对于MEDIA_ROOT）
         task.output_file = str(output_path.relative_to(settings.MEDIA_ROOT))

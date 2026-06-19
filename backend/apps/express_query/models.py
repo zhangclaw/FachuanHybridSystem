@@ -8,7 +8,7 @@ from typing import ClassVar
 from django.conf import settings
 from django.db import models
 
-from apps.core.filesystem.upload_paths import DatedUUIDPath
+from apps.core.filesystem.upload_paths import DatedUUIDPath, MediaEntity
 
 
 def _waybill_upload_to(_instance: ExpressQueryTask, filename: str) -> str:
@@ -52,7 +52,7 @@ class ExpressQueryTask(models.Model):
     id: int
     title = models.CharField(max_length=255, blank=True, default="", verbose_name="任务名称")
     waybill_image = models.FileField(
-        upload_to=DatedUUIDPath("express_query/waybills"), blank=True, null=True, verbose_name="邮单页面"
+        upload_to=DatedUUIDPath(MediaEntity.EXPRESS_QUERY_WAYBILLS), blank=True, null=True, verbose_name="邮单页面"
     )
     status = models.CharField(
         max_length=32,
