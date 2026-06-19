@@ -574,7 +574,7 @@ class TestImportWorkLogSuggestions:
     @patch("apps.core.interfaces.ServiceLocator")
     def test_no_cases_returns_zero(self, MockSL):
         MockSL.get_case_service.return_value.get_cases_by_contract.return_value = []
-        svc = _make_service()
+        svc = _make_pipeline()
         assert svc._import_work_log_suggestions(
             contract_id=1,
             confirmed_logs=[{"content": "log entry"}],
@@ -588,7 +588,7 @@ class TestImportWorkLogSuggestions:
         MockSL.get_case_service.return_value.get_cases_by_contract.return_value = [mock_case]
         MockCaseLog.objects.filter.return_value.values_list.return_value = set()
 
-        svc = _make_service()
+        svc = _make_pipeline()
         count = svc._import_work_log_suggestions(
             contract_id=1,
             confirmed_logs=[{"content": "第一次开庭"}, {"content": "提交证据"}],
@@ -604,7 +604,7 @@ class TestImportWorkLogSuggestions:
         MockSL.get_case_service.return_value.get_cases_by_contract.return_value = [mock_case]
         MockCaseLog.objects.filter.return_value.values_list.return_value = {"第一次开庭"}
 
-        svc = _make_service()
+        svc = _make_pipeline()
         count = svc._import_work_log_suggestions(
             contract_id=1,
             confirmed_logs=[{"content": "第一次开庭"}],
@@ -619,7 +619,7 @@ class TestImportWorkLogSuggestions:
         MockSL.get_case_service.return_value.get_cases_by_contract.return_value = [mock_case]
         MockCaseLog.objects.filter.return_value.values_list.return_value = set()
 
-        svc = _make_service()
+        svc = _make_pipeline()
         count = svc._import_work_log_suggestions(
             contract_id=1,
             confirmed_logs=[{"content": ""}, {"content": "  "}],
@@ -635,7 +635,7 @@ class TestImportWorkLogSuggestions:
         MockCaseLog.objects.filter.return_value.values_list.return_value = set()
         MockSL.get_case_service.return_value.create_case_log_internal.side_effect = RuntimeError("db error")
 
-        svc = _make_service()
+        svc = _make_pipeline()
         count = svc._import_work_log_suggestions(
             contract_id=1,
             confirmed_logs=[{"content": "test log"}],
