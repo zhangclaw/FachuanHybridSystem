@@ -330,7 +330,7 @@ class TestDocumentTemplateAdminActions:
         admin = self._make_admin()
         request = MagicMock()
         queryset = MagicMock()
-        with patch("apps.documents.admin.document_template_admin._get_admin_service") as mock_svc:
+        with patch("apps.documents.admin.template_admin_display_mixin._get_admin_service") as mock_svc:
             mock_svc.return_value.batch_duplicate_templates.return_value = 3
             admin.duplicate_templates(request, queryset)
             mock_svc.return_value.batch_duplicate_templates.assert_called_once_with(queryset)

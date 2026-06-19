@@ -276,9 +276,13 @@ class TestOutputStorage:
         from apps.documents.services.generation.output_storage import GeneratedDocumentStorage
 
         store = GeneratedDocumentStorage(media_root=str(tmp_path))
-        result = store.save_bytes(relative_dir="sub", filename="test.txt", content=b"hello")
-        assert "test.txt" in result
-        assert (tmp_path / "sub" / "test.txt").read_bytes() == b"hello"
+        with patch("apps.documents.services.generation.output_storage.default_storage") as mock_storage:
+            mock_storage.save.return_value = "sub/test.txt"
+            result = store.save_bytes(relative_dir="sub", filename="test.txt", content=b"hello")
+            assert "test.txt" in result
+            mock_storage.save.assert_called_once()
+            call_args = mock_storage.save.call_args
+            assert call_args[0][0] == "sub/test.txt"
 
     def test_save_for_case(self, tmp_path):
         from apps.documents.services.generation.output_storage import GeneratedDocumentStorage
