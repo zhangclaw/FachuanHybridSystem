@@ -209,7 +209,7 @@
         }
         .enterprise-prefill-section h3 {
             margin-top: 0;
-            color: #1e3a8a;
+            color: var(--fc-primary-darker);
             font-size: 14px;
             font-weight: 700;
         }
@@ -234,7 +234,7 @@
             line-height: 32px;
         }
         .provider-fav-btn:hover {
-            border-color: #f5a623;
+            border-color: var(--fc-warning-text);
         }
         .enterprise-prefill-input {
             flex: 1;
@@ -313,8 +313,8 @@
             text-decoration: underline;
         }
         .enterprise-prefill-highlight {
-            background-color: #e8f5e8 !important;
-            border-color: #16a34a !important;
+            background-color: var(--fc-success-bg) !important;
+            border-color: var(--fc-success-text) !important;
             transition: all 0.2s ease;
         }
         @media (max-width: 980px) {
@@ -771,7 +771,7 @@
                 <option value="qichacha">{% trans "企查查" %}</option>
             </select>
             <button type="button" class="provider-fav-btn" @click="toggleFavorite()" :title="isFavorite ? '取消默认' : '设为默认'">
-                <span x-text="isFavorite ? '★' : '☆'" :style="isFavorite ? 'color: #f5a623' : 'color: #bbb'"></span>
+                <span x-text="isFavorite ? '★' : '☆'" :style="isFavorite ? 'color:var(--fc-warning-text)' : 'color:var(--fc-text-disabled)'"></span>
             </button>
             <input
                 type="text"

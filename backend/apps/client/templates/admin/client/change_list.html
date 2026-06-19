@@ -163,22 +163,22 @@
     .oa-import-stage-item {
         font-size: 12px;
         color: var(--fc-text-muted);
-        background: #f1f3f5;
+        background: var(--fc-bg-muted-light);
         border: 1px solid var(--fc-border);
         border-radius: 999px;
         padding: 4px 10px;
     }
 
     .oa-import-stage-item.active {
-        color: #0b5f8c;
-        background: #e6f4fb;
-        border-color: #b6dff2;
+        color: var(--fc-primary-dark);
+        background: var(--fc-primary-subtle);
+        border-color: var(--fc-primary-light);
     }
 
     .oa-import-stage-item.done {
-        color: #1f7a3d;
-        background: #eaf7ee;
-        border-color: #b9e5c8;
+        color: var(--fc-success-text);
+        background: var(--fc-success-bg);
+        border-color: var(--fc-success-border);
     }
 
     .oa-import-phase-block {
@@ -214,7 +214,7 @@
     }
 
     .oa-import-progress-fill {
-        background: #28a745;
+        background: var(--fc-success-text);
         height: 100%;
         transition: width 0.3s;
     }
@@ -429,7 +429,7 @@
             </template>
             <template x-if="oaImport.status === 'completed'">
                 <div>
-                    <p style="color:#28a745;font-size:16px;font-weight:bold;">导入完成！</p>
+                    <p style="color:var(--fc-success-text);font-size:16px;font-weight:bold;">导入完成！</p>
                     <div style="margin-top:15px;font-size:14px;color:var(--fc-text-muted);">
                         步骤1（查找）：共发现 <span x-text="oaImport.discoveredCount || oaImport.total">0</span> 条<br>
                         步骤2（导入）：共处理 <span x-text="oaImport.total">0</span> 条<br>
@@ -446,7 +446,7 @@
             </template>
             <template x-if="oaImport.status === 'failed'">
                 <div>
-                    <p style="color:#dc3545;font-size:16px;font-weight:bold;">导入失败</p>
+                    <p style="color:var(--fc-error-text);font-size:16px;font-weight:bold;">导入失败</p>
                     <p style="color:var(--fc-text-muted);font-size:13px;margin-top:10px;" x-text="oaImport.errorMessage"></p>
                     <div style="margin-top:20px;text-align:right;">
                         <button type="button" onclick="(window.__clientAdminAppInstance || window.clientAdminApp()).closeOAImport()"

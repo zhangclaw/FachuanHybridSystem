@@ -29,7 +29,7 @@
     .category-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: var(--fc-bg-muted); border-radius: 8px; margin-bottom: 12px; cursor: pointer; }
     .category-title { font-weight: 600; font-size: 15px; }
     .category-count { background: var(--fc-border); padding: 2px 10px; border-radius: 10px; font-size: 12px; }
-    .category-count.statement { background: var(--fc-info-bg); color: #1e40af; }
+    .category-count.statement { background: var(--fc-info-bg); color: var(--fc-primary-darker); }
     .category-count.delivery { background: var(--fc-success-bg); color: var(--fc-success-text); }
     .category-count.receipt { background: var(--fc-warning-bg); color: var(--fc-warning-text); }
 
@@ -44,7 +44,7 @@
     .img-meta { font-size: 10px; color: var(--fc-text-disabled); margin-top: 2px; }
     .img-badge { position: absolute; top: 4px; right: 4px; padding: 1px 6px; border-radius: 8px; font-size: 10px; font-weight: 500; }
     .img-badge.signed { background: var(--fc-success-bg); color: var(--fc-success-text); }
-    .img-badge.unsigned { background: var(--fc-error-bg); color: #dc2626; }
+    .img-badge.unsigned { background: var(--fc-error-bg); color: var(--fc-error-text); }
 
     /* 比对结果 */
     .month-group { border: 1px solid var(--fc-border); border-radius: 8px; margin-bottom: 16px; overflow: hidden; }
@@ -53,13 +53,13 @@
     .month-status { font-size: 12px; padding: 2px 10px; border-radius: 10px; }
     .month-status.ok { background: var(--fc-success-bg); color: var(--fc-success-text); }
     .month-status.warn { background: var(--fc-warning-bg); color: var(--fc-warning-text); }
-    .month-status.error { background: var(--fc-error-bg); color: #dc2626; }
+    .month-status.error { background: var(--fc-error-bg); color: var(--fc-error-text); }
     .month-body { padding: 12px 16px; }
     .match-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--fc-bg-muted-light); font-size: 13px; }
     .match-icon { width: 20px; text-align: center; }
-    .match-icon.ok { color: #16a34a; }
-    .match-icon.warn { color: #d97706; }
-    .match-icon.error { color: #dc2626; }
+    .match-icon.ok { color: var(--fc-success-text); }
+    .match-icon.warn { color: var(--fc-warning-text); }
+    .match-icon.error { color: var(--fc-error-text); }
 
     /* LLM 选择器 */
     .llm-selector { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; padding: 12px 16px; background: var(--fc-bg-muted); border-radius: 8px; }
@@ -71,8 +71,8 @@
     .btn-primary { background: var(--fc-admin-blue); color: var(--fc-text-on-primary); }
     .btn-primary:hover { background: var(--fc-admin-blue-hover); }
     .btn-primary:disabled { background: var(--fc-text-disabled); cursor: not-allowed; }
-    .btn-success { background: #16a34a; color: #fff; }
-    .btn-success:hover { background: #15803d; }
+    .btn-success { background: var(--fc-success-text); color: var(--fc-text-on-primary); }
+    .btn-success:hover { background: var(--fc-success-text); }
     .btn-outline { background: var(--fc-bg-card); color: var(--fc-admin-blue); border: 1px solid var(--fc-admin-blue); }
     .btn-outline:hover { background: var(--fc-bg-muted); }
 
@@ -218,10 +218,10 @@
                             <span class="match-icon" :class="g.statement.signed ? 'ok' : 'warn'"
                                   x-text="g.statement.signed ? '✓' : '⚠'"></span>
                             <span>对账单: <strong x-text="g.statement.month"></strong></span>
-                            <span x-show="g.statement.total_amount" style="color: #666;">
+                            <span x-show="g.statement.total_amount" style="color: var(--fc-text-muted);">
                                 ¥<span x-text="g.statement.total_amount"></span>
                             </span>
-                            <span x-show="!g.statement.signed" style="color: #d97706; font-size: 12px;">（未签名）</span>
+                            <span x-show="!g.statement.signed" style="color: var(--fc-warning-text); font-size: 12px;">（未签名）</span>
                         </div>
                     </template>
                     <template x-for="d in g.deliveries" :key="d.filename">
@@ -231,7 +231,7 @@
                                   x-text="d.match_status === 'matched' ? '✓' : '✗'"></span>
                             <span x-text="d.date || '未知日期'"></span>
                             <span x-show="d.amount">¥<span x-text="d.amount"></span></span>
-                            <span x-show="d.remark" style="color: #dc2626; font-size: 12px;"
+                            <span x-show="d.remark" style="color: var(--fc-error-text); font-size: 12px;"
                                   x-text="'（' + d.remark + '）'"></span>
                         </div>
                     </template>
