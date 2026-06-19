@@ -23,6 +23,16 @@ def _make_service():
     return ContractFolderScanService(scan_service=MagicMock())
 
 
+def _make_processor():
+    from apps.contracts.services.contract.integrations._candidate_post_processor import CandidatePostProcessor
+    return CandidatePostProcessor(scan_service=MagicMock())
+
+
+def _make_pipeline():
+    from apps.contracts.services.contract.integrations._import_pipeline import ImportPipeline
+    return ImportPipeline()
+
+
 # ═══════════════════════════════════════════════════════════════════════════════
 # build_status_payload
 # ═══════════════════════════════════════════════════════════════════════════════
