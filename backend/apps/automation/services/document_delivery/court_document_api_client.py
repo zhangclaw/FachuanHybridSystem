@@ -16,6 +16,8 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Optional, cast
 
 import httpx
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
 
 from apps.automation.utils.logging import AutomationLogger
 from apps.core.exceptions import ExternalServiceError, NetworkError, TokenError
@@ -483,7 +485,7 @@ class CourtDocumentApiClient:  # pragma: no cover
 
         Args:
             url: wjlj 字段的 OSS 下载链接
-            save_path: 保存路径
+            save_path: 保存路径（绝对路径）
 
         Returns:
             下载是否成功
@@ -497,8 +499,7 @@ class CourtDocumentApiClient:  # pragma: no cover
         AutomationLogger.log_document_download_start(document_name=document_name, url=url)
 
         try:
-            # 确保目录存在
-            save_path.parent.mkdir(parents=True, exist_ok=True)
+            from django.conf import settings
 
             # 下载文件（OSS URL 不需要 Authorization）
             with httpx.Client(timeout=self._timeout * 2) as client:  # 下载超时加倍
@@ -514,8 +515,9 @@ class CourtDocumentApiClient:  # pragma: no cover
                     return False
 
                 # 保存文件
-                with open(save_path, "wb") as f:
-                    f.write(response.content)
+                media_root = Path(settings.MEDIA_ROOT)
+                rel_path = save_path.relative_to(media_root).as_posix()
+                default_storage.save(rel_path, ContentFile(response.content))
 
                 file_size = len(response.content)
 
