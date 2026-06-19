@@ -428,11 +428,11 @@ class TestCaseLogSchemas:
         from apps.cases.schemas.log_schemas import CaseLogAttachmentOut
 
         obj = SimpleNamespace(file=None, uploaded_at=None)
-        with patch("apps.cases.schemas.log_schemas.SchemaMixin._get_file_path", return_value="/path"):
+        with patch("apps.core.api.schemas.SchemaMixin._get_file_path", return_value="/path"):
             assert CaseLogAttachmentOut.resolve_file_path(obj) == "/path"
-        with patch("apps.cases.schemas.log_schemas.SchemaMixin._get_file_url", return_value="/url"):
+        with patch("apps.core.api.schemas.SchemaMixin._get_file_url", return_value="/url"):
             assert CaseLogAttachmentOut.resolve_media_url(obj) == "/url"
-        with patch("apps.cases.schemas.log_schemas.SchemaMixin._resolve_datetime", return_value=None):
+        with patch("apps.core.api.schemas.SchemaMixin._resolve_datetime", return_value=None):
             assert CaseLogAttachmentOut.resolve_uploaded_at(obj) is None
 
     def test_case_log_out_resolve_created_at(self):
