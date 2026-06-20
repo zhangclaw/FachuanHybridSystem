@@ -8,7 +8,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from apps.automation.api import court_guarantee_helpers as helpers
+from plugins.court_automation.guarantee import helpers
 
 
 # ---------------------------------------------------------------------------
