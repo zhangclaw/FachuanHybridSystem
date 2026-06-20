@@ -31,7 +31,7 @@ import pytest
 
 class TestCaseNumberHelpers:
     def test_get_case_number_from_table(self):
-        from apps.automation.api.court_guarantee_helpers import _get_case_number
+        from plugins.court_automation.guarantee.helpers import _get_case_number
 
         case = MagicMock()
         qs = MagicMock()
@@ -40,7 +40,7 @@ class TestCaseNumberHelpers:
         assert _get_case_number(case) == "(2025)粤01民初1号"
 
     def test_get_case_number_fallback_to_filing(self):
-        from apps.automation.api.court_guarantee_helpers import _get_case_number
+        from plugins.court_automation.guarantee.helpers import _get_case_number
 
         case = MagicMock()
         qs = MagicMock()
@@ -50,7 +50,7 @@ class TestCaseNumberHelpers:
         assert _get_case_number(case) == "FN-001"
 
     def test_get_case_number_empty(self):
-        from apps.automation.api.court_guarantee_helpers import _get_case_number
+        from plugins.court_automation.guarantee.helpers import _get_case_number
 
         case = MagicMock()
         qs = MagicMock()
@@ -60,7 +60,7 @@ class TestCaseNumberHelpers:
         assert _get_case_number(case) == ""
 
     def test_has_case_number_true(self):
-        from apps.automation.api.court_guarantee_helpers import _has_case_number
+        from plugins.court_automation.guarantee.helpers import _has_case_number
 
         case = MagicMock()
         qs = MagicMock()
@@ -69,7 +69,7 @@ class TestCaseNumberHelpers:
         assert _has_case_number(case) is True
 
     def test_has_case_number_false(self):
-        from apps.automation.api.court_guarantee_helpers import _has_case_number
+        from plugins.court_automation.guarantee.helpers import _has_case_number
 
         case = MagicMock()
         qs = MagicMock()
@@ -86,7 +86,7 @@ class TestCaseNumberHelpers:
 
 class TestGuaranteeResolveCourtName:
     def _fn(self):
-        from apps.automation.api.court_guarantee_helpers import _resolve_court_name
+        from plugins.court_automation.guarantee.helpers import _resolve_court_name
         return _resolve_court_name
 
     def test_none_input(self):
@@ -113,7 +113,7 @@ class TestGuaranteeResolveCourtName:
 
 class TestGetCaseCourtName:
     def _fn(self):
-        from apps.automation.api.court_guarantee_helpers import _get_case_court_name
+        from plugins.court_automation.guarantee.helpers import _get_case_court_name
         return _get_case_court_name
 
     def test_trial_authority_found(self):
@@ -166,14 +166,14 @@ class TestGetCaseCourtName:
 
 class TestNormalizeInsuranceCompany:
     def _fn(self):
-        from apps.automation.api.court_guarantee_helpers import _normalize_insurance_company
+        from plugins.court_automation.guarantee.helpers import _normalize_insurance_company
         return _normalize_insurance_company
 
     def test_empty_with_allowed_options(self):
         assert self._fn()("", allowed_options=["A公司", "B公司"]) == "A公司"
 
     def test_empty_without_allowed_options(self):
-        from apps.automation.api.court_guarantee_schemas import _DEFAULT_INSURANCE_COMPANY
+        from plugins.court_automation.guarantee.schemas import _DEFAULT_INSURANCE_COMPANY
         assert self._fn()("") == _DEFAULT_INSURANCE_COMPANY
 
     def test_in_allowed_options(self):
@@ -183,12 +183,12 @@ class TestNormalizeInsuranceCompany:
         assert self._fn()("C公司", allowed_options=["A公司", "B公司"]) == "A公司"
 
     def test_in_default_options(self):
-        from apps.automation.api.court_guarantee_schemas import _GUARANTEE_INSURANCE_COMPANY_OPTIONS
+        from plugins.court_automation.guarantee.schemas import _GUARANTEE_INSURANCE_COMPANY_OPTIONS
         company = _GUARANTEE_INSURANCE_COMPANY_OPTIONS[0]
         assert self._fn()(company) == company
 
     def test_not_in_default_options(self):
-        from apps.automation.api.court_guarantee_schemas import _DEFAULT_INSURANCE_COMPANY
+        from plugins.court_automation.guarantee.schemas import _DEFAULT_INSURANCE_COMPANY
         assert self._fn()("不存在的公司") == _DEFAULT_INSURANCE_COMPANY
 
 
@@ -199,7 +199,7 @@ class TestNormalizeInsuranceCompany:
 
 class TestParsePreserveAmount:
     def _fn(self):
-        from apps.automation.api.court_guarantee_helpers import _parse_preserve_amount
+        from plugins.court_automation.guarantee.helpers import _parse_preserve_amount
         return _parse_preserve_amount
 
     def test_none(self):
@@ -228,11 +228,11 @@ class TestParsePreserveAmount:
 
 class TestNormalizeConsultantCode:
     def _fn(self):
-        from apps.automation.api.court_guarantee_helpers import _normalize_consultant_code
+        from plugins.court_automation.guarantee.helpers import _normalize_consultant_code
         return _normalize_consultant_code
 
     def test_sunshine_company_no_code(self):
-        from apps.automation.api.court_guarantee_schemas import _SUNSHINE_DEFAULT_CONSULTANT_CODE
+        from plugins.court_automation.guarantee.schemas import _SUNSHINE_DEFAULT_CONSULTANT_CODE
         result = self._fn()(insurance_company_name="阳光财产保险股份有限公司", consultant_code=None)
         assert result == _SUNSHINE_DEFAULT_CONSULTANT_CODE
 
@@ -256,7 +256,7 @@ class TestNormalizeConsultantCode:
 
 class TestNormalizePropertyClueContent:
     def _fn(self):
-        from apps.automation.api.court_guarantee_helpers import _normalize_property_clue_content
+        from plugins.court_automation.guarantee.helpers import _normalize_property_clue_content
         return _normalize_property_clue_content
 
     def test_empty(self):
@@ -285,7 +285,7 @@ class TestNormalizePropertyClueContent:
 
 class TestNormalizePropertyValue:
     def _fn(self):
-        from apps.automation.api.court_guarantee_helpers import _normalize_property_value
+        from plugins.court_automation.guarantee.helpers import _normalize_property_value
         return _normalize_property_value
 
     def test_none(self):
@@ -311,7 +311,7 @@ class TestNormalizePropertyValue:
 
 class TestBuildPropertyClueInfo:
     def _fn(self):
-        from apps.automation.api.court_guarantee_helpers import _build_property_clue_info
+        from plugins.court_automation.guarantee.helpers import _build_property_clue_info
         return _build_property_clue_info
 
     def test_with_known_type(self):
@@ -329,7 +329,7 @@ class TestBuildPropertyClueInfo:
         assert result == "银行账户"
 
     def test_empty_type_and_content(self):
-        from apps.automation.api.court_guarantee_schemas import _PROPERTY_CLUE_TYPE_DISPLAY
+        from plugins.court_automation.guarantee.schemas import _PROPERTY_CLUE_TYPE_DISPLAY
         result = self._fn()(clue_type="", raw_content="")
         assert "财产线索" in result
 
@@ -341,7 +341,7 @@ class TestBuildPropertyClueInfo:
 
 class TestBuildSelectedRespondentPropertyClues:
     def _fn(self):
-        from apps.automation.api.court_guarantee_helpers import _build_selected_respondent_property_clues
+        from plugins.court_automation.guarantee.helpers import _build_selected_respondent_property_clues
         return _build_selected_respondent_property_clues
 
     def _make_party(self, party_id=1, client_id=10, name="张三", address="地址A", is_our=False):
@@ -412,7 +412,7 @@ class TestBuildSelectedRespondentPropertyClues:
 
 class TestBuildPrimaryRespondentPropertyClue:
     def _fn(self):
-        from apps.automation.api.court_guarantee_helpers import _build_primary_respondent_property_clue
+        from plugins.court_automation.guarantee.helpers import _build_primary_respondent_property_clue
         return _build_primary_respondent_property_clue
 
     @patch("apps.automation.api.court_guarantee_helpers._build_selected_respondent_property_clues")
@@ -436,7 +436,7 @@ class TestBuildPrimaryRespondentPropertyClue:
 
 class TestBuildCaseQuoteContext:
     def _fn(self):
-        from apps.automation.api.court_guarantee_helpers import _build_case_quote_context
+        from plugins.court_automation.guarantee.helpers import _build_case_quote_context
         return _build_case_quote_context
 
     def test_no_preserve_amount(self):
@@ -504,7 +504,7 @@ class TestBuildCaseQuoteContext:
 
 class TestBuildReusableQuoteOptions:
     def _fn(self):
-        from apps.automation.api.court_guarantee_helpers import _build_reusable_quote_options
+        from plugins.court_automation.guarantee.helpers import _build_reusable_quote_options
         return _build_reusable_quote_options
 
     def test_no_preserve_amount(self):
@@ -555,7 +555,7 @@ class TestBuildReusableQuoteOptions:
 
 class TestExtractQuoteCompanyOptions:
     def _fn(self):
-        from apps.automation.api.court_guarantee_helpers import _extract_quote_company_options
+        from plugins.court_automation.guarantee.helpers import _extract_quote_company_options
         return _extract_quote_company_options
 
     def test_none_context(self):
@@ -607,7 +607,7 @@ class TestExtractQuoteCompanyOptions:
 
 class TestResolveInsuranceCompanyDefaults:
     def _fn(self):
-        from apps.automation.api.court_guarantee_helpers import _resolve_insurance_company_defaults
+        from plugins.court_automation.guarantee.helpers import _resolve_insurance_company_defaults
         return _resolve_insurance_company_defaults
 
     @patch("apps.automation.api.court_guarantee_helpers._extract_quote_company_options")
@@ -628,7 +628,7 @@ class TestResolveInsuranceCompanyDefaults:
     @patch("apps.automation.api.court_guarantee_helpers._extract_quote_company_options")
     def test_no_options(self, mock_extract):
         mock_extract.return_value = []
-        from apps.automation.api.court_guarantee_schemas import _DEFAULT_INSURANCE_COMPANY, _GUARANTEE_INSURANCE_COMPANY_OPTIONS
+        from plugins.court_automation.guarantee.schemas import _DEFAULT_INSURANCE_COMPANY, _GUARANTEE_INSURANCE_COMPANY_OPTIONS
         company, options = self._fn()(quote_context=None)
         assert company == _DEFAULT_INSURANCE_COMPANY
         assert options == _GUARANTEE_INSURANCE_COMPANY_OPTIONS
@@ -641,7 +641,7 @@ class TestResolveInsuranceCompanyDefaults:
 
 class TestBuildCauseCandidates:
     def _fn(self):
-        from apps.automation.api.court_guarantee_helpers import _build_cause_candidates
+        from plugins.court_automation.guarantee.helpers import _build_cause_candidates
         return _build_cause_candidates
 
     def test_empty(self):
@@ -677,7 +677,7 @@ class TestBuildCauseCandidates:
 
 class TestNormalizePartyType:
     def _fn(self):
-        from apps.automation.api.court_guarantee_helpers import _normalize_party_type
+        from plugins.court_automation.guarantee.helpers import _normalize_party_type
         return _normalize_party_type
 
     def test_natural(self):
@@ -715,7 +715,7 @@ class TestNormalizePartyType:
 
 class TestBuildPartyPayloadFromCaseParty:
     def _fn(self):
-        from apps.automation.api.court_guarantee_helpers import _build_party_payload_from_case_party
+        from plugins.court_automation.guarantee.helpers import _build_party_payload_from_case_party
         return _build_party_payload_from_case_party
 
     def test_natural_party(self):
@@ -745,7 +745,7 @@ class TestBuildPartyPayloadFromCaseParty:
         party.client.legal_representative = "王五"
         party.client.legal_representative_id_number = "110101199001011236"
 
-        from apps.automation.api.court_guarantee_schemas import _DEFAULT_LEGAL_ID_NUMBER
+        from plugins.court_automation.guarantee.schemas import _DEFAULT_LEGAL_ID_NUMBER
         result = self._fn()(party=party)
         assert result["party_type"] == "legal"
         assert result["id_number"] == _DEFAULT_LEGAL_ID_NUMBER
@@ -759,7 +759,7 @@ class TestBuildPartyPayloadFromCaseParty:
         party.client.phone = ""
         party.client.address = ""
 
-        from apps.automation.api.court_guarantee_schemas import _DEFAULT_NATURAL_ID_NUMBER
+        from plugins.court_automation.guarantee.schemas import _DEFAULT_NATURAL_ID_NUMBER
         result = self._fn()(party=party)
         assert result["id_number"] == _DEFAULT_NATURAL_ID_NUMBER
 
@@ -780,7 +780,7 @@ class TestBuildPartyPayloadFromCaseParty:
 
 class TestListPartyPayloads:
     def _fn(self):
-        from apps.automation.api.court_guarantee_helpers import _list_party_payloads
+        from plugins.court_automation.guarantee.helpers import _list_party_payloads
         return _list_party_payloads
 
     def _make_party(self, status="plaintiff", is_our=True, name="张三"):
@@ -825,7 +825,7 @@ class TestListPartyPayloads:
 
 class TestPickPartyPayload:
     def _fn(self):
-        from apps.automation.api.court_guarantee_helpers import _pick_party_payload
+        from plugins.court_automation.guarantee.helpers import _pick_party_payload
         return _pick_party_payload
 
     @patch("apps.automation.api.court_guarantee_helpers._list_party_payloads")
@@ -848,7 +848,7 @@ class TestPickPartyPayload:
 
 class TestNormalizeSelectedPartyIds:
     def _fn(self):
-        from apps.automation.api.court_guarantee_helpers import _normalize_selected_party_ids
+        from plugins.court_automation.guarantee.helpers import _normalize_selected_party_ids
         return _normalize_selected_party_ids
 
     def test_none(self):
@@ -874,7 +874,7 @@ class TestNormalizeSelectedPartyIds:
 
 class TestListOpponentCaseParties:
     def _fn(self):
-        from apps.automation.api.court_guarantee_helpers import _list_opponent_case_parties
+        from plugins.court_automation.guarantee.helpers import _list_opponent_case_parties
         return _list_opponent_case_parties
 
     def test_our_client_excluded(self):
@@ -915,7 +915,7 @@ class TestListOpponentCaseParties:
 
 class TestListOpponentPartyPayloads:
     def _fn(self):
-        from apps.automation.api.court_guarantee_helpers import _list_opponent_party_payloads
+        from plugins.court_automation.guarantee.helpers import _list_opponent_party_payloads
         return _list_opponent_party_payloads
 
     @patch("apps.automation.api.court_guarantee_helpers._list_opponent_case_parties")
@@ -934,7 +934,7 @@ class TestListOpponentPartyPayloads:
 
 class TestBuildRespondentOptions:
     def _fn(self):
-        from apps.automation.api.court_guarantee_helpers import _build_respondent_options
+        from plugins.court_automation.guarantee.helpers import _build_respondent_options
         return _build_respondent_options
 
     @patch("apps.automation.api.court_guarantee_helpers._list_opponent_case_parties")
@@ -960,11 +960,11 @@ class TestBuildRespondentOptions:
 
 class TestBuildPlaintiffAgentPayload:
     def _fn(self):
-        from apps.automation.api.court_guarantee_helpers import _build_plaintiff_agent_payload
+        from plugins.court_automation.guarantee.helpers import _build_plaintiff_agent_payload
         return _fn
 
     def _fn_import(self):
-        from apps.automation.api.court_guarantee_helpers import _build_plaintiff_agent_payload
+        from plugins.court_automation.guarantee.helpers import _build_plaintiff_agent_payload
         return _build_plaintiff_agent_payload
 
     def test_lawyer_found_by_requester_id(self):
@@ -1032,7 +1032,7 @@ class TestBuildPlaintiffAgentPayload:
 
 class TestGuaranteeBuildSessionStatusPayload:
     def _fn(self):
-        from apps.automation.api.court_guarantee_helpers import _build_session_status_payload
+        from plugins.court_automation.guarantee.helpers import _build_session_status_payload
         return _build_session_status_payload
 
     def test_pending(self):
@@ -1119,7 +1119,7 @@ class TestGuaranteeBuildSessionStatusPayload:
 
 class TestGuaranteeUpdateSessionTask:
     def _fn(self):
-        from apps.automation.api.court_guarantee_helpers import _update_session_task
+        from plugins.court_automation.guarantee.helpers import _update_session_task
         return _update_session_task
 
     def test_none_session_id(self):
@@ -1148,12 +1148,12 @@ class TestGuaranteeUpdateSessionTask:
 
 class TestServiceGetters:
     def test_get_organization_service(self):
-        from apps.automation.api.court_guarantee_helpers import _get_organization_service
+        from plugins.court_automation.guarantee.helpers import _get_organization_service
         with patch("apps.core.dependencies.build_organization_service", return_value="svc"):
             assert _get_organization_service() == "svc"
 
     def test_get_client_service(self):
-        from apps.automation.api.court_guarantee_helpers import _get_client_service
+        from plugins.court_automation.guarantee.helpers import _get_client_service
         with patch("apps.core.dependencies.build_client_service", return_value="svc"):
             assert _get_client_service() == "svc"
 
@@ -1165,11 +1165,11 @@ class TestServiceGetters:
 
 class TestFindReusableBinding:
     def _fn(self):
-        from apps.automation.api.court_guarantee_helpers import _find_reusable_binding
+        from plugins.court_automation.guarantee.helpers import _find_reusable_binding
         return _fn
 
     def _fn_import(self):
-        from apps.automation.api.court_guarantee_helpers import _find_reusable_binding
+        from plugins.court_automation.guarantee.helpers import _find_reusable_binding
         return _find_reusable_binding
 
     @patch("apps.automation.models.CasePreservationQuoteBinding")

@@ -7,7 +7,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from apps.automation.services.insurance.preservation_quote_service_adapter import (
+from plugins.court_automation.preservation_quote.service_adapter import (
     EnhancedPreservationQuoteService,
     PreservationQuoteServiceAdapter,
 )

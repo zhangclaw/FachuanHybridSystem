@@ -29,7 +29,7 @@ import pytest
 
 class TestValidateCreateParamsRound4:
     def test_positive_credential_id_passes(self):
-        from apps.automation.services.insurance.preservation_quote.repo import (
+        from plugins.court_automation.preservation_quote.preservation_quote.repo import (
             PreservationQuoteRepository,
         )
         repo = PreservationQuoteRepository()
@@ -42,10 +42,10 @@ class TestValidateCreateParamsRound4:
         )
 
     def test_multiple_errors_collected(self):
-        from apps.automation.services.insurance.preservation_quote.repo import (
+        from plugins.court_automation.preservation_quote.preservation_quote.repo import (
             PreservationQuoteRepository,
         )
-        from apps.automation.services.insurance.exceptions import ValidationError
+        from plugins.court_automation.preservation_quote.exceptions import ValidationError
 
         repo = PreservationQuoteRepository()
         with pytest.raises(ValidationError) as exc_info:
@@ -69,7 +69,7 @@ class TestValidateCreateParamsRound4:
 
 class TestGetQuoteWithItemsRound4:
     def test_found_returns_quote(self):
-        from apps.automation.services.insurance.preservation_quote.repo import (
+        from plugins.court_automation.preservation_quote.preservation_quote.repo import (
             PreservationQuoteRepository,
         )
 
@@ -90,7 +90,7 @@ class TestGetQuoteWithItemsRound4:
 class TestGetQuoteModel:
     @pytest.mark.asyncio
     async def test_success(self):
-        from apps.automation.services.insurance.preservation_quote.repo import (
+        from plugins.court_automation.preservation_quote.preservation_quote.repo import (
             PreservationQuoteRepository,
         )
 
@@ -107,7 +107,7 @@ class TestGetQuoteModel:
 
     @pytest.mark.asyncio
     async def test_not_found(self):
-        from apps.automation.services.insurance.preservation_quote.repo import (
+        from plugins.court_automation.preservation_quote.preservation_quote.repo import (
             PreservationQuoteRepository,
         )
         from apps.core.exceptions import NotFoundError
@@ -132,7 +132,7 @@ class TestGetQuoteModel:
 class TestMarkRunning:
     @pytest.mark.asyncio
     async def test_sets_status_and_started_at(self):
-        from apps.automation.services.insurance.preservation_quote.repo import (
+        from plugins.court_automation.preservation_quote.preservation_quote.repo import (
             PreservationQuoteRepository,
         )
 
@@ -156,7 +156,7 @@ class TestMarkRunning:
 class TestSetTotalCompanies:
     @pytest.mark.asyncio
     async def test_sets_total(self):
-        from apps.automation.services.insurance.preservation_quote.repo import (
+        from plugins.court_automation.preservation_quote.preservation_quote.repo import (
             PreservationQuoteRepository,
         )
 
@@ -179,7 +179,7 @@ class TestSetTotalCompanies:
 class TestSavePremiumResultsEdge:
     @pytest.mark.asyncio
     async def test_clean_decimal_null_string(self):
-        from apps.automation.services.insurance.preservation_quote.repo import (
+        from plugins.court_automation.preservation_quote.preservation_quote.repo import (
             PreservationQuoteRepository,
         )
 
@@ -215,7 +215,7 @@ class TestSavePremiumResultsEdge:
     @pytest.mark.asyncio
     async def test_clean_decimal_type_error(self):
         """Test clean_decimal with TypeError (non-string non-None value that str() handles)."""
-        from apps.automation.services.insurance.preservation_quote.repo import (
+        from plugins.court_automation.preservation_quote.preservation_quote.repo import (
             PreservationQuoteRepository,
         )
 
@@ -253,7 +253,7 @@ class TestSavePremiumResultsEdge:
 
     @pytest.mark.asyncio
     async def test_empty_results(self):
-        from apps.automation.services.insurance.preservation_quote.repo import (
+        from plugins.court_automation.preservation_quote.preservation_quote.repo import (
             PreservationQuoteRepository,
         )
 
@@ -287,7 +287,7 @@ class TestListQuotes:
     @pytest.mark.django_db
     def test_happy_path_with_status_filter(self):
         """list_quotes with valid params works through Paginator."""
-        from apps.automation.services.insurance.preservation_quote.repo import (
+        from plugins.court_automation.preservation_quote.preservation_quote.repo import (
             PreservationQuoteRepository,
         )
 

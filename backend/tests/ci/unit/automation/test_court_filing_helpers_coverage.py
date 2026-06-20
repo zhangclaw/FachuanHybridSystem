@@ -12,7 +12,7 @@ import pytest
 
 class TestResolveCourtName:
     def _import_func(self):
-        from apps.automation.api.court_filing_helpers import _resolve_court_name
+        from plugins.court_automation.filing.helpers import _resolve_court_name
         return _resolve_court_name
 
     def test_already_has_renmfy(self):
@@ -31,7 +31,7 @@ class TestResolveCourtName:
 
 class TestNormalizeFilingEngine:
     def _import_func(self):
-        from apps.automation.api.court_filing_helpers import _normalize_filing_engine
+        from plugins.court_automation.filing.helpers import _normalize_filing_engine
         return _normalize_filing_engine
 
     def test_valid_engine(self):
@@ -66,7 +66,7 @@ class TestNormalizeFilingEngine:
 
 class TestNormalizeFilingType:
     def _import_func(self):
-        from apps.automation.api.court_filing_helpers import _normalize_filing_type
+        from plugins.court_automation.filing.helpers import _normalize_filing_type
         return _normalize_filing_type
 
     def test_valid_type(self):
@@ -102,7 +102,7 @@ class TestNormalizeFilingType:
 
 class TestResolveOriginalCaseNumber:
     def _import_func(self):
-        from apps.automation.api.court_filing_helpers import _resolve_original_case_number
+        from plugins.court_automation.filing.helpers import _resolve_original_case_number
         return _resolve_original_case_number
 
     def test_no_case_numbers(self):
@@ -140,7 +140,7 @@ class TestResolveOriginalCaseNumber:
 
 class TestInferFilingType:
     def _import_func(self):
-        from apps.automation.api.court_filing_helpers import _infer_filing_type
+        from plugins.court_automation.filing.helpers import _infer_filing_type
         return _infer_filing_type
 
     @pytest.mark.django_db
@@ -181,7 +181,7 @@ class TestInferFilingType:
 
 class TestBuildPartyPayloads:
     def _import_func(self):
-        from apps.automation.api.court_filing_helpers import _build_party_payloads
+        from plugins.court_automation.filing.helpers import _build_party_payloads
         return _build_party_payloads
 
     def test_basic_plaintiff(self):
@@ -240,7 +240,7 @@ class TestBuildPartyPayloads:
 
 class TestExecutor:
     def test_executor_exists(self):
-        from apps.automation.api.court_filing_helpers import _SESSION_UPDATE_EXECUTOR
+        from plugins.court_automation.filing.helpers import _SESSION_UPDATE_EXECUTOR
         assert _SESSION_UPDATE_EXECUTOR is not None
 
 
@@ -248,5 +248,5 @@ class TestExecutor:
 
 class TestGetOrganizationService:
     def test_is_callable(self):
-        from apps.automation.api.court_filing_helpers import _get_organization_service
+        from plugins.court_automation.filing.helpers import _get_organization_service
         assert callable(_get_organization_service)

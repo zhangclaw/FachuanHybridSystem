@@ -10,7 +10,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from apps.automation.api.court_filing_helpers import (
+from plugins.court_automation.filing.helpers import (
     _apply_execution_party_fallbacks,
     _build_execution_reason_text,
     _build_material_slot_signals,
@@ -26,7 +26,7 @@ from apps.automation.api.court_filing_helpers import (
     _to_valid_mobile,
     _update_session_task,
 )
-from apps.automation.api.court_filing_schemas import (
+from plugins.court_automation.filing.schemas import (
     _FILING_ENGINE_API,
     _FILING_TYPE_CIVIL,
     _FILING_TYPE_EXECUTION,
