@@ -239,9 +239,13 @@ def execute_preservation_quote_task(quote_id: int) -> dict[str, Any]:
     """
     from ..models import PreservationQuote, QuoteStatus
 
-    from plugins.court_automation.preservation_quote.service import PreservationQuoteService
-    from plugins.court_automation.preservation_quote.court_insurance_client import CourtInsuranceClient
-    from plugins.court_automation.preservation_quote.exceptions import TokenError
+    try:
+        from plugins.court_automation.preservation_quote.service import PreservationQuoteService
+        from plugins.court_automation.preservation_quote.court_insurance_client import CourtInsuranceClient
+        from plugins.court_automation.preservation_quote.exceptions import TokenError
+    except ImportError:
+        logger.error("court_automation plugin not installed — cannot execute preservation quote task")
+        return {"quote_id": quote_id, "status": "error", "message": "plugin not installed"}
     from ..services.scraper.core.token_service import TokenService
 
     logger.info("🚀 开始执行询价任务 #%s", quote_id)
