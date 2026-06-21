@@ -80,6 +80,69 @@ def _get_tools_module():
 
 
 # ---------------------------------------------------------------------------
+# Plugin-dependent tool sets
+# ---------------------------------------------------------------------------
+# These tools are conditionally exported in __all__ (behind ``if _HAS_*``
+# guards).  The regex parser picks them up from source regardless, but the
+# *real* module only exposes them when the plugin submodule is present.
+# We detect availability at import time and filter them out of parameterised
+# tests that use ``getattr`` on the live module.
+
+COURT_FILING_TOOLS = frozenset({
+    "execute_court_filing",
+    "get_court_filing_case_info",
+    "get_court_filing_session",
+})
+
+GUARANTEE_TOOLS = frozenset({
+    "bind_guarantee_quote",
+    "delete_guarantee_binding",
+    "delete_guarantee_quote",
+    "ensure_guarantee_quote",
+    "execute_guarantee",
+    "get_guarantee_case_info",
+    "get_guarantee_session",
+    "retry_guarantee_quote",
+})
+
+PRESERVATION_QUOTE_TOOLS = frozenset({
+    "create_preservation_quote",
+    "execute_preservation_quote",
+    "get_preservation_quote",
+    "list_preservation_quotes",
+    "retry_preservation_quote",
+})
+
+ALL_PLUGIN_TOOLS = COURT_FILING_TOOLS | GUARANTEE_TOOLS | PRESERVATION_QUOTE_TOOLS
+
+
+def _plugin_tools_available() -> frozenset[str]:
+    """Return the subset of ALL_PLUGIN_TOOLS that are actually importable."""
+    available: set[str] = set()
+    try:
+        from mcp_server.tools import automation  # noqa: F401
+    except (ImportError, Exception):
+        # If the automation module itself can't be imported, no plugin tools
+        return frozenset()
+
+    mod = _get_tools_module()
+    for name in ALL_PLUGIN_TOOLS:
+        if hasattr(mod, name):
+            available.add(name)
+    return frozenset(available)
+
+
+_AVAILABLE_PLUGIN_TOOLS = _plugin_tools_available()
+
+
+def _available_tools() -> list[str]:
+    """Return the subset of _ALL_TOOLS that are actually present in the
+    live module (i.e. excluding plugin tools whose plugin is not installed)."""
+    missing_plugins = ALL_PLUGIN_TOOLS - _AVAILABLE_PLUGIN_TOOLS
+    return [n for n in _ALL_TOOLS if n not in missing_plugins]
+
+
+# ---------------------------------------------------------------------------
 # Tests
 # ---------------------------------------------------------------------------
 
@@ -112,13 +175,13 @@ class TestCallableAndMetadata:
     def _load_module(self):
         self.tools = _get_tools_module()
 
-    @pytest.mark.parametrize("name", _ALL_TOOLS, ids=lambda n: n)
+    @pytest.mark.parametrize("name", _available_tools(), ids=lambda n: n)
     def test_is_callable(self, name: str):
         fn = getattr(self.tools, name, None)
         assert fn is not None, f"{name} not found in mcp_server.tools"
         assert callable(fn), f"{name} is not callable"
 
-    @pytest.mark.parametrize("name", _ALL_TOOLS, ids=lambda n: n)
+    @pytest.mark.parametrize("name", _available_tools(), ids=lambda n: n)
     def test_has_docstring(self, name: str):
         fn = getattr(self.tools, name)
         doc = getattr(fn, "__doc__", None)
@@ -127,7 +190,7 @@ class TestCallableAndMetadata:
             "MCP uses the docstring as the tool description."
         )
 
-    @pytest.mark.parametrize("name", _ALL_TOOLS, ids=lambda n: n)
+    @pytest.mark.parametrize("name", _available_tools(), ids=lambda n: n)
     def test_has_type_annotations(self, name: str):
         """Every parameter (except 'request' injected by some frameworks)
         should have a type annotation."""
