@@ -5,9 +5,9 @@ from __future__ import annotations
 from typing import Any
 
 from django.http import HttpRequest
-from ninja import Router
+from ninja import Router, Schema
 
-from apps.core.security.auth import JWTOrSessionAuth, Schema
+from apps.core.security.auth import JWTOrSessionAuth
 
 from apps.express_query.models import ExpressQueryTask
 
