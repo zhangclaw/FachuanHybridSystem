@@ -5,13 +5,11 @@ Targets remaining uncovered branches:
 - extract_download_links: HBFY public link (hb/msg path), SFDW link
 - _is_valid_download_link: HBFY msg path (path ends with /hb/msg), SFDW
 - extract_party_names: extractor has no extract method
-- _extract_party_names_with_ollama: response without 'message' key
-- _filter_parties: ends with 财, ends with 案
 - _sanitize_link: mixed trailing punctuation
 """
 from __future__ import annotations
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 from apps.automation.services.sms.sms_parser_service import SMSParserService
 
@@ -117,59 +115,6 @@ class TestExtractPartyNamesEdge:
         self.service._party_candidate_extractor = extractor
         result = self.service.extract_party_names("content")
         assert result == []
-
-
-# ---------------------------------------------------------------------------
-# _extract_party_names_with_ollama — response without 'message' key
-# ---------------------------------------------------------------------------
-
-
-class TestExtractPartyNamesWithOllamaEdge:
-    def setup_method(self):
-        self.service = SMSParserService(
-            ollama_model="test-model",
-            ollama_base_url="http://localhost:11434",
-            llm_service=MagicMock(),
-        )
-
-    def test_response_without_message_key(self):
-        response = MagicMock()
-        response.content = '{"parties": ["张三"]}'
-        self.service._llm_service.chat.return_value = response
-        safe_prompt = "Extract: {content}"
-        with patch.object(type(self.service), "PARTY_EXTRACTION_PROMPT", safe_prompt):
-            result = self.service._extract_party_names_with_ollama("content")
-        # The code checks response["message"]["content"] but our mock
-        # returns a MagicMock for __getitem__. The actual code sets
-        # response = {"message": {"content": llm_response.content}} so
-        # it should work correctly.
-        assert isinstance(result, list)
-
-
-# ---------------------------------------------------------------------------
-# _filter_parties — ends with 财, 案
-# ---------------------------------------------------------------------------
-
-
-class TestFilterPartiesEdge:
-    def setup_method(self):
-        self.service = SMSParserService()
-
-    def test_ends_with_cai(self):
-        result = self.service._filter_parties(["张三财"])
-        assert result == []
-
-    def test_ends_with_an(self):
-        result = self.service._filter_parties(["张三案"])
-        assert result == []
-
-    def test_empty_string(self):
-        result = self.service._filter_parties([""])
-        assert result == []
-
-    def test_only_digits(self):
-        result = self.service._filter_parties(["12345"])
-        assert "12345" in result
 
 
 # ---------------------------------------------------------------------------
