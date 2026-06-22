@@ -580,7 +580,7 @@ try:
 
     if _check_mh():
         _has_message_hub_plugin = True
-        import plugins.message_hub.admin  # noqa: F401 — 触发 @admin.register
+        import plugins.message_hub.admin
 except ImportError:
     pass
 
@@ -590,7 +590,7 @@ try:
 
     if _check_cl():
         _has_court_token_admin = True
-        import plugins.court_automation.token_admin  # noqa: F401 — 触发 @admin.register
+        import plugins.court_automation.token_admin
 except ImportError:
     pass
 
@@ -600,7 +600,7 @@ try:
 
     if _check_dc():
         _has_doc_convert_plugin = True
-        import plugins.doc_convert.admin  # noqa: F401 — 触发 @admin.register
+        import plugins.doc_convert.admin
 except ImportError:
     pass
 

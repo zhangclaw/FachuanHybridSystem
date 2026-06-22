@@ -4,8 +4,8 @@ This file re-exports from the plugin for backward compatibility.
 """
 
 try:
-    from plugins.court_automation.token_admin.token_acquisition_history_admin_service import *  # noqa: F401,F403
-    from plugins.court_automation.token_admin.token_acquisition_history_admin_service import TokenAcquisitionHistoryAdminService  # noqa: F401
+    from plugins.court_automation.token_admin.token_acquisition_history_admin_service import *  # noqa: F403
+    from plugins.court_automation.token_admin.token_acquisition_history_admin_service import TokenAcquisitionHistoryAdminService
 
 except ImportError:
     pass
