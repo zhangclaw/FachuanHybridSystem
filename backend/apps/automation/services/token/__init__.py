@@ -1,7 +1,7 @@
 """Stub: Token services moved to plugins/court_automation/token/"""
 
 try:
-    from plugins.court_automation.token import (  # noqa: F401
+    from plugins.court_automation.token import (
         AccountSelectionStrategy,
         AutoLoginService,
         AutoTokenAcquisitionService,

@@ -8,13 +8,13 @@ from unittest.mock import MagicMock
 
 import pytest
 
-pytestmark = pytest.mark.skipif(not _HAS_MH, reason="message_hub plugin not installed")
-
 try:
     from plugins import has_message_hub_plugin
     _HAS_MH = has_message_hub_plugin()
 except ImportError:
     _HAS_MH = False
+
+pytestmark = pytest.mark.skipif(not _HAS_MH, reason="message_hub plugin not installed")
 
 
 
