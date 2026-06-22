@@ -174,9 +174,9 @@
   html:not([data-theme="light"]) input[type="tel"],
   html:not([data-theme="light"]) textarea,
   html:not([data-theme="light"]) select {
-    background-color: var(--fc-bg-card);
-    color: var(--fc-text-primary);
-    border-color: var(--fc-border-input);
+    background-color: var(--fc-bg-card) !important;
+    color: var(--fc-text-primary) !important;
+    border-color: var(--fc-border-input) !important;
   }
 
   html:not([data-theme="light"]) input:focus,
@@ -305,9 +305,9 @@ html[data-theme="dark"] input[type="url"],
 html[data-theme="dark"] input[type="tel"],
 html[data-theme="dark"] textarea,
 html[data-theme="dark"] select {
-  background-color: var(--fc-bg-card);
-  color: var(--fc-text-primary);
-  border-color: var(--fc-border-input);
+  background-color: var(--fc-bg-card) !important;
+  color: var(--fc-text-primary) !important;
+  border-color: var(--fc-border-input) !important;
 }
 
 html[data-theme="dark"] input:focus,
