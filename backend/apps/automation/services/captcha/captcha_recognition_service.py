@@ -13,5 +13,5 @@ except ImportError:
     CaptchaResult = None  # type: ignore[assignment,misc]
     CaptchaServiceAdapter = None  # type: ignore[assignment,misc]
 
-    def _is_auto_recognize_enabled() -> bool:  # type: ignore[misc]
+    def _is_auto_recognize_enabled() -> bool:
         return False

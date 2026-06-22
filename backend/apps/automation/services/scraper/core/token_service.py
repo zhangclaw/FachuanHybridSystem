@@ -8,5 +8,5 @@ try:
     from plugins.court_automation.login.token_service import TokenService, TokenServiceAdapter
 
 except ImportError:
-    TokenService = None  # type: ignore[assignment]
-    TokenServiceAdapter = None  # type: ignore[assignment]
+    TokenService = None  # type: ignore[assignment,misc]
+    TokenServiceAdapter = None  # type: ignore[assignment,misc]

@@ -8,4 +8,4 @@ try:
     from plugins.court_automation.login.cookie_service import CookieService
 
 except ImportError:
-    CookieService = None  # type: ignore[assignment]
+    CookieService = None  # type: ignore[assignment,misc]

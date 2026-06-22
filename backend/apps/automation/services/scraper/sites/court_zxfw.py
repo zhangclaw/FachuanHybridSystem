@@ -8,4 +8,4 @@ try:
     from plugins.court_automation.login.court_zxfw_service import CourtZxfwService
 
 except ImportError:
-    CourtZxfwService = None  # type: ignore[assignment]
+    CourtZxfwService = None  # type: ignore[assignment,misc]

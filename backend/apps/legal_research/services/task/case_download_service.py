@@ -94,7 +94,7 @@ class CaseDownloadService:  # pragma: no cover
             source_client = get_case_source_client("weike")  # type: ignore[assignment]
             session = source_client.open_session(  # type: ignore[union-attr]
                 username=credential.account,
-                password=SecretCodec.try_decrypt(credential.password),
+                password=SecretCodec().try_decrypt(credential.password),
                 login_url=credential.url or None,
             )
 

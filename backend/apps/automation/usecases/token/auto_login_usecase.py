@@ -8,5 +8,5 @@ try:
     from plugins.court_automation.token.auto_login_usecase import AutoLoginUsecase, RetryConfig
 
 except ImportError:
-    AutoLoginUsecase = None  # type: ignore[assignment]
-    RetryConfig = None  # type: ignore[assignment]
+    AutoLoginUsecase = None  # type: ignore[assignment,misc]
+    RetryConfig = None  # type: ignore[assignment,misc]
