@@ -19,6 +19,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          submodules: true
 
       - name: Security guard (ID/mobile/email/password/token in added lines)
         run: |
@@ -48,6 +49,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          submodules: true
 
       - name: LLM privacy review (requires claude CLI + API key)
         env:
@@ -102,6 +104,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          submodules: true
 
       - name: Repository hygiene
         run: |
@@ -329,6 +332,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          submodules: true
 
       - name: Install uv
         uses: astral-sh/setup-uv@v5
