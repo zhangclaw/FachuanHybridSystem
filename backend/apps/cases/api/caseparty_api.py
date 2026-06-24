@@ -19,8 +19,13 @@ router = Router()
 def _get_case_party_service() -> Any:
     """工厂函数：创建 CasePartyService 实例"""
     from apps.cases.services.party.case_party_service import CasePartyService
+    from apps.contracts.services.contract.wiring import get_contract_service
+    from apps.core.interfaces import ServiceLocator
 
-    return CasePartyService()
+    return CasePartyService(
+        client_service=ServiceLocator.get_client_service(),
+        contract_service=get_contract_service(),
+    )
 
 
 @router.get("/parties", response=list[CasePartyOut])
