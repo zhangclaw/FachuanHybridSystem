@@ -63,6 +63,24 @@ class ClientQueryFacade:
             self.access_policy.ensure_has_perm(user, "client.view_client", "无权限查看客户")
         return self.query_service.get_clients_by_ids(client_ids=client_ids)
 
+    def check_duplicate_by_name(self, name: str) -> list[dict[str, Any]]:
+        """按名称精确查询同名当事人，返回候选列表（最多10条）。"""
+        from apps.client.models import Client
+
+        clients = Client.objects.filter(name=name)[:10]
+        return [
+            {
+                "id": c.id,
+                "name": c.name,
+                "client_type": c.client_type,
+                "id_number": c.id_number,
+                "address": c.address,
+                "phone": c.phone,
+                "legal_representative": c.legal_representative,
+            }
+            for c in clients
+        ]
+
     def get_related_items(self, *, client_id: int) -> dict[str, list[dict[str, Any]]]:
         """获取客户关联的案件和合同。"""
         from apps.cases.models import CaseParty

@@ -15,7 +15,7 @@ from apps.client.schemas import ClientIn, ClientOut, ClientUpdateIn, OACredentia
 from apps.client.services.text_parser import parse_client_text as _parse_client
 from apps.client.services.text_parser import parse_multiple_clients_text as _parse_multi
 from apps.core.dto.request_context import extract_request_context
-from apps.core.exceptions import ValidationException
+from apps.core.exceptions import ConflictError, ValidationException
 from apps.core.utils.id_card_utils import IdCardUtils
 
 
@@ -109,6 +109,14 @@ def check_oa_credential(request: Any) -> OACredentialCheckOut:  # pragma: no cov
     return OACredentialCheckOut(has_credential=has_credential)
 
 
+@router.get("/clients/check-duplicate")
+def check_duplicate(request: Any, name: str = "") -> dict[str, Any]:  # pragma: no cover
+    """查询同名当事人，供UI层在输入时实时提示。"""
+    facade = _get_query_facade()
+    candidates = facade.check_duplicate_by_name(name)
+    return {"success": True, "candidates": candidates}
+
+
 @router.get("/clients/{client_id}", response=ClientOut)
 def get_client(request: Any, client_id: int) -> Any:  # pragma: no cover
     """获取单个客户"""
@@ -120,9 +128,21 @@ def get_client(request: Any, client_id: int) -> Any:  # pragma: no cover
 @router.post("/clients", response=ClientOut)
 def create_client(request: Any, payload: ClientIn) -> Any:  # pragma: no cover
     """创建客户"""
+    if not payload.force_create:
+        query_facade = _get_query_facade()
+        candidates = query_facade.check_duplicate_by_name(payload.name)
+        if candidates:
+            raise ConflictError(
+                message="检测到同名当事人，请确认是否复用",
+                code="DUPLICATE_CLIENT_DETECTED",
+                errors={"candidates": candidates},
+            )
+
     service = _get_mutation_service()
     user = getattr(request, "auth", None) or extract_request_context(request).user
-    return service.create_client(data=payload.model_dump(), user=user)
+    data = payload.model_dump()
+    data.pop("force_create", None)
+    return service.create_client(data=data, user=user)
 
 
 @router.post("/clients-with-docs", response=ClientOut)

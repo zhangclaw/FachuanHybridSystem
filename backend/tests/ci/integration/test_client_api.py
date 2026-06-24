@@ -261,3 +261,82 @@ def test_get_content_template(authenticated_client):
     data = resp.json()
     assert data["clue_type"] == "bank"
     assert "template" in data
+
+
+# ===================================================================
+# Duplicate Check
+# ===================================================================
+
+
+@pytest.mark.django_db
+class TestDuplicateCheck:
+    def test_check_duplicate_no_match(self, authenticated_client):
+        resp = authenticated_client.get(
+            "/api/v1/client/clients/check-duplicate", {"name": "不存在的人"}
+        )
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["success"] is True
+        assert data["candidates"] == []
+
+    def test_check_duplicate_found(self, authenticated_client):
+        Client.objects.create(
+            name="周利明",
+            client_type=Client.NATURAL,
+            id_number="362322197812248133",
+        )
+        resp = authenticated_client.get(
+            "/api/v1/client/clients/check-duplicate", {"name": "周利明"}
+        )
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["success"] is True
+        assert len(data["candidates"]) == 1
+        assert data["candidates"][0]["name"] == "周利明"
+
+    def test_create_no_duplicate(self, authenticated_client):
+        resp = authenticated_client.post(
+            "/api/v1/client/clients",
+            data=json.dumps({"name": "全新客户", "client_type": "natural"}),
+            content_type="application/json",
+        )
+        assert resp.status_code == 200
+        assert resp.json()["name"] == "全新客户"
+
+    def test_create_duplicate_without_force(self, authenticated_client):
+        Client.objects.create(name="重复客户", client_type=Client.NATURAL)
+        resp = authenticated_client.post(
+            "/api/v1/client/clients",
+            data=json.dumps({"name": "重复客户", "client_type": "natural"}),
+            content_type="application/json",
+        )
+        assert resp.status_code == 409
+        data = resp.json()
+        assert data["success"] is False
+        assert data["code"] == "DUPLICATE_CLIENT_DETECTED"
+        assert len(data["errors"]["candidates"]) == 1
+
+    def test_create_duplicate_with_force(self, authenticated_client):
+        Client.objects.create(name="强制创建", client_type=Client.NATURAL)
+        resp = authenticated_client.post(
+            "/api/v1/client/clients",
+            data=json.dumps({
+                "name": "强制创建",
+                "client_type": "natural",
+                "force_create": True,
+            }),
+            content_type="application/json",
+        )
+        assert resp.status_code == 200
+        # 应创建第二条同名记录
+        assert Client.objects.filter(name="强制创建").count() == 2
+
+    def test_create_empty_candidate_list_no_409(self, authenticated_client):
+        """无同名候选时不触发 409，正常创建"""
+        resp = authenticated_client.post(
+            "/api/v1/client/clients",
+            data=json.dumps({"name": "唯一客户", "client_type": "natural"}),
+            content_type="application/json",
+        )
+        assert resp.status_code == 200
+        assert resp.json()["name"] == "唯一客户"

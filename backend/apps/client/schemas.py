@@ -90,6 +90,7 @@ class ClientIn(Schema):
     id_number: str | None = None
     legal_representative: str | None = None
     legal_representative_id_number: str | None = None
+    force_create: bool = False
 
 
 class ClientUpdateIn(Schema):
