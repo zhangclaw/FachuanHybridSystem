@@ -3,8 +3,9 @@
 提供用户登录、登出和当前用户信息接口
 """
 
-from typing import cast
+from typing import Any, cast
 
+from asgiref.sync import sync_to_async
 from django.http import HttpRequest
 from ninja import Router
 
@@ -38,10 +39,13 @@ _auth_service = _get_auth_service()
 
 @router.post("/login", response=LoginOut, auth=None)
 @rate_limit_from_settings("AUTH")
-def login_view(request: HttpRequest, payload: LoginIn) -> LoginOut:  # pragma: no cover
-    user = _auth_service.login(request, payload.username, payload.password)
-    user_out = LawyerOut.from_orm(user)
-    return LoginOut(success=True, user=user_out)
+async def login_view(request: HttpRequest, payload: LoginIn) -> LoginOut:  # pragma: no cover
+    def _do() -> Any:
+        user = _auth_service.login(request, payload.username, payload.password)
+        user_out = LawyerOut.from_orm(user)
+        return LoginOut(success=True, user=user_out)
+
+    return cast(LoginOut, await sync_to_async(_do)())
 
 
 @router.post("/logout", auth=None)
@@ -52,7 +56,7 @@ def logout_view(request: HttpRequest) -> dict[str, bool]:  # pragma: no cover
 
 @router.post("/register", response=RegisterOut, auth=None)
 @rate_limit_from_settings("AUTH")
-def register_view(request: HttpRequest, payload: RegisterIn) -> RegisterOut:  # pragma: no cover
+async def register_view(request: HttpRequest, payload: RegisterIn) -> RegisterOut:  # pragma: no cover
     """
     用户注册
 
@@ -65,26 +69,28 @@ def register_view(request: HttpRequest, payload: RegisterIn) -> RegisterOut:  # 
         return RegisterOut(success=False, message="密码至少6个字符")
 
     # 检查用户名是否已存在
-    if _auth_service.username_exists(payload.username):
+    if await sync_to_async(_auth_service.username_exists)(payload.username):
         return RegisterOut(success=False, message="用户名已存在")
 
     try:
-        result = _auth_service.register(
-            username=payload.username,
-            password=payload.password,
-            real_name=payload.real_name,
-            phone=payload.phone,
-        )
-        user = result.user
-        is_first = user.is_active  # 首位用户自动激活
+        def _do() -> Any:
+            result = _auth_service.register(
+                username=payload.username,
+                password=payload.password,
+                real_name=payload.real_name,
+                phone=payload.phone,
+            )
+            user = result.user
+            is_first = user.is_active  # 首位用户自动激活
+            return RegisterOut(
+                success=True,
+                user=LawyerOut.from_orm(user),
+                requires_approval=not is_first,
+                setup_in_progress=is_first,
+                message="注册成功，系统正在初始化..." if is_first else "注册成功，请等待管理员审批",
+            )
 
-        return RegisterOut(
-            success=True,
-            user=LawyerOut.from_orm(user),
-            requires_approval=not is_first,
-            setup_in_progress=is_first,
-            message="注册成功，系统正在初始化..." if is_first else "注册成功，请等待管理员审批",
-        )
+        return cast(RegisterOut, await sync_to_async(_do)())
     except Exception as e:
         return RegisterOut(success=False, message=str(e))
 
@@ -101,7 +107,7 @@ def me_view(request: HttpRequest) -> LawyerOut:  # pragma: no cover
 
 @router.post("/password-reset/request", response=PasswordResetOut, auth=None)
 @rate_limit_from_settings("AUTH")
-def request_password_reset(request: HttpRequest, payload: PasswordResetRequestIn) -> PasswordResetOut:  # pragma: no cover
+async def request_password_reset(request: HttpRequest, payload: PasswordResetRequestIn) -> PasswordResetOut:  # pragma: no cover
     """
     请求密码重置
 
@@ -111,8 +117,8 @@ def request_password_reset(request: HttpRequest, payload: PasswordResetRequestIn
     if not payload.email or "@" not in payload.email:
         return PasswordResetOut(success=False, message="请输入有效的邮箱地址")
 
-    # 调用服务
-    success, message = PasswordResetService.request_password_reset(payload.email)
+    # 调用服务（含邮件发送 IO）
+    success, message = await sync_to_async(PasswordResetService.request_password_reset)(payload.email)
 
     return PasswordResetOut(success=success, message=message)
 
