@@ -170,21 +170,6 @@ class SystemConfigService:
 
     @classmethod
     async def aget_value(cls, key: str, default: str = "") -> str:  # pragma: no cover
-        """异步获取配置值 — 直接使用 async ORM,不走缓存"""
-        config = await SystemConfig.objects.filter(key=key, is_active=True).afirst()
-        if config is None:
-            return default
-        value: str = config.value
-        if config.is_secret:
-            from apps.core.security.secret_codec import SecretCodec
-
-            codec = SecretCodec()
-            if codec.is_encrypted(value):
-                value = codec.decrypt(value)
-        return value
-
-    @classmethod
-    async def aget_value(cls, key: str, default: str = "") -> str:  # pragma: no cover
         """异步获取配置值 — 使用 async ORM"""
         config = await SystemConfig.objects.filter(key=key, is_active=True).afirst()
         if config is None:
