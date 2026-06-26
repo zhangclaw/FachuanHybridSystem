@@ -9,8 +9,10 @@ Requirements: 2.1, 2.2, 2.3, 8.1, 8.2, 8.3, 8.4
 
 import logging
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
+from asgiref.sync import sync_to_async
+from django.conf import settings
 from ninja import File, Router
 from ninja.files import UploadedFile
 from pydantic import BaseModel, Field
@@ -41,13 +43,13 @@ def _validate_file_format(filename: str) -> str:
 
 
 def _save_uploaded_file(file: UploadedFile) -> str:
-    """保存上传的文件（委托给 FileUploadService）"""
-    from apps.core.services.file_upload_service import FileUploadService
+    """保存上传的文件（委托给 storage_service）"""
+    from apps.core.services.storage_service import save_uploaded_file
 
-    upload_service = FileUploadService()
-    saved_path = upload_service.save_file(file, base_dir="document_recognition")
+    rel_path, _ = save_uploaded_file(file, rel_dir="document_recognition")
+    saved_path = str(Path(settings.MEDIA_ROOT) / rel_path)
     logger.info("文件已保存: %s", saved_path)
-    return str(saved_path)
+    return saved_path
 
 
 # ============================================================================
@@ -151,7 +153,7 @@ class UpdateInfoResponseSchema(BaseModel):
 
 
 @router.post("/court-document/recognize", response=TaskSubmitResponseSchema)
-def recognize_document(request: Any, file: UploadedFile = File(...)) -> TaskSubmitResponseSchema:  # pragma: no cover
+async def recognize_document(request: Any, file: UploadedFile = File(...)) -> TaskSubmitResponseSchema:  # pragma: no cover
     """
     提交文书识别任务（异步）
 
@@ -167,63 +169,69 @@ def recognize_document(request: Any, file: UploadedFile = File(...)) -> TaskSubm
     _validate_file_format(filename)
 
     # 2. 保存文件
-    file_path = _save_uploaded_file(file)
+    file_path = await sync_to_async(_save_uploaded_file)(file)
 
-    # 3. 创建任务记录
-    task = _get_task_service().create_task(file_path=file_path, original_filename=filename)
+    # 3. 创建任务记录 + 提交异步任务
+    def _create_and_submit() -> Any:
+        task = _get_task_service().create_task(file_path=file_path, original_filename=filename)
+        submit_task(
+            "apps.document_recognition.tasks.execute_document_recognition_task",
+            task.id,
+            task_name=f"document_recognition_{task.id}",
+        )
+        return task.id
 
-    # 4. 提交异步任务
-    submit_task(
-        "apps.document_recognition.tasks.execute_document_recognition_task",
-        task.id,
-        task_name=f"document_recognition_{task.id}",
-    )
+    task_id = await sync_to_async(_create_and_submit)()
 
-    logger.info("文书识别任务已提交: task_id=%s", task.id)
+    logger.info("文书识别任务已提交: task_id=%s", task_id)
 
-    return TaskSubmitResponseSchema(task_id=task.id, status="pending", message="任务已提交，正在后台处理")
+    return TaskSubmitResponseSchema(task_id=task_id, status="pending", message="任务已提交，正在后台处理")
 
 
 @router.get("/court-document/task/{task_id}", response=TaskStatusResponseSchema)
-def get_task_status(request: Any, task_id: int) -> TaskStatusResponseSchema:  # pragma: no cover
+async def get_task_status(request: Any, task_id: int) -> TaskStatusResponseSchema:  # pragma: no cover
     """
     查询识别任务状态和结果
     """
-    task = _get_task_service().get_task(task_id, select_case=True)
 
-    # 构建响应
-    recognition = None
-    binding = None
+    def _do() -> Any:
+        task = _get_task_service().get_task(task_id, select_case=True)
 
-    if task.status == "success":
-        recognition = RecognitionResultSchema(
-            document_type=task.document_type,
-            case_number=task.case_number,
-            key_time=task.key_time.isoformat() if task.key_time else None,
-            confidence=task.confidence,
-            extraction_method=task.extraction_method,
-        )
+        # 构建响应
+        recognition = None
+        binding = None
 
-        if task.binding_success is not None:
-            binding = BindingResultSchema(
-                success=task.binding_success,
-                case_id=task.case_id,
-                case_name=task.case.name if task.case else None,
-                case_log_id=task.case_log_id,
-                message=task.binding_message,
-                error_code=task.binding_error_code,
+        if task.status == "success":
+            recognition = RecognitionResultSchema(
+                document_type=task.document_type,
+                case_number=task.case_number,
+                key_time=task.key_time.isoformat() if task.key_time else None,
+                confidence=task.confidence,
+                extraction_method=task.extraction_method,
             )
 
-    return TaskStatusResponseSchema(
-        task_id=task.id,
-        status=task.status,
-        file_path=task.renamed_file_path or task.file_path,
-        recognition=recognition,
-        binding=binding,
-        error_message=task.error_message,
-        created_at=task.created_at.isoformat(),
-        finished_at=task.finished_at.isoformat() if task.finished_at else None,
-    )
+            if task.binding_success is not None:
+                binding = BindingResultSchema(
+                    success=task.binding_success,
+                    case_id=task.case_id,
+                    case_name=task.case.name if task.case else None,
+                    case_log_id=task.case_log_id,
+                    message=task.binding_message,
+                    error_code=task.binding_error_code,
+                )
+
+        return TaskStatusResponseSchema(
+            task_id=task.id,
+            status=task.status,
+            file_path=task.renamed_file_path or task.file_path,
+            recognition=recognition,
+            binding=binding,
+            error_message=task.error_message,
+            created_at=task.created_at.isoformat(),
+            finished_at=task.finished_at.isoformat() if task.finished_at else None,
+        )
+
+    return cast(TaskStatusResponseSchema, await sync_to_async(_do)())
 
 
 # ============================================================================
@@ -246,7 +254,7 @@ def _get_task_service() -> Any:
 
 
 @router.get("/court-document/search-cases", response=list[CaseSearchResultSchema])
-def search_cases_for_binding(request: Any, q: str = "", limit: int = 20) -> list[CaseSearchResultSchema]:  # pragma: no cover
+async def search_cases_for_binding(request: Any, q: str = "", limit: int = 20) -> list[CaseSearchResultSchema]:  # pragma: no cover
     """
     搜索可绑定的案件
 
@@ -263,7 +271,7 @@ def search_cases_for_binding(request: Any, q: str = "", limit: int = 20) -> list
     """
     limit = min(limit, 20)
     task_service = _get_task_service()
-    raw_results = task_service.search_cases_for_binding(search_term=q.strip() if q else "", limit=limit)
+    raw_results = await sync_to_async(task_service.search_cases_for_binding)(search_term=q.strip() if q else "", limit=limit)
 
     results = [
         CaseSearchResultSchema(
@@ -282,7 +290,7 @@ def search_cases_for_binding(request: Any, q: str = "", limit: int = 20) -> list
 
 
 @router.post("/court-document/task/{task_id}/bind", response=ManualBindingResponseSchema)
-def manual_bind_case(request: Any, task_id: int, payload: ManualBindingRequestSchema) -> ManualBindingResponseSchema:  # pragma: no cover
+async def manual_bind_case(request: Any, task_id: int, payload: ManualBindingRequestSchema) -> ManualBindingResponseSchema:  # pragma: no cover
     """
     手动绑定案件
 
@@ -297,23 +305,27 @@ def manual_bind_case(request: Any, task_id: int, payload: ManualBindingRequestSc
 
     Requirements: 3.1
     """
-    # 1. 获取任务
-    task = _get_task_service().get_task(task_id, select_case=True)
+    # 1. 获取任务并检查是否已绑定（在 sync 上下文中）
+    def _check_bound() -> Any:
+        task = _get_task_service().get_task(task_id, select_case=True)
+        if task.binding_success:
+            return ManualBindingResponseSchema(
+                success=False,
+                case_id=task.case_id,
+                case_name=task.case.name if task.case else None,
+                case_log_id=task.case_log_id,
+                message="任务已绑定到案件",
+                error_code="ALREADY_BOUND",
+            )
+        return None
 
-    # 2. 检查任务是否已绑定
-    if task.binding_success:
-        return ManualBindingResponseSchema(
-            success=False,
-            case_id=task.case_id,
-            case_name=task.case.name if task.case else None,
-            case_log_id=task.case_log_id,
-            message="任务已绑定到案件",
-            error_code="ALREADY_BOUND",
-        )
+    already_bound = await sync_to_async(_check_bound)()
+    if already_bound:
+        return cast(ManualBindingResponseSchema, already_bound)
 
-    # 3. 调用服务层执行手动绑定
+    # 2. 调用服务层执行手动绑定（返回的是 dataclass，非 ORM 对象）
     binding_service = _get_case_binding_service()
-    result = binding_service.manual_bind_document_to_case(
+    result = await sync_to_async(binding_service.manual_bind_document_to_case)(
         task_id=task_id, case_id=payload.case_id, user=getattr(request, "user", None)
     )
 
@@ -328,7 +340,7 @@ def manual_bind_case(request: Any, task_id: int, payload: ManualBindingRequestSc
 
 
 @router.post("/court-document/task/{task_id}/update-info", response=UpdateInfoResponseSchema)
-def update_task_info(request: Any, task_id: int, payload: UpdateInfoRequestSchema) -> UpdateInfoResponseSchema:  # pragma: no cover
+async def update_task_info(request: Any, task_id: int, payload: UpdateInfoRequestSchema) -> UpdateInfoResponseSchema:  # pragma: no cover
     """
     手动更新识别信息（案号、关键时间）
 
@@ -342,15 +354,17 @@ def update_task_info(request: Any, task_id: int, payload: UpdateInfoRequestSchem
         更新结果
     """
 
-    task = _get_task_service().update_task_info(
-        task_id,
-        case_number=payload.case_number,
-        key_time=payload.key_time,
-    )
+    def _do() -> Any:
+        task = _get_task_service().update_task_info(
+            task_id,
+            case_number=payload.case_number,
+            key_time=payload.key_time,
+        )
+        return UpdateInfoResponseSchema(
+            success=True,
+            message="保存成功",
+            case_number=task.case_number,
+            key_time=task.key_time.isoformat() if task.key_time else None,
+        )
 
-    return UpdateInfoResponseSchema(
-        success=True,
-        message="保存成功",
-        case_number=task.case_number,
-        key_time=task.key_time.isoformat() if task.key_time else None,
-    )
+    return cast(UpdateInfoResponseSchema, await sync_to_async(_do)())

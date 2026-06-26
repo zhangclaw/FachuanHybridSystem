@@ -5,11 +5,9 @@ Automation 服务模块
 
 子模块：
 - token/: Token 管理服务
-- document_delivery/: 文书送达服务
 - sms/: 短信处理服务
 - document/: 文书处理服务
 - ai/: AI 服务
-- insurance/: 保险服务
 - chat/: 聊天服务
 - captcha/: 验证码服务
 - scraper/: 爬虫服务

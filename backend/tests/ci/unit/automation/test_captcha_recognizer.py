@@ -4,11 +4,19 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+try:
+    from plugins import has_court_login_plugin
+    _HAS_LOGIN = has_court_login_plugin()
+except ImportError:
+    _HAS_LOGIN = False
+
 from apps.automation.services.scraper.core.captcha_recognizer import (
     CaptchaRecognizer,
     ManualCaptchaRecognizer,
     get_captcha_recognizer,
 )
+
+pytestmark = pytest.mark.skipif(not _HAS_LOGIN, reason="court_login plugin not installed")
 
 
 # ── ManualCaptchaRecognizer.__init__ ─────────────────────────────────────────
@@ -49,7 +57,7 @@ class TestManualCaptchaRecognizerRecognize:
 
         r = ManualCaptchaRecognizer(task=task, timeout=0, poll_interval=0.01)
 
-        with patch("apps.automation.services.scraper.core.captcha_recognizer.Path") as mock_path_cls:
+        with patch("plugins.court_automation.login.captcha_recognizer.Path") as mock_path_cls:
             mock_path_instance = MagicMock()
             mock_path_instance.__truediv__ = MagicMock(return_value=MagicMock())
             mock_path_cls.return_value = mock_path_instance

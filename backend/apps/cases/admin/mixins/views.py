@@ -33,9 +33,9 @@ def _get_case_stage_choices() -> list[tuple[str, str]]:
 
 def _has_court_filing_plugin() -> bool:
     try:
-        from plugins import has_court_automation_plugin
+        from plugins import has_court_automation_plugin  # type: ignore[attr-defined]
 
-        return has_court_automation_plugin()
+        return has_court_automation_plugin()  # type: ignore[no-any-return]
     except ImportError:
         return False
 
@@ -656,6 +656,7 @@ class CaseAdminViewsMixin:  # pragma: no cover
         from pathlib import Path
 
         from django.conf import settings
+        from django.core.files.storage import default_storage
         from django.http import JsonResponse
 
         try:
@@ -671,19 +672,14 @@ class CaseAdminViewsMixin:  # pragma: no cover
             if ext not in [".pdf"]:
                 return JsonResponse({"success": False, "error": "仅支持 PDF 格式"}, status=400)
 
-            # 创建临时目录
-            temp_dir = Path(settings.MEDIA_ROOT) / "case_documents" / "temp"
-            temp_dir.mkdir(parents=True, exist_ok=True)
-
             # 防止 path traversal：只保留文件名部分
             safe_name = Path(str(file.name or "")).name
             temp_filename = f"{uuid.uuid4().hex}_{safe_name}"
-            temp_path = temp_dir / temp_filename
+            rel_path = f"case_documents/temp/{temp_filename}"
 
             # 保存文件
-            with open(temp_path, "wb+") as destination:
-                for chunk in file.chunks():
-                    destination.write(chunk)
+            saved_name = default_storage.save(rel_path, file)
+            temp_path = Path(settings.MEDIA_ROOT) / saved_name
 
             logger.info("临时文件上传成功: %s", temp_path)
 
@@ -731,10 +727,13 @@ class CaseAdminViewsMixin:  # pragma: no cover
                     {"success": False, "error": str("文件夹不存在: %(path)s" % {"path": folder_path})}, status=404
                 )
 
-            # 安全检查：只允许打开用户主目录或 /Volumes 下的目录（防止打开系统敏感目录）
+            # 安全检查：只允许打开用户主目录、MEDIA_ROOT 或 /Volumes 下的目录（防止打开系统敏感目录）
+            from django.conf import settings
+
             home = Path.home().resolve()
             volumes = Path("/Volumes").resolve()
-            if not (folder.is_relative_to(home) or folder.is_relative_to(volumes)):
+            media_root = Path(settings.MEDIA_ROOT).resolve()
+            if not (folder.is_relative_to(home) or folder.is_relative_to(volumes) or folder.is_relative_to(media_root)):
                 return JsonResponse({"success": False, "error": "不允许打开该目录"}, status=403)
 
             system = platform.system()

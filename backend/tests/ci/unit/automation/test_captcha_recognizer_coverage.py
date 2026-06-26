@@ -6,11 +6,19 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+try:
+    from plugins import has_court_login_plugin
+    _HAS_LOGIN = has_court_login_plugin()
+except ImportError:
+    _HAS_LOGIN = False
+
 from apps.automation.services.scraper.core.captcha_recognizer import (
     CaptchaRecognizer,
     ManualCaptchaRecognizer,
     get_captcha_recognizer,
 )
+
+pytestmark = pytest.mark.skipif(not _HAS_LOGIN, reason="court_login plugin not installed")
 
 
 class TestGetCaptchaRecognizer:
@@ -74,7 +82,7 @@ class TestManualCaptchaRecognizerRecognizeSuccess:
 
         task.refresh_from_db = MagicMock(side_effect=refresh_side_effect)
 
-        with patch("apps.automation.services.scraper.core.captcha_recognizer.Path") as mock_path_cls:
+        with patch("plugins.court_automation.login.captcha_recognizer.Path") as mock_path_cls:
             mock_captcha_dir = MagicMock()
             mock_image_path = MagicMock()
             mock_image_path.__truediv__ = MagicMock(return_value=mock_image_path)
@@ -85,17 +93,19 @@ class TestManualCaptchaRecognizerRecognizeSuccess:
                 mock_settings.MEDIA_ROOT = "/tmp/media"
                 with patch("apps.automation.models.ScraperTaskStatus") as mock_status:
                     mock_status.WAITING_FOR_CAPTCHA = "WAITING_FOR_CAPTCHA"
-                    result = r.recognize(b"\x89PNG")
+                    with patch("django.core.files.storage.default_storage") as mock_storage:
+                        mock_storage.save.return_value = "automation/captcha_pending/test.png"
+                        result = r.recognize(b"\x89PNG")
 
         assert result == "1234"  # stripped and spaces removed
-        mock_image_path.unlink.assert_called_once_with(missing_ok=True)
+        mock_storage.delete.assert_called_once_with("automation/captcha_pending/test.png")
 
     def test_recognize_exception_returns_none(self):
         task = MagicMock()
         task.id = "task_1"
         r = ManualCaptchaRecognizer(task=task, timeout=1, poll_interval=0.01)
 
-        with patch("apps.automation.services.scraper.core.captcha_recognizer.Path") as mock_path_cls:
+        with patch("plugins.court_automation.login.captcha_recognizer.Path") as mock_path_cls:
             mock_path_cls.side_effect = Exception("path error")
             with patch("django.conf.settings") as mock_settings:
                 mock_settings.MEDIA_ROOT = "/tmp/media"
@@ -115,7 +125,7 @@ class TestManualCaptchaRecognizerTimeoutWithStatusUpdate:
 
         r = ManualCaptchaRecognizer(task=task, timeout=0, poll_interval=0.01)
 
-        with patch("apps.automation.services.scraper.core.captcha_recognizer.Path") as mock_path_cls, \
+        with patch("plugins.court_automation.login.captcha_recognizer.Path") as mock_path_cls, \
              patch("django.conf.settings") as mock_settings:
             mock_settings.MEDIA_ROOT = "/tmp/media"
             mock_dir = MagicMock()
@@ -150,7 +160,7 @@ class TestManualCaptchaRecognizerUnlinkError:
 
         task.refresh_from_db = MagicMock(side_effect=refresh_side_effect)
 
-        with patch("apps.automation.services.scraper.core.captcha_recognizer.Path") as mock_path_cls:
+        with patch("plugins.court_automation.login.captcha_recognizer.Path") as mock_path_cls:
             mock_dir = MagicMock()
             mock_image_path = MagicMock()
             mock_image_path.unlink.side_effect = PermissionError("no access")

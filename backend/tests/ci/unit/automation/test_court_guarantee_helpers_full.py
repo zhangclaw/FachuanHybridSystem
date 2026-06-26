@@ -1,4 +1,4 @@
-"""Full coverage tests for apps.automation.api.court_guarantee_helpers."""
+"""Full coverage tests for plugins.court_automation.guarantee.helpers."""
 
 from __future__ import annotations
 
@@ -7,8 +7,13 @@ from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 import pytest
+try:
+    from plugins.court_automation import filing  # noqa: F401
+except ImportError:
+    pytest.skip("court_automation plugin not installed", allow_module_level=True)
 
-from apps.automation.api import court_guarantee_helpers as helpers
+
+from plugins.court_automation.guarantee import helpers
 
 
 # ---------------------------------------------------------------------------
@@ -327,19 +332,18 @@ class TestBuildPartyPayloadFromCaseParty:
         assert result["party_type"] == "legal"
         assert result["legal_representative"] == "李四"
 
-    def test_missing_name_defaults_to_zhangsan(self):
+    def test_missing_name_raises_error(self):
         client = SimpleNamespace(
-            id=1, client_type="natural", name="", id_number="", phone="",
-            address="", is_our_client=False, legal_representative="", legal_representative_id_number="",
+            id=1, client_type="natural", name="", id_number="110101199003077715", phone="",
+            address="广州市天河区", is_our_client=False, legal_representative="", legal_representative_id_number="",
         )
         party = SimpleNamespace(id=1, legal_status="defendant", client=client)
-        result = helpers._build_party_payload_from_case_party(party=party)
-        assert result["name"] == "张三"
+        with pytest.raises(ValueError, match="客户姓名不能为空"):
+            helpers._build_party_payload_from_case_party(party=party)
 
     def test_none_party(self):
-        result = helpers._build_party_payload_from_case_party(party=None)
-        assert result["name"] == "张三"
-        assert result["party_type"] == "natural"
+        with pytest.raises(ValueError, match="客户姓名不能为空"):
+            helpers._build_party_payload_from_case_party(party=None)
 
 
 # ======================================================================
@@ -393,12 +397,12 @@ class TestListAndPickPartyPayloads:
         assert result["name"] == "张三"
 
     def test_pick_empty_returns_default(self):
-        result = helpers._pick_party_payload(
-            case_parties=[],
-            preferred_statuses=set(),
-            prefer_our=False,
-        )
-        assert result["name"] == "张三"
+        with pytest.raises(ValueError, match="客户姓名不能为空"):
+            helpers._pick_party_payload(
+                case_parties=[],
+                preferred_statuses=set(),
+                prefer_our=False,
+            )
 
 
 # ======================================================================
@@ -594,7 +598,7 @@ class TestUpdateSessionTask:
     def test_noop_when_none(self):
         helpers._update_session_task(session_id=None, status="running")
 
-    @patch("apps.automation.api.court_guarantee_helpers.timezone")
+    @patch("plugins.court_automation.guarantee.helpers.timezone")
     def test_sync_update(self, mock_tz):
         mock_tz.now.return_value = "2026-01-01"
         with patch("apps.automation.models.ScraperTask") as MockTask:
@@ -603,7 +607,7 @@ class TestUpdateSessionTask:
                     helpers._update_session_task(session_id=5, status="success", set_started=True, set_finished=True)
                     MockTask.objects.filter.assert_called_once_with(id=5)
 
-    @patch("apps.automation.api.court_guarantee_helpers.timezone")
+    @patch("plugins.court_automation.guarantee.helpers.timezone")
     def test_async_update(self, mock_tz):
         mock_tz.now.return_value = "2026-01-01"
         with patch("asyncio.get_running_loop", return_value=MagicMock()):

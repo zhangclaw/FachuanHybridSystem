@@ -9,8 +9,13 @@ from __future__ import annotations
 import re
 
 import pytest
+try:
+    from plugins.court_automation import filing  # noqa: F401
+except ImportError:
+    pytest.skip("court_automation plugin not installed", allow_module_level=True)
 
-from apps.automation.services.scraper.sites.court_zxfw_filing.party_info_handler import PartyInfoHandlerMixin
+
+from plugins.court_automation.filing.playwright_filing.party_info_handler import PartyInfoHandlerMixin
 
 
 # ============================================================

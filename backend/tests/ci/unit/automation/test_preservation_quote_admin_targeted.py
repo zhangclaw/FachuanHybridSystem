@@ -8,10 +8,15 @@ from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pytest
+try:
+    from plugins.court_automation import filing  # noqa: F401
+except ImportError:
+    pytest.skip("court_automation plugin not installed", allow_module_level=True)
+
 from django.utils import timezone
 
 from apps.automation.models import InsuranceQuote, PreservationQuote, QuoteItemStatus, QuoteStatus
-from apps.automation.services.admin.preservation_quote_admin_service import PreservationQuoteAdminService
+from plugins.court_automation.preservation_quote.admin_service import PreservationQuoteAdminService
 from apps.core.exceptions import BusinessException, NotFoundError, ValidationException
 
 

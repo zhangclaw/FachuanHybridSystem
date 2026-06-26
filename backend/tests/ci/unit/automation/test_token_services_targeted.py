@@ -8,11 +8,19 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
+try:
+    from plugins import has_court_login_plugin
+    _HAS_LOGIN = has_court_login_plugin()
+except ImportError:
+    _HAS_LOGIN = False
+
 from apps.core.exceptions import (
     AutoTokenAcquisitionError,
     NoAvailableAccountError,
     ValidationException,
 )
+
+pytestmark = pytest.mark.skipif(not _HAS_LOGIN, reason="court_login plugin not installed")
 
 
 # ── AutoTokenAcquisitionService ───────────────────────────────────
@@ -20,7 +28,7 @@ from apps.core.exceptions import (
 
 class TestAutoTokenAcquisitionService:
     def _make_service(self):
-        from apps.automation.services.token.auto_token_acquisition_service import AutoTokenAcquisitionService
+        from plugins.court_automation.token.auto_token_acquisition_service import AutoTokenAcquisitionService
 
         svc = AutoTokenAcquisitionService(
             account_selection_strategy=MagicMock(),
@@ -31,7 +39,7 @@ class TestAutoTokenAcquisitionService:
         return svc
 
     def test_init_with_defaults(self):
-        from apps.automation.services.token.auto_token_acquisition_service import AutoTokenAcquisitionService
+        from plugins.court_automation.token.auto_token_acquisition_service import AutoTokenAcquisitionService
 
         svc = AutoTokenAcquisitionService()
         assert svc._acquisition_count == 0
@@ -55,7 +63,7 @@ class TestAutoTokenAcquisitionService:
         assert svc._failure_count == 0
 
     def test_clear_locks(self):
-        from apps.automation.services.token.auto_token_acquisition_service import AutoTokenAcquisitionService
+        from plugins.court_automation.token.auto_token_acquisition_service import AutoTokenAcquisitionService
 
         AutoTokenAcquisitionService._active_acquisitions.add("test")
         AutoTokenAcquisitionService._acquisition_locks["test"] = asyncio.Lock()
@@ -79,7 +87,7 @@ class TestAutoTokenAcquisitionService:
 
 class TestAutoLoginService:
     def _make_service(self, usecase=None):
-        from apps.automation.services.token.auto_login_service import AutoLoginService, RetryConfig
+        from plugins.court_automation.token.auto_login_service import AutoLoginService, RetryConfig
 
         return AutoLoginService(
             retry_config=RetryConfig(max_network_retries=1, max_captcha_retries=1, login_timeout=5.0),
@@ -88,7 +96,7 @@ class TestAutoLoginService:
         )
 
     def test_init_defaults(self):
-        from apps.automation.services.token.auto_login_service import AutoLoginService
+        from plugins.court_automation.token.auto_login_service import AutoLoginService
 
         svc = AutoLoginService()
         assert svc.retry_config.max_network_retries == 3
@@ -121,7 +129,7 @@ class TestAutoLoginService:
 
 class TestRetryConfig:
     def test_defaults(self):
-        from apps.automation.services.token.auto_login_service import RetryConfig
+        from plugins.court_automation.token.auto_login_service import RetryConfig
 
         config = RetryConfig()
         assert config.max_network_retries == 3
@@ -131,7 +139,7 @@ class TestRetryConfig:
         assert config.login_timeout == 60.0
 
     def test_custom_values(self):
-        from apps.automation.services.token.auto_login_service import RetryConfig
+        from plugins.court_automation.token.auto_login_service import RetryConfig
 
         config = RetryConfig(max_network_retries=5, login_timeout=120.0)
         assert config.max_network_retries == 5
@@ -143,7 +151,7 @@ class TestRetryConfig:
 
 class TestBaoquanTokenProvider:
     def _make_provider(self, **kwargs):
-        from apps.automation.services.insurance.preservation_quote.token_provider import BaoquanTokenProvider
+        from plugins.court_automation.preservation_quote.preservation_quote.token_provider import BaoquanTokenProvider
 
         return BaoquanTokenProvider(**kwargs)
 
@@ -165,7 +173,7 @@ class TestBaoquanTokenProvider:
         mock_token_service.get_token.return_value = None
         provider = self._make_provider(token_service=mock_token_service)
 
-        from apps.automation.services.insurance.exceptions import TokenError
+        from plugins.court_automation.preservation_quote.exceptions import TokenError
 
         with pytest.raises(TokenError, match="Token 不存在"):
             asyncio.run(provider.get_token())
@@ -197,7 +205,7 @@ class TestBaoquanTokenProvider:
         mock_baoquan.get_valid_baoquan_token = AsyncMock(side_effect=Exception("API error"))
         provider = self._make_provider(baoquan_token_service=mock_baoquan)
 
-        from apps.automation.services.insurance.exceptions import TokenError
+        from plugins.court_automation.preservation_quote.exceptions import TokenError
 
         with pytest.raises(TokenError, match="保全系统 Token 获取失败"):
             asyncio.run(provider.get_token())

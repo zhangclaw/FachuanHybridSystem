@@ -6,6 +6,14 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
+try:
+    from plugins import has_court_login_plugin
+    _HAS_LOGIN = has_court_login_plugin()
+except ImportError:
+    _HAS_LOGIN = False
+
+pytestmark = pytest.mark.skipif(not _HAS_LOGIN, reason="court_login plugin not installed")
+
 
 # ============================================================
 # token_service.py - TokenService._get_cache_key
@@ -31,7 +39,7 @@ class TestTokenServiceAdapter:
         from apps.automation.services.scraper.core.token_service import TokenService, TokenServiceAdapter
         adapter = TokenServiceAdapter.__new__(TokenServiceAdapter)
         adapter._service = None
-        with patch("apps.automation.services.scraper.core.token_service.TokenService") as MockTS:
+        with patch("plugins.court_automation.login.token_service.TokenService") as MockTS:
             mock_instance = MagicMock()
             MockTS.return_value = mock_instance
             result = adapter.service

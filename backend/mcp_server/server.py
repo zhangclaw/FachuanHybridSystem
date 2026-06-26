@@ -14,7 +14,6 @@ from mcp_server.tools import (
     auto_namer_process_by_path,
     batch_create_cases,
     batch_create_clients,
-    bind_guarantee_quote,
     bind_materials,
     browse_case_folders,
     browse_folders,
@@ -45,7 +44,6 @@ from mcp_server.tools import (
     create_contract,
     create_contract_with_cases,
     create_credential,
-    create_delivery_schedule,
     create_document_template,
     create_export,
     create_folder_binding,
@@ -59,7 +57,6 @@ from mcp_server.tools import (
     create_payment,
     create_pdf_split_job,
     create_placeholder,
-    create_preservation_quote,
     create_project,
     create_property_clue,
     create_research_task,
@@ -88,8 +85,6 @@ from mcp_server.tools import (
     delete_folder_binding,
     delete_folder_template,
     delete_grant,
-    delete_guarantee_binding,
-    delete_guarantee_quote,
     delete_identity_doc,
     delete_lawfirm,
     delete_lawyer,
@@ -139,11 +134,7 @@ from mcp_server.tools import (
     download_supplementary_agreement,
     enterprise_prefill,
     enterprise_search,
-    ensure_guarantee_quote,
     execute_case_import,
-    execute_court_filing,
-    execute_guarantee,
-    execute_preservation_quote,
     export_rotated_images,
     export_rotated_pdf,
     extract_pdf_pages,
@@ -185,12 +176,9 @@ from mcp_server.tools import (
     get_conversion_progress,
     get_credential,
     get_grant,
-    get_court_filing_case_info,
-    get_court_filing_session,
     get_court_sms_detail,
     get_custom_fields,
     get_dashboard_stats,
-    get_delivery_schedule,
     get_document_template,
     get_export_statuses,
     get_export_task,
@@ -200,8 +188,6 @@ from mcp_server.tools import (
     get_folder_binding,
     get_folder_template,
     get_finance_stats,
-    get_guarantee_case_info,
-    get_guarantee_session,
     get_identity_doc,
     get_identity_doc_task,
     get_inbox_message,
@@ -219,7 +205,6 @@ from mcp_server.tools import (
     get_placeholder,
     get_placeholder_by_key,
     get_preview_html,
-    get_preservation_quote,
     get_property_clue,
     get_property_clue_content_template,
     get_recording,
@@ -260,7 +245,6 @@ from mcp_server.tools import (
     list_court_sms,
     list_courts_data,
     list_credentials,
-    list_delivery_schedules,
     list_doc_convert_types,
     list_document_templates,
     list_enterprise_providers,
@@ -276,7 +260,6 @@ from mcp_server.tools import (
     list_oa_configs,
     list_payments,
     list_placeholders,
-    list_preservation_quotes,
     list_projects,
     list_property_clues,
     list_queued_tasks,
@@ -309,7 +292,6 @@ from mcp_server.tools import (
     preview_supplementary_agreement_context,
     process_document,
     process_document_by_path,
-    query_document_delivery,
     quick_recognize_invoice,
     rename_inbox_attachment,
     rename_material_group,
@@ -320,8 +302,6 @@ from mcp_server.tools import (
     reset_extract_recording,
     reset_performance_metrics,
     resubmit_task,
-    retry_guarantee_quote,
-    retry_preservation_quote,
     retry_sms_processing,
     save_archive_overrides,
     save_group_order,
@@ -358,7 +338,6 @@ from mcp_server.tools import (
     update_contract,
     update_contract_lawyers,
     update_credential,
-    update_delivery_schedule,
     update_document_template,
     update_folder_template,
     update_grant,
@@ -387,6 +366,46 @@ from mcp_server.tools import (
     approve_workflow_step,
     cancel_workflow,
 )
+
+# 条件导入：网上立案
+try:
+    from mcp_server.tools import (
+        execute_court_filing,
+        get_court_filing_case_info,
+        get_court_filing_session,
+    )
+    _HAS_FILING = True
+except ImportError:
+    _HAS_FILING = False
+
+# 条件导入：诉讼保全
+try:
+    from mcp_server.tools import (
+        bind_guarantee_quote,
+        delete_guarantee_binding,
+        delete_guarantee_quote,
+        ensure_guarantee_quote,
+        execute_guarantee,
+        get_guarantee_case_info,
+        get_guarantee_session,
+        retry_guarantee_quote,
+    )
+    _HAS_GUARANTEE = True
+except ImportError:
+    _HAS_GUARANTEE = False
+
+# 条件导入：财产保全询价
+try:
+    from mcp_server.tools import (
+        create_preservation_quote,
+        execute_preservation_quote,
+        get_preservation_quote,
+        list_preservation_quotes,
+        retry_preservation_quote,
+    )
+    _HAS_QUOTE = True
+except ImportError:
+    _HAS_QUOTE = False
 
 mcp = FastMCP("法穿AI Copilot")
 
@@ -634,19 +653,15 @@ mcp.tool()(delete_court_sms)
 mcp.tool()(download_sms_documents)
 mcp.tool()(download_sms_document)
 
-# 自动化 - 财产保全询价
-mcp.tool()(create_preservation_quote)
-mcp.tool()(list_preservation_quotes)
-mcp.tool()(get_preservation_quote)
-mcp.tool()(execute_preservation_quote)
-mcp.tool()(retry_preservation_quote)
+# 自动化 - 财产保全询价 (需 plugins/court_automation)
+if _HAS_QUOTE:
+    mcp.tool()(create_preservation_quote)
+    mcp.tool()(list_preservation_quotes)
+    mcp.tool()(get_preservation_quote)
+    mcp.tool()(execute_preservation_quote)
+    mcp.tool()(retry_preservation_quote)
 
 # 自动化 - 文书送达
-mcp.tool()(query_document_delivery)
-mcp.tool()(list_delivery_schedules)
-mcp.tool()(create_delivery_schedule)
-mcp.tool()(get_delivery_schedule)
-mcp.tool()(update_delivery_schedule)
 
 # 自动化 - 验证码
 mcp.tool()(get_captcha_image)
@@ -656,20 +671,22 @@ mcp.tool()(submit_captcha_answer)
 mcp.tool()(auto_namer_process)
 mcp.tool()(auto_namer_process_by_path)
 
-# 自动化 - 网上立案
-mcp.tool()(get_court_filing_case_info)
-mcp.tool()(get_court_filing_session)
-mcp.tool()(execute_court_filing)
+# 自动化 - 网上立案 (需 plugins/court_automation)
+if _HAS_FILING:
+    mcp.tool()(get_court_filing_case_info)
+    mcp.tool()(get_court_filing_session)
+    mcp.tool()(execute_court_filing)
 
-# 自动化 - 诉讼保全
-mcp.tool()(get_guarantee_case_info)
-mcp.tool()(get_guarantee_session)
-mcp.tool()(execute_guarantee)
-mcp.tool()(ensure_guarantee_quote)
-mcp.tool()(bind_guarantee_quote)
-mcp.tool()(delete_guarantee_quote)
-mcp.tool()(retry_guarantee_quote)
-mcp.tool()(delete_guarantee_binding)
+# 自动化 - 诉讼保全 (需 plugins/court_automation)
+if _HAS_GUARANTEE:
+    mcp.tool()(get_guarantee_case_info)
+    mcp.tool()(get_guarantee_session)
+    mcp.tool()(execute_guarantee)
+    mcp.tool()(ensure_guarantee_quote)
+    mcp.tool()(bind_guarantee_quote)
+    mcp.tool()(delete_guarantee_quote)
+    mcp.tool()(retry_guarantee_quote)
+    mcp.tool()(delete_guarantee_binding)
 
 # 自动化 - 性能监控
 mcp.tool()(health_check)

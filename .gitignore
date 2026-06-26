@@ -313,3 +313,6 @@ FastAPI_backend/
 # Local env backups
 backend/.env.bak*
 backend/.env.docker-backup
+
+# Plugins 备份目录（与 backend/plugins 共享 gitdir，不应入库）
+backend/_plugins_backup/

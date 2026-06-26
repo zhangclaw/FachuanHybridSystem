@@ -4,7 +4,13 @@ from __future__ import annotations
 
 from types import SimpleNamespace
 
-from apps.automation.api import court_guarantee_helpers as helpers
+import pytest
+try:
+    from plugins.court_automation import filing  # noqa: F401
+except ImportError:
+    pytest.skip("court_automation plugin not installed", allow_module_level=True)
+
+from plugins.court_automation.guarantee import helpers
 from apps.core.dto.client import PropertyClueDTO
 
 

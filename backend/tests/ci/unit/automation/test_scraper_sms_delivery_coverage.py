@@ -1,4 +1,4 @@
-"""Coverage tests for automation scrapers, SMS, document delivery, insurance, GSXT, and admin services."""
+"""Coverage tests for automation scrapers, SMS, insurance, GSXT, and admin services."""
 from __future__ import annotations
 
 import re
@@ -7,6 +7,11 @@ from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 import pytest
+try:
+    from plugins.court_automation import filing  # noqa: F401
+except ImportError:
+    pytest.skip("court_automation plugin not installed", allow_module_level=True)
+
 
 
 # --- hbfy_scraper ---
@@ -158,22 +163,22 @@ class TestCourtZxfw:
 
 class TestCourtZxfwFiling:
     def test_filing_steps_import(self):
-        from apps.automation.services.scraper.sites.court_zxfw_filing.filing_steps import FilingStepsMixin
+        from plugins.court_automation.filing.playwright_filing.filing_steps import FilingStepsMixin
 
         assert FilingStepsMixin is not None
 
     def test_party_info_handler_import(self):
-        from apps.automation.services.scraper.sites.court_zxfw_filing.party_info_handler import PartyInfoHandlerMixin
+        from plugins.court_automation.filing.playwright_filing.party_info_handler import PartyInfoHandlerMixin
 
         assert PartyInfoHandlerMixin is not None
 
     def test_form_utils_import(self):
-        from apps.automation.services.scraper.sites.court_zxfw_filing.form_utils import FormUtilsMixin
+        from plugins.court_automation.filing.playwright_filing.form_utils import FormUtilsMixin
 
         assert FormUtilsMixin is not None
 
     def test_service_import(self):
-        from apps.automation.services.scraper.sites.court_zxfw_filing.service import CourtZxfwFilingService
+        from plugins.court_automation.filing.playwright_filing.service import CourtZxfwFilingService
 
         assert CourtZxfwFilingService is not None
 
@@ -220,63 +225,16 @@ class TestSMSServices:
         assert DocumentAttachmentService is not None
 
 
-# --- document_delivery ---
-
-class TestDocumentDelivery:
-    def test_service_import(self):
-        from apps.automation.services.document_delivery.document_delivery_service import DocumentDeliveryService
-
-        assert DocumentDeliveryService is not None
-
-    def test_schedule_service_import(self):
-        from apps.automation.services.document_delivery.document_delivery_schedule_service import (
-            DocumentDeliveryScheduleService,
-        )
-
-        assert DocumentDeliveryScheduleService is not None
-
-    def test_processor_import(self):
-        from apps.automation.services.document_delivery.processor.document_delivery_processor import (
-            DocumentDeliveryProcessor,
-        )
-
-        assert DocumentDeliveryProcessor is not None
-
-    def test_matching_mixin_import(self):
-        from apps.automation.services.document_delivery._matching_mixin import DocumentDeliveryMatchingMixin
-
-        assert DocumentDeliveryMatchingMixin is not None
-
-    def test_document_processor_import(self):
-        from apps.automation.services.document_delivery.delivery.document_processor import DocumentProcessor
-
-        assert DocumentProcessor is not None
-
-    def test_playwright_delivery_import(self):
-        from apps.automation.services.document_delivery.delivery.playwright_delivery_service import (
-            PlaywrightDeliveryService,
-        )
-
-        assert PlaywrightDeliveryService is not None
-
-    def test_playwright_service_import(self):
-        from apps.automation.services.document_delivery.playwright.document_delivery_playwright_service import (
-            DocumentDeliveryPlaywrightService,
-        )
-
-        assert DocumentDeliveryPlaywrightService is not None
-
-
 # --- insurance ---
 
 class TestInsurance:
     def test_court_insurance_client_import(self):
-        from apps.automation.services.insurance.court_insurance_client import CourtInsuranceClient
+        from plugins.court_automation.preservation_quote.court_insurance_client import CourtInsuranceClient
 
         assert CourtInsuranceClient is not None
 
     def test_preservation_quote_service_import(self):
-        from apps.automation.services.insurance.preservation_quote_service import PreservationQuoteService
+        from plugins.court_automation.preservation_quote.service import PreservationQuoteService
 
         assert PreservationQuoteService is not None
 
@@ -299,7 +257,7 @@ class TestGSXT:
 
 class TestAdminServices:
     def test_preservation_quote_admin_service_import(self):
-        from apps.automation.services.admin.preservation_quote_admin_service import PreservationQuoteAdminService
+        from plugins.court_automation.preservation_quote.admin_service import PreservationQuoteAdminService
 
         assert PreservationQuoteAdminService is not None
 
@@ -365,11 +323,11 @@ class TestScrapingTasks:
 
 class TestCourtGuaranteeApi:
     def test_import(self):
-        from apps.automation.api.court_guarantee_api import router
+        from plugins.court_automation.guarantee.api_endpoint import router
 
         assert router is not None
 
     def test_check_plugin_import(self):
-        from apps.automation.api.court_guarantee_api import _check_plugin
+        from plugins.court_automation.guarantee.api_endpoint import _check_plugin
 
         assert callable(_check_plugin)

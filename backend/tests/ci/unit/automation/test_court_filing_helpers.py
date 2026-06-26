@@ -7,8 +7,13 @@ from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 import pytest
+try:
+    from plugins.court_automation import filing  # noqa: F401
+except ImportError:
+    pytest.skip("court_automation plugin not installed", allow_module_level=True)
 
-from apps.automation.api.court_filing_helpers import (
+
+from plugins.court_automation.filing.helpers import (
     _apply_execution_party_fallbacks,
     _build_agent_payloads,
     _build_execution_reason_text,

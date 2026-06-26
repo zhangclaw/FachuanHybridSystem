@@ -1,12 +1,12 @@
 from __future__ import annotations
 
+import asyncio
 import logging
 import os
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 
 from django.apps import apps as django_apps
-from django.db import connection
 
 logger = logging.getLogger("apps.oa_filing")
 
@@ -71,23 +71,21 @@ class ScriptExecutorService:
         contract_id: int,
         case_id: int | None,
     ) -> None:  # pragma: no cover
-        """后台线程：执行脚本并更新会话状态。"""
+        """后台线程：执行脚本并更新会话状态。
+
+        asyncio.run() 在当前线程创建全新的事件循环，与 Django ASGI 的
+        主事件循环完全隔离，无需 nest_asyncio。
+        DJANGO_ALLOW_ASYNC_UNSAFE 仍需设置，因为 asyncio.run() 创建的
+        event loop 会被 Django 检测到，拒绝同步 ORM 调用。
+        """
         from apps.oa_filing.models import FilingSession, SessionStatus
 
-        # Playwright sync_playwright().start() 会在当前线程创建事件循环，
-        # 导致 Django 的 @async_unsafe 装饰器拒绝 ORM 操作。
-        # 在后台线程中绕过此检查是安全的，因为该线程由 ThreadPoolExecutor 管理。
+        # asyncio.run() 会创建 running event loop，Django 检测到后拒绝
+        # 同步 ORM。在隔离的工作线程中这是安全的。
         os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
-        connection.close()
-
-        # Django Ninja (ASGI) 在进程中留下事件循环，Playwright Sync API
-        # 检测到后会拒绝启动。nest_asyncio 允许在已有 loop 中嵌套调用。
-        import nest_asyncio
-
-        nest_asyncio.apply()
 
         try:
-            self._dispatch(site_name, credential, contract_id, case_id)
+            asyncio.run(self._dispatch(site_name, credential, contract_id, case_id))
             FilingSession.objects.filter(pk=session_id).update(status=SessionStatus.COMPLETED)
             logger.info("立案完成: session=%d", session_id)
         except Exception as exc:
@@ -96,10 +94,8 @@ class ScriptExecutorService:
                 error_message=str(exc),
             )
             logger.error("立案失败: session=%d, error=%s", session_id, exc)
-        finally:
-            connection.close()
 
-    def _dispatch(
+    async def _dispatch(
         self,
         site_name: str,
         credential: Any,
@@ -110,11 +106,11 @@ class ScriptExecutorService:
         from apps.oa_filing.services.exceptions import ScriptExecutionError
 
         if site_name == "金诚同达OA":
-            self._run_jtn(credential, contract_id, case_id)
+            await self._run_jtn(credential, contract_id, case_id)
         else:
             raise ScriptExecutionError(f"不支持的OA系统: {site_name}")
 
-    def _run_jtn(self, credential: Any, contract_id: int, case_id: int | None) -> None:
+    async def _run_jtn(self, credential: Any, contract_id: int, case_id: int | None) -> None:
         """执行金诚同达 OA 立案。"""
         from apps.oa_filing.services.exceptions import ScriptExecutionError
         from apps.oa_filing.services.oa_scripts.jtn.filing import (
@@ -131,12 +127,13 @@ class ScriptExecutorService:
         contract_party_model = django_apps.get_model("contracts", "ContractParty")
 
         # ── 委托方（PRINCIPAL） ──
-        principal_parties: list[Any] = list(
-            contract_party_model.objects.filter(
+        principal_parties: list[Any] = [
+            party
+            async for party in contract_party_model.objects.filter(
                 contract_id=contract_id,
                 role="PRINCIPAL",
-            ).select_related("client")
-        )
+            ).select_related("client").aiterator()
+        ]
         clients: list[ClientInfo] = []
         for party in principal_parties:
             c = party.client
@@ -154,23 +151,23 @@ class ScriptExecutorService:
             raise ScriptExecutionError("合同没有委托方当事人")
 
         # ── 案件负责人（主办律师 real_name） ──
-        primary_assignment = (
+        primary_assignment = await (
             contract_assignment_model.objects.filter(
                 contract_id=contract_id,
                 is_primary=True,
             )
             .select_related("lawyer")
-            .first()
+            .afirst()
         )
         manager_name: str = ""
         if primary_assignment is not None:
             manager_name = primary_assignment.lawyer.real_name or ""
 
         # ── 案件信息 ──
-        contract = contract_model.objects.get(pk=contract_id)
+        contract = await contract_model.objects.aget(pk=contract_id)
 
         if case_id is not None:
-            case = case_model.objects.get(pk=case_id)
+            case = await case_model.objects.aget(pk=case_id)
             category = self._map_case_category(case)
             stage = self._map_case_stage(case)
             which_side = self._map_which_side(case, contract_id)
@@ -206,12 +203,13 @@ class ScriptExecutorService:
         )
 
         # ── 对方当事人（OPPOSING → 利冲） ──
-        opposing_parties: list[Any] = list(
-            contract_party_model.objects.filter(
+        opposing_parties: list[Any] = [
+            party
+            async for party in contract_party_model.objects.filter(
                 contract_id=contract_id,
                 role="OPPOSING",
-            ).select_related("client")
-        )
+            ).select_related("client").aiterator()
+        ]
         conflict_parties: list[ConflictPartyInfo] = []
         for party in opposing_parties:
             c = party.client
@@ -241,7 +239,7 @@ class ScriptExecutorService:
             account=str(credential.account),
             password=str(credential.password),
         )
-        script.run(
+        await script.run(
             clients,
             case_info=case_info,
             conflict_parties=conflict_parties,

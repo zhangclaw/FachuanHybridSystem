@@ -5,6 +5,8 @@ import uuid
 from pathlib import Path
 from typing import Any
 
+from django.conf import settings
+from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import UploadedFile
 from django.db import transaction
 from django.db.models import Q
@@ -21,6 +23,7 @@ from apps.batch_printing.services.execution import MacPrintExecutorService, Rule
 from apps.batch_printing.services.job.file_prepare_service import FilePrepareService
 from apps.batch_printing.services.preset import PresetDiscoveryService
 from apps.batch_printing.services.storage import BatchPrintStorage
+from apps.core.constants import LARGE_FILE_MAX_SIZE
 from apps.core.dependencies.core import build_task_submission_service
 from apps.core.exceptions import NotFoundError, ValidationException
 from apps.core.services.storage_service import normalize_to_media_rel, sanitize_upload_filename
@@ -28,7 +31,7 @@ from apps.core.services.storage_service import normalize_to_media_rel, sanitize_
 logger = logging.getLogger("apps.batch_printing")
 
 _ALLOWED_SUFFIX = {".pdf", ".docx"}
-_MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB
+_MAX_FILE_SIZE = LARGE_FILE_MAX_SIZE
 
 
 class BatchPrintJobService:
@@ -94,10 +97,9 @@ class BatchPrintJobService:
                     )
 
                 source_path = storage.source_file_path(order=index, filename=original_name)
-                source_path.parent.mkdir(parents=True, exist_ok=True)
-                with source_path.open("wb") as fp:
-                    for chunk in upload.chunks():
-                        fp.write(chunk)
+                rel_path = f"batch_printing/jobs/{storage._job_id}/source/{source_path.name}"
+                saved_name = default_storage.save(rel_path, upload)
+                source_path = Path(settings.MEDIA_ROOT) / saved_name
 
                 relpath = normalize_to_media_rel(source_path.as_posix())
                 file_type = BatchPrintFileType.PDF if suffix == ".pdf" else BatchPrintFileType.DOCX
@@ -254,8 +256,15 @@ class BatchPrintJobService:
         success = 0
         failed = 0
 
-        for item in items:
-            job.refresh_from_db(fields=["cancel_requested"])
+        total = len(items)
+        _CANCEL_CHECK_INTERVAL = 10
+        _PROGRESS_UPDATE_INTERVAL = 10
+
+        for index, item in enumerate(items):
+            # Throttle cancel check: every N items instead of every item
+            if index % _CANCEL_CHECK_INTERVAL == 0:
+                job.refresh_from_db(fields=["cancel_requested"])
+
             if job.cancel_requested:
                 BatchPrintItem.objects.filter(id=item.id, status=BatchPrintItemStatus.PENDING).update(
                     status=BatchPrintItemStatus.CANCELLED,
@@ -296,13 +305,16 @@ class BatchPrintJobService:
                 logger.exception("batch_print_item_failed", extra={"job_id": str(job.id), "item_id": item.id})
 
             processed += 1
-            progress = int((processed / max(1, len(items))) * 100)
-            BatchPrintJob.objects.filter(id=job.id).update(
-                processed_count=processed,
-                success_count=success,
-                failed_count=failed,
-                progress=progress,
-            )
+
+            # Batch progress update: every N items or on the last item
+            if index % _PROGRESS_UPDATE_INTERVAL == 0 or index == total - 1:
+                progress = int((processed / max(1, total)) * 100)
+                BatchPrintJob.objects.filter(id=job.id).update(
+                    processed_count=processed,
+                    success_count=success,
+                    failed_count=failed,
+                    progress=progress,
+                )
 
         job.refresh_from_db(fields=["cancel_requested"])
         if job.cancel_requested:

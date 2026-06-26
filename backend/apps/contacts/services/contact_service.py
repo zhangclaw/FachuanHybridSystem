@@ -3,12 +3,15 @@
 from __future__ import annotations
 
 import logging
+import operator
+from functools import reduce
 from typing import Any, cast
 
 from django.db import transaction
-from django.db.models import Count, QuerySet
+from django.db.models import Count, Q, QuerySet
 
 from apps.contacts.models import CaseContact
+from apps.contacts.schemas.contact_schemas import CaseContactUpdate
 from apps.core.exceptions import NotFoundError
 from apps.core.security import DjangoPermsMixin
 
@@ -92,8 +95,9 @@ class CaseContactService(DjangoPermsMixin):
                 errors={"contact_id": f"ID 为 {contact_id} 的工作人员不存在"},
             ) from None
 
+        allowed_keys = CaseContactUpdate.model_fields.keys()
         for key, value in data.items():
-            if hasattr(contact, key):
+            if key in allowed_keys:
                 setattr(contact, key, value)
         contact.save()
 
@@ -135,8 +139,12 @@ class CaseContactService(DjangoPermsMixin):
         court: str | None = None,
         role: str | None = None,
         limit: int = 20,
+        *,
+        user: Any | None = None,
+        perm_open_access: bool = False,
     ) -> list[dict[str, Any]]:
-        """跨案件搜索工作人员（公共接口，无需认证）"""
+        """跨案件搜索工作人员（需认证）"""
+        self.ensure_admin(user, perm_open_access=perm_open_access)
         qs = CaseContact.objects.select_related("authority")
 
         if q:
@@ -146,7 +154,7 @@ class CaseContactService(DjangoPermsMixin):
         if role:
             qs = qs.filter(role=role)
 
-        results = cast(
+        grouped: list[dict[str, Any]] = cast(
             list[dict[str, Any]],
             list(
                 qs.values("authority__name", "name", "role")
@@ -155,40 +163,65 @@ class CaseContactService(DjangoPermsMixin):
             ),
         )
 
-        # 为每组结果收集 case_ids
-        grouped: list[dict[str, Any]] = []
-        for row in results:
-            case_ids = list(
-                CaseContact.objects.filter(
-                    name=row["name"],
-                    role=row["role"],
-                    authority__name=row["authority__name"],
-                )
-                .values_list("case_id", flat=True)
-                .distinct()
+        if not grouped:
+            return []
+
+        # Build a single Q filter covering all (name, role, authority__name) combos
+        combo_q = reduce(
+            operator.or_,
+            [
+                Q(name=r["name"], role=r["role"], authority__name=r["authority__name"])
+                for r in grouped
+            ],
+        )
+
+        # Batch query 1: collect all case_ids per group
+        all_contacts = (
+            CaseContact.objects.filter(combo_q)
+            .values("name", "role", "authority__name", "case_id")
+            .distinct()
+        )
+        case_id_map: dict[tuple[str, str, str], list[int]] = {}
+        for cc in all_contacts:
+            key: tuple[str, str, str] = (
+                cc["name"],
+                cc["role"],
+                cc["authority__name"] or "",
             )
-            # 获取最新的联系信息
-            latest = (
-                CaseContact.objects.filter(
-                    name=row["name"],
-                    role=row["role"],
-                    authority__name=row["authority__name"],
-                )
-                .select_related("authority")
-                .order_by("-updated_at")
-                .first()
-            )
-            grouped.append(
+            case_id_map.setdefault(key, []).append(cc["case_id"])
+
+        # Batch query 2: fetch latest contact per group (one query, keep first per group)
+        latest_qs = (
+            CaseContact.objects.filter(combo_q)
+            .select_related("authority")
+            .order_by("name", "role", "authority__name", "-updated_at")
+        )
+        latest_map: dict[tuple[str, str, str], CaseContact] = {}
+        for contact in latest_qs:
+            auth_name: str = (contact.authority.name or "") if contact.authority else ""
+            key = (contact.name, contact.role, auth_name)
+            if key not in latest_map:
+                latest_map[key] = contact
+
+        # Assemble final results
+        results: list[dict[str, Any]] = []
+        for row in grouped:
+            key = (row["name"], row["role"], row["authority__name"] or "")
+            latest = latest_map.get(key)
+            role_display = latest.get_role_display() if latest is not None else None
+            phone = latest.phone if latest is not None else None
+            address = latest.address if latest is not None else None
+            results.append(
                 {
                     "authority_name": row["authority__name"],
                     "name": row["name"],
                     "role": row["role"],
-                    "role_display": latest.get_role_display() if latest else None,
-                    "phone": latest.phone if latest else None,
-                    "address": latest.address if latest else None,
+                    "role_display": role_display,
+                    "phone": phone,
+                    "address": address,
                     "occurrence_count": row["occurrence_count"],
-                    "case_ids": case_ids,
+                    "case_ids": case_id_map.get(key, []),
                 }
             )
 
-        return grouped
+        return results

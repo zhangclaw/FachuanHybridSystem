@@ -2,18 +2,13 @@
 
 Covers: parse, extract_download_links, _sanitize_link, _is_valid_download_link,
 extract_verification_code, extract_case_numbers, extract_party_names,
-_find_existing_clients_in_sms, _extract_party_names_with_ollama,
-_extract_party_names_with_regex, _collect_company_names, _collect_versus_patterns,
-_collect_name_contexts, _filter_parties, _is_document_delivery_without_parties,
+_find_existing_clients_in_sms,
 lazy-loaded properties.
 """
 
 from __future__ import annotations
 
-import json
-from unittest.mock import MagicMock, patch, PropertyMock
-
-import pytest
+from unittest.mock import MagicMock, patch
 
 from apps.automation.models import CourtSMSType
 from apps.automation.services.sms.sms_parser_service import SMSParseResult, SMSParserService
@@ -353,191 +348,6 @@ class TestFindExistingClientsInSMS:
 
 
 # ---------------------------------------------------------------------------
-# _extract_party_names_with_ollama
-# ---------------------------------------------------------------------------
-
-
-class TestExtractPartyNamesWithOllama:
-    def setup_method(self):
-        self.service = SMSParserService(
-            ollama_model="test-model",
-            ollama_base_url="http://localhost:11434",
-            llm_service=MagicMock(),
-        )
-
-    def test_success(self):
-        response = MagicMock()
-        response.content = '{"parties": ["张三", "李四"]}'
-        self.service._llm_service.chat.return_value = response
-        # The prompt template contains literal braces in JSON examples which
-        # conflict with str.format(). Patch to a safe template for testing.
-        safe_prompt = "Extract parties from: {content}"
-        with patch.object(type(self.service), "PARTY_EXTRACTION_PROMPT", safe_prompt):
-            result = self.service._extract_party_names_with_ollama("张三与李四纠纷")
-        assert result == ["张三", "李四"]
-
-    def test_llm_error_returns_empty(self):
-        from apps.core.llm.exceptions import LLMError
-        self.service._llm_service.chat.side_effect = LLMError("fail")
-        safe_prompt = "Extract: {content}"
-        with patch.object(type(self.service), "PARTY_EXTRACTION_PROMPT", safe_prompt):
-            result = self.service._extract_party_names_with_ollama("content")
-        assert result == []
-
-    def test_invalid_json_returns_empty(self):
-        response = MagicMock()
-        response.content = "not json"
-        self.service._llm_service.chat.return_value = response
-        safe_prompt = "Extract: {content}"
-        with patch.object(type(self.service), "PARTY_EXTRACTION_PROMPT", safe_prompt):
-            result = self.service._extract_party_names_with_ollama("content")
-        assert result == []
-
-    def test_json_no_parties_key(self):
-        response = MagicMock()
-        response.content = '{"other": "data"}'
-        self.service._llm_service.chat.return_value = response
-        safe_prompt = "Extract: {content}"
-        with patch.object(type(self.service), "PARTY_EXTRACTION_PROMPT", safe_prompt):
-            result = self.service._extract_party_names_with_ollama("content")
-        assert result == []
-
-    def test_parties_not_list(self):
-        response = MagicMock()
-        response.content = '{"parties": "not a list"}'
-        self.service._llm_service.chat.return_value = response
-        safe_prompt = "Extract: {content}"
-        with patch.object(type(self.service), "PARTY_EXTRACTION_PROMPT", safe_prompt):
-            result = self.service._extract_party_names_with_ollama("content")
-        assert result == []
-
-
-# ---------------------------------------------------------------------------
-# _extract_party_names_with_regex
-# ---------------------------------------------------------------------------
-
-
-class TestExtractPartyNamesWithRegex:
-    def setup_method(self):
-        self.service = SMSParserService()
-
-    def test_company_name(self):
-        result = self.service._extract_party_names_with_regex("广州市天河科技有限公司与张三纠纷")
-        assert any("广州市天河科技有限公司" in r for r in result)
-
-    def test_versus_pattern(self):
-        result = self.service._extract_party_names_with_regex("收到张三与李四的合同纠纷案件通知")
-        names = [n for n in result if n in ("张三", "李四")]
-        assert len(names) >= 1
-
-    def test_empty_content(self):
-        result = self.service._extract_party_names_with_regex("")
-        assert result == []
-
-
-# ---------------------------------------------------------------------------
-# _filter_parties
-# ---------------------------------------------------------------------------
-
-
-class TestFilterParties:
-    def setup_method(self):
-        self.service = SMSParserService()
-
-    def test_valid_party(self):
-        result = self.service._filter_parties(["张三"])
-        assert "张三" in result
-
-    def test_too_short(self):
-        result = self.service._filter_parties(["张"])
-        assert result == []
-
-    def test_too_long(self):
-        result = self.service._filter_parties(["张" * 31])
-        assert result == []
-
-    def test_contains_exclude_keyword(self):
-        result = self.service._filter_parties(["人民法院"])
-        assert result == []
-
-    def test_non_chinese_chars(self):
-        result = self.service._filter_parties(["abc"])
-        assert result == []
-
-    def test_invalid_fragment(self):
-        result = self.service._filter_parties(["有限公司"])
-        assert result == []
-
-    def test_ends_with_de(self):
-        result = self.service._filter_parties(["张三的"])
-        assert result == []
-
-    def test_starts_with_de(self):
-        result = self.service._filter_parties(["的张三"])
-        assert result == []
-
-    def test_with_digits(self):
-        result = self.service._filter_parties(["公司123"])
-        assert "公司123" in result
-
-
-# ---------------------------------------------------------------------------
-# _collect_company_names / _collect_versus_patterns / _collect_name_contexts
-# ---------------------------------------------------------------------------
-
-
-class TestCollectMethods:
-    def setup_method(self):
-        self.service = SMSParserService()
-
-    def test_collect_company_names(self):
-        parties = []
-        self.service._collect_company_names("广州天河科技有限公司", parties)
-        assert any("有限公司" in p for p in parties)
-
-    def test_collect_versus_patterns(self):
-        parties = []
-        self.service._collect_versus_patterns("张三诉李四案件", parties)
-        assert any(p in ("张三", "李四") for p in parties)
-
-    def test_collect_name_contexts(self):
-        parties = []
-        self.service._collect_name_contexts("当事人：张三", parties)
-        assert "张三" in parties
-
-    def test_collect_name_contexts_applicant(self):
-        parties = []
-        self.service._collect_name_contexts("申请人：李四", parties)
-        assert "李四" in parties
-
-
-# ---------------------------------------------------------------------------
-# _is_document_delivery_without_parties
-# ---------------------------------------------------------------------------
-
-
-class TestIsDocumentDeliveryWithoutParties:
-    def setup_method(self):
-        self.service = SMSParserService(
-            client_service=MagicMock(),
-            party_matching_service=MagicMock(),
-            party_candidate_extractor=MagicMock(),
-        )
-
-    @patch("apps.automation.services.sms.sms_parser_service.TextUtils")
-    def test_true_when_delivery_sms(self, mock_utils):
-        mock_utils.extract_case_numbers.return_value = ["(2025)粤01民初1号"]
-        content = "请查收送达文书 https://sd.gdcourts.gov.cn/v3/dzsd/ABC123 （2025）粤01民初1号"
-        result = self.service._is_document_delivery_without_parties(content)
-        assert result is True
-
-    def test_false_when_has_party_indicators(self):
-        content = "请查收送达文书 https://sd.gdcourts.gov.cn/v3/dzsd/ABC123 原告张三"
-        result = self.service._is_document_delivery_without_parties(content)
-        assert result is False
-
-
-# ---------------------------------------------------------------------------
 # parse (integration of all parts)
 # ---------------------------------------------------------------------------
 
@@ -549,13 +359,6 @@ class TestParse:
             party_matching_service=MagicMock(),
             party_candidate_extractor=MagicMock(),
         )
-
-    def test_document_delivery_type(self):
-        self.service._find_existing_clients_in_sms = MagicMock(return_value=[])
-        content = "请查收文书 https://sd.gdcourts.gov.cn/v3/dzsd/ABC123"
-        result = self.service.parse(content)
-        assert result.sms_type == CourtSMSType.DOCUMENT_DELIVERY
-        assert result.has_valid_download_link is True
 
     def test_filing_notification_type(self):
         self.service._find_existing_clients_in_sms = MagicMock(return_value=[])

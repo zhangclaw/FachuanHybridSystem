@@ -8,6 +8,15 @@ from datetime import timedelta
 from unittest.mock import MagicMock, patch
 
 import pytest
+
+try:
+    from plugins import has_court_login_plugin
+    _HAS_LOGIN = has_court_login_plugin()
+except ImportError:
+    _HAS_LOGIN = False
+
+pytestmark = pytest.mark.skipif(not _HAS_LOGIN, reason="court_login plugin not installed")
+
 from django.utils import timezone
 
 from apps.automation.models import TokenAcquisitionHistory, TokenAcquisitionStatus
@@ -74,7 +83,7 @@ class TestCleanupOldRecords:
         assert result == 1
         assert TokenAcquisitionHistory.objects.count() == 1
 
-    @patch("apps.automation.services.admin.token_acquisition_history_admin_service.TokenAcquisitionHistory")
+    @patch("plugins.court_automation.token_admin.token_acquisition_history_admin_service.TokenAcquisitionHistory")
     def test_exception_wraps_in_business_exception(self, mock_model, svc, db):
         mock_model.objects.filter.return_value.count.side_effect = RuntimeError("db error")
         with pytest.raises(BusinessException):

@@ -12,9 +12,14 @@ from typing import Any
 from unittest.mock import MagicMock
 
 import pytest
+try:
+    from plugins.court_automation import filing  # noqa: F401
+except ImportError:
+    pytest.skip("court_automation plugin not installed", allow_module_level=True)
 
-from apps.automation.services.insurance.preservation_quote_service import PreservationQuoteService
-from apps.automation.services.insurance.exceptions import ValidationError
+
+from plugins.court_automation.preservation_quote.service import PreservationQuoteService
+from plugins.court_automation.preservation_quote.exceptions import ValidationError
 
 
 # ---------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-"""Tests for apps.automation.services.insurance.preservation_quote_service_adapter."""
+"""Tests for plugins.court_automation.preservation_quote.service_adapter."""
 
 from __future__ import annotations
 
@@ -6,8 +6,13 @@ from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 import pytest
+try:
+    from plugins.court_automation import filing  # noqa: F401
+except ImportError:
+    pytest.skip("court_automation plugin not installed", allow_module_level=True)
 
-from apps.automation.services.insurance.preservation_quote_service_adapter import (
+
+from plugins.court_automation.preservation_quote.service_adapter import (
     EnhancedPreservationQuoteService,
     PreservationQuoteServiceAdapter,
 )

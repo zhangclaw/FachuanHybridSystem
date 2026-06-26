@@ -5,6 +5,20 @@ from __future__ import annotations
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
+import pytest
+
+try:
+    from apps.automation.services.scraper.core.captcha_recognizer import (
+        ManualCaptchaRecognizer,
+        get_captcha_recognizer,
+        FileBasedCaptchaRecognizer,
+    )
+    _HAS_CAPTCHA = ManualCaptchaRecognizer is not None
+except ImportError:
+    _HAS_CAPTCHA = False
+
+pytestmark = pytest.mark.skipif(not _HAS_CAPTCHA, reason="captcha_recognizer plugin not installed")
+
 
 # ======================================================================
 # ManualCaptchaRecognizer
@@ -39,8 +53,9 @@ class TestManualCaptchaRecognizer:
 
         r = self._make_recognizer(task=task, timeout=5, poll_interval=0.01)
 
-        with patch("apps.automation.services.scraper.core.captcha_recognizer.Path") as MockPath, \
-             patch("apps.automation.services.scraper.core.captcha_recognizer.time") as mock_time:
+        with patch("plugins.court_automation.login.captcha_recognizer.Path") as MockPath, \
+             patch("plugins.court_automation.login.captcha_recognizer.time") as mock_time, \
+             patch("django.core.files.storage.default_storage") as mock_storage:
             mock_time.time.return_value = 1000.0
             mock_time.sleep = MagicMock()
 
@@ -49,6 +64,7 @@ class TestManualCaptchaRecognizer:
             mock_captcha_dir.mkdir = MagicMock()
             mock_captcha_dir.__truediv__ = MagicMock(return_value=mock_captcha_dir)
             mock_captcha_dir.write_bytes = MagicMock()
+            mock_storage.save.return_value = "automation/captcha_pending/99_test.png"
 
             with patch("django.conf.settings.MEDIA_ROOT", "/media"):
                 result = r.recognize(b"fake_captcha_image")
@@ -65,12 +81,14 @@ class TestManualCaptchaRecognizer:
 
         r = self._make_recognizer(task=task, timeout=1, poll_interval=0.1)
 
-        with patch("apps.automation.services.scraper.core.captcha_recognizer.Path") as MockPath:
+        with patch("plugins.court_automation.login.captcha_recognizer.Path") as MockPath, \
+             patch("django.core.files.storage.default_storage") as mock_storage:
             mock_file = MagicMock()
             MockPath.return_value.__truediv__ = MagicMock(return_value=MagicMock(
                 mkdir=MagicMock(),
                 __truediv__=MagicMock(return_value=mock_file),
             ))
+            mock_storage.save.return_value = "automation/captcha_pending/77_test.png"
 
             with patch("django.conf.settings.MEDIA_ROOT", "/media"):
                 result = r.recognize(b"img")
@@ -86,11 +104,13 @@ class TestManualCaptchaRecognizer:
 
         r = self._make_recognizer(task=task, timeout=5, poll_interval=0.01)
 
-        with patch("apps.automation.services.scraper.core.captcha_recognizer.Path") as MockPath:
+        with patch("plugins.court_automation.login.captcha_recognizer.Path") as MockPath, \
+             patch("django.core.files.storage.default_storage") as mock_storage:
             MockPath.return_value.__truediv__ = MagicMock(return_value=MagicMock(
                 mkdir=MagicMock(),
                 __truediv__=MagicMock(return_value=MagicMock(write_bytes=MagicMock())),
             ))
+            mock_storage.save.return_value = "automation/captcha_pending/1_test.png"
             with patch("django.conf.settings.MEDIA_ROOT", "/media"):
                 result = r.recognize(b"img")
 

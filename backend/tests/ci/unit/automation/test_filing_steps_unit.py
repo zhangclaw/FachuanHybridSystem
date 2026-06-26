@@ -5,6 +5,11 @@ from __future__ import annotations
 from types import SimpleNamespace
 
 import pytest
+try:
+    from plugins.court_automation import filing  # noqa: F401
+except ImportError:
+    pytest.skip("court_automation plugin not installed", allow_module_level=True)
+
 
 
 class TestExtractCourtKeyword:
@@ -17,7 +22,7 @@ class TestExtractCourtKeyword:
         ("广州互联网法院", "互联网法"),  # 无区/县时返回原名
     ])
     def test_extract_court_keyword(self, name, expected):
-        from apps.automation.services.scraper.sites.court_zxfw_filing.filing_steps import FilingStepsMixin
+        from plugins.court_automation.filing.playwright_filing.filing_steps import FilingStepsMixin
         result = FilingStepsMixin._extract_court_keyword(name)
         assert expected in result
 
@@ -25,7 +30,7 @@ class TestExtractCourtKeyword:
 class TestInferUploadSlotByText:
 
     def test_civil_slot_0_complaint(self):
-        from apps.automation.services.scraper.sites.court_zxfw_filing.filing_steps import FilingStepsMixin
+        from plugins.court_automation.filing.playwright_filing.filing_steps import FilingStepsMixin
         mixin = FilingStepsMixin.__new__(FilingStepsMixin)
         mixin.CIVIL_UPLOAD_SLOT_KEYWORDS = [
             ("0", ("民事起诉状", "起诉状")),
@@ -38,7 +43,7 @@ class TestInferUploadSlotByText:
         assert result == "0"
 
     def test_civil_slot_1_identity(self):
-        from apps.automation.services.scraper.sites.court_zxfw_filing.filing_steps import FilingStepsMixin
+        from plugins.court_automation.filing.playwright_filing.filing_steps import FilingStepsMixin
         mixin = FilingStepsMixin.__new__(FilingStepsMixin)
         mixin.CIVIL_UPLOAD_SLOT_KEYWORDS = [
             ("0", ("民事起诉状",)),
@@ -51,14 +56,14 @@ class TestInferUploadSlotByText:
         assert result == "1"
 
     def test_empty_text_returns_none(self):
-        from apps.automation.services.scraper.sites.court_zxfw_filing.filing_steps import FilingStepsMixin
+        from plugins.court_automation.filing.playwright_filing.filing_steps import FilingStepsMixin
         mixin = FilingStepsMixin.__new__(FilingStepsMixin)
         mixin.CIVIL_UPLOAD_SLOT_KEYWORDS = []
         mixin.EXEC_UPLOAD_SLOT_KEYWORDS = []
         assert mixin._infer_upload_slot_by_text(container_text="", is_execution=False) is None
 
     def test_no_match_returns_none(self):
-        from apps.automation.services.scraper.sites.court_zxfw_filing.filing_steps import FilingStepsMixin
+        from plugins.court_automation.filing.playwright_filing.filing_steps import FilingStepsMixin
         mixin = FilingStepsMixin.__new__(FilingStepsMixin)
         mixin.CIVIL_UPLOAD_SLOT_KEYWORDS = [("0", ("起诉状",))]
         mixin.EXEC_UPLOAD_SLOT_KEYWORDS = []
@@ -67,7 +72,7 @@ class TestInferUploadSlotByText:
         ) is None
 
     def test_exec_uses_exec_keywords(self):
-        from apps.automation.services.scraper.sites.court_zxfw_filing.filing_steps import FilingStepsMixin
+        from plugins.court_automation.filing.playwright_filing.filing_steps import FilingStepsMixin
         mixin = FilingStepsMixin.__new__(FilingStepsMixin)
         mixin.CIVIL_UPLOAD_SLOT_KEYWORDS = []
         mixin.EXEC_UPLOAD_SLOT_KEYWORDS = [("0", ("执行申请书",))]

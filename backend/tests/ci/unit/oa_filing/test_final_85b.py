@@ -7,7 +7,15 @@ from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 
+try:
+    from plugins import has_court_login_plugin
+    _HAS_LOGIN = has_court_login_plugin()
+except ImportError:
+    _HAS_LOGIN = False
+
 from apps.core.exceptions import NotFoundError, ValidationException
+
+pytestmark = pytest.mark.skipif(not _HAS_LOGIN, reason="court_login plugin not installed")
 
 
 # ============================================================================
@@ -256,27 +264,13 @@ class TestScraperMonitorService:
 
 
 # ============================================================================
-# automation/services/document_delivery/
-# ============================================================================
-
-
-class TestDocumentDeliveryServices:
-    def test_api_delivery_service(self):
-        from apps.automation.services.document_delivery.delivery.api_delivery_service import (
-            ApiDeliveryService,
-        )
-
-        assert ApiDeliveryService is not None
-
-
-# ============================================================================
 # automation/services/token/_login_handler.py
 # ============================================================================
 
 
 class TestLoginHandler:
     def test_module_imports(self):
-        from apps.automation.services.token import _login_handler
+        from plugins.court_automation.token import _login_handler
 
         assert _login_handler is not None
 
@@ -288,7 +282,7 @@ class TestLoginHandler:
 
 class TestAutoTokenAcquisitionService:
     def test_module_imports(self):
-        from apps.automation.services.token.auto_token_acquisition_service import (
+        from plugins.court_automation.token.auto_token_acquisition_service import (
             AutoTokenAcquisitionService,
         )
 

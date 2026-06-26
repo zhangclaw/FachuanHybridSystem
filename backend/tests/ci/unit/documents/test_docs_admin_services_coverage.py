@@ -6,12 +6,21 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+try:
+    from plugins import has_message_hub_plugin
+    _HAS_MH = has_message_hub_plugin()
+except ImportError:
+    _HAS_MH = False
+
+pytestmark = pytest.mark.skipif(not _HAS_MH, reason="message_hub plugin not installed")
+
+
 
 # --- document_template_admin ---
 
 class TestDocumentTemplateAdmin:
     def test_get_template_service(self):
-        from apps.documents.admin.document_template_admin import _get_template_service
+        from apps.documents.admin.template_admin_display_mixin import _get_template_service
 
         with patch("apps.documents.services.template.template_service.DocumentTemplateService") as mock_cls:
             mock_cls.return_value = MagicMock()
@@ -19,24 +28,24 @@ class TestDocumentTemplateAdmin:
             assert result is not None
 
     def test_to_django_relative_path(self, tmp_path):
-        from apps.documents.admin.document_template_admin import _to_django_relative_path
+        from apps.documents.admin.template_admin_views_mixin import _to_django_relative_path
 
         result = _to_django_relative_path(tmp_path / "test.txt")
         assert isinstance(result, str)
 
     def test_normalize_private_docx_root_empty(self):
-        from apps.documents.admin.document_template_admin import _normalize_private_docx_root
+        from apps.documents.admin.template_admin_views_mixin import _normalize_private_docx_root
 
         assert _normalize_private_docx_root("") == ""
 
     def test_normalize_private_docx_root_invalid(self):
-        from apps.documents.admin.document_template_admin import _normalize_private_docx_root
+        from apps.documents.admin.template_admin_views_mixin import _normalize_private_docx_root
 
         with pytest.raises(ValueError, match="不存在"):
             _normalize_private_docx_root("/nonexistent/path/that/does/not/exist")
 
     def test_normalize_private_docx_root_valid(self, tmp_path):
-        from apps.documents.admin.document_template_admin import _normalize_private_docx_root
+        from apps.documents.admin.template_admin_views_mixin import _normalize_private_docx_root
 
         result = _normalize_private_docx_root(str(tmp_path))
         assert tmp_path.exists()
@@ -275,11 +284,11 @@ class TestExpressQuery:
 
 class TestMessageHub:
     def test_imap_fetcher_import(self):
-        from apps.message_hub.services.imap.imap_fetcher import ImapFetcher
+        from plugins.message_hub.services.imap.imap_fetcher import ImapFetcher
 
         assert ImapFetcher is not None
 
     def test_inbox_message_admin_import(self):
-        from apps.message_hub.admin.inbox_message_admin import InboxMessageAdmin
+        from plugins.message_hub.admin.inbox_message_admin import InboxMessageAdmin
 
         assert InboxMessageAdmin is not None

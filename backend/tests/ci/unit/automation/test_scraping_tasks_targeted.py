@@ -8,6 +8,11 @@ from threading import Thread
 from unittest.mock import MagicMock, patch
 
 import pytest
+try:
+    from plugins.court_automation import filing  # noqa: F401
+except ImportError:
+    pytest.skip("court_automation plugin not installed", allow_module_level=True)
+
 
 from apps.automation.tasks.scraping_tasks import (
     _run_coroutine_sync,
@@ -114,7 +119,7 @@ class TestExecutePreservationQuoteTask:
             assert result["status"] == "skipped"
 
     def test_token_error(self):
-        from apps.automation.services.insurance.exceptions import TokenError
+        from plugins.court_automation.preservation_quote.exceptions import TokenError
 
         with patch("apps.automation.models.PreservationQuote") as MockQuote:
             MockQuote.objects.filter.return_value.exists.return_value = True

@@ -6,6 +6,20 @@ from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pytest
+
+try:
+    from plugins import has_court_login_plugin
+    _HAS_LOGIN = has_court_login_plugin()
+except ImportError:
+    _HAS_LOGIN = False
+
+pytestmark = pytest.mark.skipif(not _HAS_LOGIN, reason="court_login plugin not installed")
+
+try:
+    from plugins.court_automation import filing  # noqa: F401
+except ImportError:
+    pytest.skip("court_automation plugin not installed", allow_module_level=True)
+
 from django.utils import timezone
 
 from apps.core.exceptions import BusinessException, ValidationException
@@ -85,7 +99,7 @@ class TestPreservationQuoteAdminService:
     """Tests for PreservationQuoteAdminService."""
 
     def _make_service(self):
-        from apps.automation.services.admin.preservation_quote_admin_service import PreservationQuoteAdminService
+        from plugins.court_automation.preservation_quote.admin_service import PreservationQuoteAdminService
         return PreservationQuoteAdminService()
 
     @pytest.mark.django_db

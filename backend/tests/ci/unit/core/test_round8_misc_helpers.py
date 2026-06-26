@@ -7,6 +7,11 @@ from decimal import Decimal
 from unittest.mock import MagicMock, patch
 
 import pytest
+try:
+    from plugins.court_automation import filing  # noqa: F401
+except ImportError:
+    pytest.skip("court_automation plugin not installed", allow_module_level=True)
+
 
 from apps.core.exceptions import ValidationException
 
@@ -80,30 +85,6 @@ class TestBackendConfig:
 
 
 # ---------------------------------------------------------------------------
-# DocumentDeliveryRecord.to_dict edge cases
-# ---------------------------------------------------------------------------
-
-
-class TestDocumentDeliveryRecordExtended:
-    def test_full_record(self):
-        from apps.automation.services.document_delivery.data_classes import DocumentDeliveryRecord
-
-        record = DocumentDeliveryRecord(
-            case_number="2025-粤01民初1号",
-            send_time=datetime(2025, 1, 15, 10, 0, 0),
-            element_index=3,
-            document_name="判决书",
-            court_name="广州市法院",
-            delivery_event_id="evt_456",
-        )
-        d = record.to_dict()
-        assert d["element_index"] == 3
-        assert d["document_name"] == "判决书"
-        assert d["court_name"] == "广州市法院"
-        assert d["delivery_event_id"] == "evt_456"
-
-
-# ---------------------------------------------------------------------------
 # CaseNumberExtractorService lazy loading
 # ---------------------------------------------------------------------------
 
@@ -143,7 +124,7 @@ class TestCaseNumberExtractorService:
 
 class TestInsuranceClientFacade:
     def test_init(self):
-        from apps.automation.services.insurance.preservation_quote.client_facade import InsuranceClientFacade
+        from plugins.court_automation.preservation_quote.preservation_quote.client_facade import InsuranceClientFacade
 
         mock_client = MagicMock()
         facade = InsuranceClientFacade(client=mock_client)

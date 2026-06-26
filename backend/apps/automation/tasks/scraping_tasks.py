@@ -44,12 +44,19 @@ def _get_scraper_map() -> dict[str, type[Any]]:
     延迟加载爬虫类映射，避免循环导入
     """
     from ..models import ScraperTaskType
-    from ..services.scraper.scrapers import CourtDocumentScraper, CourtFilingScraper
+    from ..services.scraper.scrapers import CourtDocumentScraper
 
-    return {
-        ScraperTaskType.COURT_DOCUMENT: CourtDocumentScraper,
-        ScraperTaskType.COURT_FILING: CourtFilingScraper,
-    }
+    try:
+        from plugins.court_automation.filing.playwright_filing.service import (
+            CourtZxfwFilingService as CourtFilingScraper,
+        )
+    except ImportError:
+        CourtFilingScraper = None
+
+    _scraper_map: dict[str, type[Any]] = {ScraperTaskType.COURT_DOCUMENT: CourtDocumentScraper}
+    if CourtFilingScraper is not None:
+        _scraper_map[ScraperTaskType.COURT_FILING] = CourtFilingScraper
+    return _scraper_map
 
 
 def check_stuck_tasks() -> None:
@@ -231,9 +238,14 @@ def execute_preservation_quote_task(quote_id: int) -> dict[str, Any]:
         quote_id: 询价任务 ID
     """
     from ..models import PreservationQuote, QuoteStatus
-    from ..services.insurance.court_insurance_client import CourtInsuranceClient
-    from ..services.insurance.exceptions import TokenError
-    from ..services.insurance.preservation_quote_service import PreservationQuoteService
+
+    try:
+        from plugins.court_automation.preservation_quote.service import PreservationQuoteService
+        from plugins.court_automation.preservation_quote.court_insurance_client import CourtInsuranceClient
+        from plugins.court_automation.preservation_quote.exceptions import TokenError
+    except ImportError:
+        logger.error("court_automation plugin not installed — cannot execute preservation quote task")
+        return {"quote_id": quote_id, "status": "error", "message": "plugin not installed"}
     from ..services.scraper.core.token_service import TokenService
 
     logger.info("🚀 开始执行询价任务 #%s", quote_id)
@@ -245,9 +257,9 @@ def execute_preservation_quote_task(quote_id: int) -> dict[str, Any]:
 
     try:
         token_service = TokenService()
-        insurance_client = CourtInsuranceClient(token_service)  # type: ignore[arg-type]
+        insurance_client = CourtInsuranceClient(token_service)
         quote_service = PreservationQuoteService(
-            token_service=token_service,  # type: ignore[arg-type]
+            token_service=token_service,
             insurance_client=insurance_client,
         )
 

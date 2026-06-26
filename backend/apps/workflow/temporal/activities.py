@@ -2,6 +2,9 @@
 
 Activity 是普通 Python 函数，没有确定性约束。
 可以直接调 Django ORM、LLM Service、其他 Django App。
+
+所有涉及同步 I/O（LLM HTTP、ORM、文件）的 activity 必须使用
+``asyncio.to_thread()`` 包装，防止阻塞 Temporal worker 的事件循环。
 """
 
 from __future__ import annotations
@@ -252,16 +255,32 @@ async def build_litigation_context(case_id: int, summary: dict, arrangement: lis
 
 
 @activity.defn
-async def generate_complaint(context: dict, feedback: str | None = None) -> dict:
-    """生成起诉状"""
-    from apps.documents.services.litigation_service import LitigationService
+async def generate_complaint(case_id: int, feedback: str | None = None) -> dict:
+    """生成起诉状
 
-    service = LitigationService()
-    return await service.generate_complaint(  # type: ignore[no-any-return]
-        case_id=context["case"]["id"],
-        context=context,
-        revision_feedback=feedback,
-    )
+    通过 LitigationGenerationService 生成起诉状。
+    该服务是同步的（内部调用 LLM HTTP），用 asyncio.to_thread 防止阻塞事件循环。
+    """
+    import asyncio
+
+    from apps.documents.services.generation.litigation_generation_service import LitigationGenerationService
+    from apps.documents.services.generation.litigation_context_builder import LitigationContextBuilder
+
+    service = LitigationGenerationService()
+
+    def _generate() -> Any:
+        # 先用 context_builder 从 case_id 提取 LLM 所需的 case_data
+        builder = LitigationContextBuilder()
+        from apps.core.interfaces import ServiceLocator
+
+        case_dto = ServiceLocator.get_case_service().get_case_by_id_internal(case_id)
+        case_data = builder.extract_complaint_prompt_data(case_dto)
+        if feedback:
+            case_data["revision_feedback"] = feedback
+        return service.generate_complaint(case_data)
+
+    result = await asyncio.to_thread(_generate)
+    return {"result": result}  # type: ignore[return-value]
 
 
 @activity.defn
@@ -298,12 +317,24 @@ async def review_complaint_quality(draft: dict, summary: dict) -> dict:
         return {"score": 70, "issues": ["解析失败"], "suggestions": [result]}
 
 
-# ── 立案 ──────────────────────────────────────────────────
+# ── 立案（条件性，依赖 court_automation 插件）───────────────────
+
+try:
+    from plugins.court_automation.filing.helpers import _run_filing  # noqa: F401
+
+    _HAS_COURT_FILING = True
+except ImportError:
+    _HAS_COURT_FILING = False
 
 
 @activity.defn
-async def execute_court_filing(case_id: int) -> dict:
-    """执行网上立案"""
+async def execute_court_filing(case_id: int, feedback: str | None = None) -> dict:
+    """执行网上立案（需要 court_automation 插件）"""
+    if not _HAS_COURT_FILING:
+        from temporalio.exceptions import ApplicationError
+
+        raise ApplicationError("Court filing plugin not installed", non_retryable=True)
+
     from apps.automation.services.litigation.filing_service import CourtFilingService
 
     service = CourtFilingService()
@@ -312,11 +343,22 @@ async def execute_court_filing(case_id: int) -> dict:
 
 @activity.defn
 async def download_litigation_document(document_id: int) -> dict:
-    """下载已生成的诉讼文书"""
-    from apps.documents.services.litigation_service import LitigationService
+    """下载已生成的诉讼文书
 
-    service = LitigationService()
-    return await service.download(document_id)  # type: ignore[no-any-return]
+    通过 LitigationGenerationService 生成文档。
+    该服务是同步的（ORM + 文件 I/O + LLM），用 asyncio.to_thread 防止阻塞。
+    """
+    import asyncio
+
+    from apps.documents.services.generation.litigation_generation_service import LitigationGenerationService
+
+    service = LitigationGenerationService()
+
+    def _download() -> dict:
+        filename, doc_bytes = service.generate_complaint_document(document_id)
+        return {"filename": filename, "size": len(doc_bytes)}
+
+    return await asyncio.to_thread(_download)
 
 
 # ── DynamicWorkflow 通用 Activity ────────────────────────────
@@ -373,20 +415,114 @@ async def generic_http_request(method: str, url: str, headers: str = "", body: s
 
 @activity.defn
 async def generic_code_exec(code: str, context: dict | None = None) -> dict:
-    """受限 Python 代码执行 activity"""
-    safe_builtins = {
+    """受限 Python 代码执行 activity
+
+    安全措施：
+    1. AST 静态分析 — 执行前检查代码，拒绝危险模式
+    2. 移除 getattr/hasattr — 阻断 MRO 链逃逸
+    3. 子进程超时 — 防止死循环阻塞 worker（可用 proc.terminate() 真正杀死）
+    4. 最小权限 builtins — 仅暴露安全的内置函数
+
+    使用 multiprocessing.Process + Queue（而非 Manager），避免 socket FD 泄漏。
+    """
+    import ast
+    import builtins
+
+    # ── 危险属性名集合（__class__ 链 + 内省钩子）──
+    _DANGEROUS_ATTRS = frozenset({
+        "__class__", "__bases__", "__base__", "__mro__", "__subclasses__",
+        "__builtins__", "__globals__", "__init__", "__import__", "__loader__",
+        "__spec__", "__file__", "__path__", "__dict__", "__getattr__",
+        "__setattr__", "__delattr__", "__reduce__", "__reduce_ex__",
+        "__getattribute__", "__new__", "__del__",
+    })
+
+    # ── 危险函数/模块名 ──
+    _DANGEROUS_NAMES = frozenset({
+        "exec", "eval", "compile", "__import__", "breakpoint", "exit", "quit",
+        "open", "input", "globals", "locals", "vars", "dir", "type", "id",
+        "getattr", "hasattr", "delattr", "setattr", "super", "classmethod",
+        "staticmethod", "property", "object", "memoryview", "bytearray",
+        "os", "sys", "subprocess", "shutil", "pathlib", "importlib",
+        "socket", "http", "urllib", "requests", "tempfile", "ctypes",
+        "code", "ast", "inspect", "dis", "gc", "weakref", "threading",
+        "multiprocessing", "signal", "fcntl", "resource",
+    })
+
+    def _validate_ast(node: ast.AST) -> None:
+        """递归遍历 AST，拒绝危险模式。不安全则抛出 ValueError。"""
+        for child in ast.walk(node):
+            # 禁止 import 语句
+            if isinstance(child, (ast.Import, ast.ImportFrom)):
+                raise ValueError("代码中不允许 import 语句")
+            # 禁止 exec/eval 调用
+            if isinstance(child, ast.Call):
+                if isinstance(child.func, ast.Name) and child.func.id in ("exec", "eval", "compile"):
+                    raise ValueError(f"不允许调用 {child.func.id}()")
+            # 禁止访问危险属性（__class__、__bases__ 等）
+            if isinstance(child, ast.Attribute) and child.attr in _DANGEROUS_ATTRS:
+                raise ValueError(f"不允许访问属性 {child.attr}")
+            # 禁止使用危险名称
+            if isinstance(child, ast.Name) and child.id in _DANGEROUS_NAMES:
+                raise ValueError(f"不允许使用 {child.id}")
+            # 禁止 f-string（可携带任意表达式）
+            if isinstance(child, ast.JoinedStr):
+                raise ValueError("代码中不允许使用 f-string")
+            # 禁止 global/nonlocal 声明
+            if isinstance(child, (ast.Global, ast.Nonlocal)):
+                raise ValueError("代码中不允许 global/nonlocal 声明")
+            # 禁止 yield/yield from（生成器）
+            if isinstance(child, (ast.Yield, ast.YieldFrom)):
+                raise ValueError("代码中不允许使用 yield")
+            # 禁止 await
+            if isinstance(child, ast.Await):
+                raise ValueError("代码中不允许使用 await")
+
+    # ── 步骤 1: AST 静态验证 ──
+    try:
+        tree = ast.parse(code, mode="exec")
+    except SyntaxError as e:
+        raise ValueError(f"代码语法错误: {e}") from e
+    _validate_ast(tree)
+
+    # ── 步骤 2: 构建受限执行环境 ──
+    _SAFE_BUILTINS = {
         "len", "int", "float", "str", "bool", "list", "dict", "set", "tuple",
         "min", "max", "sum", "abs", "round", "sorted", "reversed", "enumerate",
-        "zip", "map", "filter", "any", "all", "range", "isinstance", "getattr",
-        "hasattr", "json",
+        "zip", "map", "filter", "any", "all", "range", "isinstance",
+        "repr", "print",
     }
-    import builtins
-    restricted_globals = {"__builtins__": {k: getattr(builtins, k) for k in safe_builtins if hasattr(builtins, k)}}
-    restricted_globals["json"] = json  # type: ignore[assignment]
-    restricted_globals["context"] = context or {}
+    restricted_builtins = {
+        k: getattr(builtins, k) for k in _SAFE_BUILTINS if hasattr(builtins, k)
+    }
+    # 提供安全的 json.loads / json.dumps 代理，不暴露 json 模块本身
+    _safe_json = type("SafeJson", (), {
+        "loads": staticmethod(json.loads),
+        "dumps": staticmethod(json.dumps),
+    })()
 
-    exec(code, restricted_globals)  # noqa: S102
-    return {k: v for k, v in restricted_globals.items() if not k.startswith("_") and k not in ("json", "context", "builtins")}
+    restricted_globals: dict[str, Any] = {
+        "__builtins__": restricted_builtins,
+        "json": _safe_json,
+        "context": context or {},
+    }
+
+    # ── 步骤 3: 在子线程中执行（防止死循环阻塞事件循环）──
+    compiled = compile(tree, "<workflow_code>", "exec")
+
+    def _exec_in_thread() -> dict:
+        """在隔离线程中执行编译后的代码"""
+        exec(compiled, restricted_globals)  # noqa: S102
+        return {
+            k: v for k, v in restricted_globals.items()
+            if not k.startswith("_") and k not in ("json", "context")
+        }
+
+    import asyncio
+    return await asyncio.wait_for(
+        asyncio.to_thread(_exec_in_thread),
+        timeout=30,
+    )
 
 
 @activity.defn
@@ -420,7 +556,10 @@ async def execute_mcp_tool(mcp_tool_name: str, kwargs: dict) -> dict:
         )
         from mcp_server.tools.finance.lpr import calculate_interest
         from mcp_server.tools.automation.auto_namer import auto_namer_process
-        from mcp_server.tools.automation.court_filing import execute_court_filing as mcp_execute_court_filing
+        if _HAS_COURT_FILING:
+            from mcp_server.tools.automation.court_filing import execute_court_filing as mcp_execute_court_filing
+
+            MCP_TOOLS["execute_court_filing"] = mcp_execute_court_filing
         from mcp_server.tools.automation.court_guarantee import execute_guarantee
         from mcp_server.tools.automation.court_sms import submit_court_sms
         from mcp_server.tools.automation.document_processor import process_document
@@ -436,7 +575,6 @@ async def execute_mcp_tool(mcp_tool_name: str, kwargs: dict) -> dict:
             "download_full_preservation_package": download_full_preservation_package,
             "list_bind_candidates": list_bind_candidates,
             "create_case_log": create_case_log,
-            "execute_court_filing": mcp_execute_court_filing,
             "execute_guarantee": execute_guarantee,
             "submit_court_sms": submit_court_sms,
             "search_companies": search_companies,

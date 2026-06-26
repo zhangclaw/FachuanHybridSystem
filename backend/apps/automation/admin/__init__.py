@@ -6,11 +6,11 @@ Admin模块主文件
 # 文档处理 Admin
 from .document import DocumentProcessorAdmin
 
-# 文书送达 Admin
-from .document_delivery import DocumentDeliveryScheduleAdmin, DocumentQueryHistoryAdmin
-
-# 财产保全询价 Admin
-from .insurance import PreservationQuoteAdmin
+# 财产保全询价 Admin（已迁移到 plugin）
+try:
+    from plugins.court_automation.preservation_quote.admin import PreservationQuoteAdmin
+except ImportError:
+    pass
 
 # 爬虫 Admin
 from .scraper import CourtDocumentAdmin, QuickDownloadAdmin, ScraperTaskAdmin, TestCourtAdmin
@@ -19,12 +19,15 @@ from .scraper import CourtDocumentAdmin, QuickDownloadAdmin, ScraperTaskAdmin, T
 from .sms import CourtSMSAdmin
 
 # 测试工具 Admin
-from .test_tools_hub import TestToolsHubAdmin
+from .tools_hub_admin import TestToolsHubAdmin
 
-# Token 管理 Admin
-from .token import CourtTokenAdmin
+# Token 管理 Admin（已迁移到 plugin）
+try:
+    from .token import CourtTokenAdmin
+except ImportError:
+    pass
 
-__all__ = [
+_admin_all = [
     # 文档处理
     "DocumentProcessorAdmin",
     # 爬虫
@@ -32,15 +35,13 @@ __all__ = [
     "QuickDownloadAdmin",
     "CourtDocumentAdmin",
     "TestCourtAdmin",
-    # Token 管理
-    "CourtTokenAdmin",
-    # 财产保全询价
-    "PreservationQuoteAdmin",
     # 法院短信
     "CourtSMSAdmin",
-    # 文书送达
-    "DocumentDeliveryScheduleAdmin",
-    "DocumentQueryHistoryAdmin",
     # 测试工具
     "TestToolsHubAdmin",
 ]
+if "PreservationQuoteAdmin" in dir():
+    _admin_all.append("PreservationQuoteAdmin")
+if "CourtTokenAdmin" in dir():
+    _admin_all.append("CourtTokenAdmin")
+__all__ = _admin_all

@@ -153,8 +153,27 @@ register_exception_handlers(api_v1)
 
 def _register_app_routers() -> None:
     from apps.automation.api import router as automation_router
-    from apps.automation.api.court_filing_api import router as court_filing_router
-    from apps.automation.api.court_guarantee_api import router as court_guarantee_router
+
+    from ninja import Router
+
+    court_filing_router: Router | None = None
+    court_guarantee_router: Router | None = None
+    inbox_router: Router | None = None
+    try:
+        from plugins.court_automation.filing.api_endpoint import router as _filing_r
+        court_filing_router = _filing_r
+    except ImportError:
+        pass
+    try:
+        from plugins.court_automation.guarantee.api_endpoint import router as _guarantee_r
+        court_guarantee_router = _guarantee_r
+    except ImportError:
+        pass
+    try:
+        from plugins.message_hub.api import router as _inbox_r
+        inbox_router = _inbox_r
+    except ImportError:
+        pass
     from apps.batch_printing.api import router as batch_printing_router
     from apps.cases.api import router as cases_router
     from apps.chat_records.api import router as chat_records_router
@@ -184,7 +203,6 @@ def _register_app_routers() -> None:
     from apps.legal_research.api import router as legal_research_router
     from apps.litigation_ai.api.litigation_api import router as litigation_router
     from apps.litigation_ai.api.mock_trial_api import router as mock_trial_router
-    from apps.message_hub.api import router as inbox_router
     from apps.organization.api import router as organization_router
     from apps.pdf_splitting.api import router as pdf_splitting_router
     from apps.reminders.api import router as reminders_router
@@ -206,7 +224,8 @@ def _register_app_routers() -> None:
     api_v1.add_router("/story-viz", story_viz_router, auth=JWTOrSessionAuth())
     api_v1.add_router("/enterprise-data", enterprise_data_router, auth=JWTOrSessionAuth(), tags=["企业数据查询"])
     api_v1.add_router("/reminders", reminders_router)
-    api_v1.add_router("/inbox", inbox_router)
+    if inbox_router is not None:
+        api_v1.add_router("/inbox", inbox_router)
     api_v1.add_router("/chat-records", chat_records_router, tags=["梳理聊天记录"])
 
     from apps.express_query.api import router as express_query_router
@@ -281,8 +300,10 @@ def _register_app_routers() -> None:
 
     api_v1.add_router("/doc-converter", doc_converter_router, auth=JWTOrSessionAuth(), tags=["DOC 转 DOCX"])
 
-    api_v1.add_router("/court-filing", court_filing_router, auth=JWTOrSessionAuth(), tags=["一张网立案"])
-    api_v1.add_router("/court-guarantee", court_guarantee_router, auth=JWTOrSessionAuth(), tags=["一张网担保"])
+    if court_filing_router is not None:
+        api_v1.add_router("/court-filing", court_filing_router, auth=JWTOrSessionAuth(), tags=["一张网立案"])
+    if court_guarantee_router is not None:
+        api_v1.add_router("/court-guarantee", court_guarantee_router, auth=JWTOrSessionAuth(), tags=["一张网担保"])
 
     # POI 文档生成服务（Apache POI microservice）
     from apps.core.api.poi_api import router as poi_router

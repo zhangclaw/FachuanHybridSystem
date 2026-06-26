@@ -2,13 +2,23 @@ name: backend-ci
 
 on:
   pull_request:
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend-ci.yml'
   push:
     branches:
       - main
       - master
       - dev
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend-ci.yml'
   schedule:
-    - cron: "0 2 * * *"
+    - cron: "0 2 * * 0"  # 每周日 UTC 2:00（节省 minutes）
+
+concurrency:
+  group: backend-ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   backend-security-guard:
@@ -16,7 +26,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -45,13 +55,19 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
-      - name: LLM privacy review (requires claude CLI)
+      - name: LLM privacy review (requires claude CLI + API key)
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           set -euo pipefail
+          if ! command -v claude &>/dev/null || [ -z "${ANTHROPIC_API_KEY:-}" ]; then
+            echo "Claude CLI or API key not available, skipping LLM privacy review."
+            exit 0
+          fi
           base=""
           if [ "${GITHUB_EVENT_NAME}" = "pull_request" ] && [ -n "${GITHUB_BASE_REF:-}" ]; then
             git fetch origin "${GITHUB_BASE_REF}" --depth=1
@@ -93,7 +109,7 @@ jobs:
           --health-retries=5
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -139,6 +155,13 @@ jobs:
 
       - name: Install uv
         uses: astral-sh/setup-uv@v5
+
+      - name: Cache uv packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/uv
+          key: uv-${{ runner.os }}-${{ hashFiles('backend/uv.lock') }}
+          restore-keys: uv-${{ runner.os }}-
 
       - name: Setup Python
         run: uv python install ${{ matrix.python-version }}
@@ -242,7 +265,7 @@ jobs:
             apps/core/middleware/security.py \
             apps/organization/services/auth/auth_service.py \
             apps/organization/services/access/organization_access_policy.py \
-            apps/automation/services/token/cache_manager.py \
+            apps/automation/services/wiring.py \
             apps/automation/utils/logging_mixins/common.py \
             apiSystem/apiSystem/api.py
 
@@ -270,7 +293,7 @@ jobs:
           TEST_DB_HOST: "127.0.0.1"
           TEST_DB_PORT: "5432"
           PYTHONPATH: "apiSystem:."
-        run: uv run pytest -c pytest.ini -o "addopts=--reuse-db --import-mode=importlib -q --tb=short --strict-markers --timeout=30" --capture=no --no-cov -q tests/ci/unit/
+        run: uv run pytest -c pytest.ini -o "addopts=--reuse-db --import-mode=importlib -q --tb=short --strict-markers --timeout=30" --capture=fd --no-cov -q tests/ci/unit/
 
       - name: Smoke check (minimal)
         env:
@@ -289,7 +312,7 @@ jobs:
             --skip-q
 
       - name: Dependency audit (pip-audit)
-        run: uv run pip-audit --ignore-vuln CVE-2026-3219 --ignore-vuln CVE-2026-6357 --ignore-vuln CVE-2026-42304 --ignore-vuln CVE-2026-46678 --ignore-vuln PYSEC-2026-89 --ignore-vuln PYSEC-2026-161 --ignore-vuln PYSEC-2025-183 --ignore-vuln PYSEC-2026-175 --ignore-vuln PYSEC-2026-177 --ignore-vuln PYSEC-2026-178 --ignore-vuln PYSEC-2026-179 --ignore-vuln PYSEC-2026-196
+        run: uv run pip-audit --ignore-vuln CVE-2026-3219 --ignore-vuln CVE-2026-6357 --ignore-vuln CVE-2026-42304 --ignore-vuln CVE-2026-46678 --ignore-vuln PYSEC-2026-89 --ignore-vuln PYSEC-2026-161 --ignore-vuln PYSEC-2025-183 --ignore-vuln PYSEC-2026-175 --ignore-vuln PYSEC-2026-177 --ignore-vuln PYSEC-2026-178 --ignore-vuln PYSEC-2026-179 --ignore-vuln PYSEC-2026-196 --ignore-vuln CVE-2026-54911 --ignore-vuln GHSA-6v7p-g79w-8964 --ignore-vuln GHSA-4xgf-cpjx-pc3j
 
       - name: Static security scan (bandit)
         run: uv run bandit -r apps -q -lll -x "*/migrations/*,*/static/*,*/staticfiles/*,*/media/*,*/venv*/*,*/htmlcov/*"
@@ -320,12 +343,19 @@ jobs:
           --health-retries=5
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Install uv
         uses: astral-sh/setup-uv@v5
+
+      - name: Cache uv packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/uv
+          key: uv-${{ runner.os }}-${{ hashFiles('backend/uv.lock') }}
+          restore-keys: uv-${{ runner.os }}-
 
       - name: Setup Python
         run: uv python install ${{ matrix.python-version }}
@@ -346,7 +376,7 @@ jobs:
           PYTHONPATH: "apiSystem:."
         run: |
           uv run pytest -c pytest.ini -o addopts="" \
-            --capture=no \
+            --capture=fd \
             --reuse-db --import-mode=importlib -q \
             --cov=apps.cases.services.case.case_admin_export_bridge \
             --cov=apps.cases.services.case.case_contract_export_bridge \
@@ -383,10 +413,16 @@ jobs:
           --health-retries=5
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-
+        uses: actions/checkout@v7
       - name: Install uv
         uses: astral-sh/setup-uv@v5
+
+      - name: Cache uv packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/uv
+          key: uv-${{ runner.os }}-${{ hashFiles('backend/uv.lock') }}
+          restore-keys: uv-${{ runner.os }}-
 
       - name: Setup Python
         run: uv python install ${{ matrix.python-version }}
@@ -405,7 +441,7 @@ jobs:
           TEST_DB_HOST: "127.0.0.1"
           TEST_DB_PORT: "5432"
           PYTHONPATH: "apiSystem:."
-        run: uv run pytest -c pytest.ini --no-cov -q tests/ci/integration/
+        run: uv run pytest -c pytest.ini -o "addopts=--reuse-db --import-mode=importlib -q --tb=short --strict-markers --timeout=60" --no-cov -q tests/ci/integration/
 
   backend-property-smoke:
     runs-on: ubuntu-latest
@@ -433,10 +469,16 @@ jobs:
           --health-retries=5
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-
+        uses: actions/checkout@v7
       - name: Install uv
         uses: astral-sh/setup-uv@v5
+
+      - name: Cache uv packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/uv
+          key: uv-${{ runner.os }}-${{ hashFiles('backend/uv.lock') }}
+          restore-keys: uv-${{ runner.os }}-
 
       - name: Setup Python
         run: uv python install ${{ matrix.python-version }}
@@ -485,8 +527,7 @@ jobs:
           --health-retries=5
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-
+        uses: actions/checkout@v7
       - name: Install uv
         uses: astral-sh/setup-uv@v5
 

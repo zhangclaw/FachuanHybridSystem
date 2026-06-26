@@ -9,7 +9,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
 
-from apps.core.filesystem.upload_paths import DatedUUIDPath
+from apps.core.filesystem.upload_paths import DatedUUIDPath, MediaEntity
 from apps.core.models.enums import AuthorityType, CaseStage, CaseStatus, SimpleCaseType
 
 if TYPE_CHECKING:
@@ -77,6 +77,8 @@ class Case(models.Model):
         verbose_name=_("前序案件"),
         help_text=_("该案的前一个审理阶段，如二审案件指向前一审案件"),
     )
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("创建时间"))
+    updated_at = models.DateTimeField(auto_now=True, verbose_name=_("更新时间"))
 
     history = HistoricalRecords()
 
@@ -188,7 +190,7 @@ class CaseNumber(models.Model):
         help_text=_("如：民事判决书、民事调解书、执行证书等"),
     )
     document_file = models.FileField(
-        upload_to=DatedUUIDPath("case_documents"),
+        upload_to=DatedUUIDPath(MediaEntity.CASE_DOCUMENTS),
         blank=True,
         null=True,
         verbose_name=_("裁判文书文件"),

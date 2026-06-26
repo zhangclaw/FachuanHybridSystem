@@ -7,12 +7,11 @@ import json
 from decimal import Decimal
 from pathlib import Path
 from typing import Any
-from unittest.mock import MagicMock, patch, PropertyMock
+from unittest.mock import MagicMock, PropertyMock, patch
 
 import pytest
 
 from apps.contracts.models import Contract
-
 
 # ── Templatetags ────────────────────────────────────────────────────────────
 
@@ -394,8 +393,11 @@ class TestContractsSignals:
         instance.file_path = test_file.name
         instance.pk = 1
 
-        with patch("apps.contracts.signals.settings") as mock_settings:
+        with patch("apps.contracts.signals.settings") as mock_settings, \
+             patch("apps.contracts.signals.transaction") as mock_txn:
             mock_settings.MEDIA_ROOT = str(tmp_path)
+            # Execute on_commit callback immediately for testing
+            mock_txn.on_commit.side_effect = lambda fn: fn()
             _cleanup_finalized_material_file(None, instance)
 
         assert not test_file.exists()  # File should be deleted
@@ -416,8 +418,10 @@ class TestContractsSignals:
         instance.file_path = "nonexistent/file.pdf"
         instance.pk = 2
 
-        with patch("apps.contracts.signals.settings") as mock_settings:
+        with patch("apps.contracts.signals.settings") as mock_settings, \
+             patch("apps.contracts.signals.transaction") as mock_txn:
             mock_settings.MEDIA_ROOT = str(tmp_path)
+            mock_txn.on_commit.side_effect = lambda fn: fn()
             _cleanup_finalized_material_file(None, instance)
         # No exception raised
 
@@ -432,8 +436,10 @@ class TestContractsSignals:
         instance.file_path = "error.pdf"
         instance.pk = 3
 
-        with patch("apps.contracts.signals.settings") as mock_settings:
+        with patch("apps.contracts.signals.settings") as mock_settings, \
+             patch("apps.contracts.signals.transaction") as mock_txn:
             mock_settings.MEDIA_ROOT = str(tmp_path)
+            mock_txn.on_commit.side_effect = lambda fn: fn()
             with patch("pathlib.Path.unlink", side_effect=OSError("Permission denied")):
                 # Should not raise
                 _cleanup_finalized_material_file(None, instance)
@@ -500,7 +506,7 @@ class TestCaseCreationWorkflow:
     """contracts/services/contract/admin/workflows/case_creation_workflow.py tests."""
 
     def test_module_importable(self) -> None:
-        from apps.contracts.services.contract.admin.workflows.case_creation_workflow import ContractCaseCreationWorkflow
+        from apps.contracts.services.contract.admin.case_creation_workflow import ContractCaseCreationWorkflow
 
         assert ContractCaseCreationWorkflow is not None
 
@@ -509,7 +515,7 @@ class TestCloneWorkflow:
     """contracts/services/contract/admin/workflows/clone_workflow.py tests."""
 
     def test_module_importable(self) -> None:
-        from apps.contracts.services.contract.admin.workflows.clone_workflow import ContractCloneWorkflow
+        from apps.contracts.services.contract.admin.clone_workflow import ContractCloneWorkflow
 
         assert ContractCloneWorkflow is not None
 
@@ -518,7 +524,7 @@ class TestFilingNumberWorkflow:
     """contracts/services/contract/admin/workflows/filing_number_workflow.py tests."""
 
     def test_module_importable(self) -> None:
-        from apps.contracts.services.contract.admin.workflows.filing_number_workflow import ContractFilingNumberWorkflow
+        from apps.contracts.services.contract.admin.filing_number_workflow import ContractFilingNumberWorkflow
 
         assert ContractFilingNumberWorkflow is not None
 
@@ -542,17 +548,14 @@ class TestOverrideServiceExtended:
 
 
 class TestCompositionExtended:
-    """composition.py extended tests."""
+    """wiring.py extended tests."""
 
-    @patch("apps.contracts.services.contract.usecases.composition.ContractService")
-    @patch("apps.contracts.services.contract.usecases.composition.ContractQueryFacade")
-    @patch("apps.contracts.services.contract.usecases.composition.ContractAccessPolicy")
-    @patch("apps.contracts.services.contract.usecases.composition.ContractQueryService")
-    def test_build_without_services(self, MockQS: Any, MockAP: Any, MockQF: Any, MockCS: Any) -> None:
-        from apps.contracts.services.contract.usecases.composition import build_contract_service
+    @patch("apps.contracts.services.contract.query.ContractQueryFacade")
+    @patch("apps.contracts.services.contract.domain.ContractAccessPolicy")
+    @patch("apps.contracts.services.contract.query.ContractQueryService")
+    def test_build_without_services(self, MockQS: Any, MockAP: Any, MockQF: Any) -> None:
+        from apps.contracts.services.contract.wiring import build_contract_service
 
-        mock_instance = MagicMock()
-        MockCS.return_value = mock_instance
         with patch(
             "apps.contracts.services.assignment.lawyer_assignment_service.LawyerAssignmentService"
         ):

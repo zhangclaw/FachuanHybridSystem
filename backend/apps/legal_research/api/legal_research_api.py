@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import asyncio
 import re
 import zipfile
+from asyncio import get_running_loop
 from io import BytesIO
 from typing import Any
 
+from asgiref.sync import sync_to_async
 from django.http import FileResponse, Http404, HttpResponse
 from ninja import Router
 
@@ -86,16 +89,24 @@ def _serialize_result(result: Any) -> LegalResearchResultOut:
 
 
 @router.post("/tasks", response=LegalResearchCreateOut)
-def create_task(request: Any, payload: LegalResearchTaskCreateIn) -> LegalResearchCreateOut:  # pragma: no cover
-    task = _get_service().create_task(payload=payload, user=getattr(request, "user", None))
-    return LegalResearchCreateOut(task_id=task.id, status=task.status)
+async def create_task(request: Any, payload: LegalResearchTaskCreateIn) -> LegalResearchCreateOut:  # pragma: no cover
+    service = _get_service()
+
+    def _do() -> Any:
+        task = service.create_task(
+            payload=payload, user=getattr(request, "user", None)
+        )
+        return LegalResearchCreateOut(task_id=task.id, status=task.status)
+
+    return await sync_to_async(_do)()
 
 
 @router.post("/capability/search", response=AgentSearchResponseV1)
-def capability_search(request: Any, payload: AgentSearchRequestV1) -> AgentSearchResponseV1:  # pragma: no cover
+async def capability_search(request: Any, payload: AgentSearchRequestV1) -> AgentSearchResponseV1:  # pragma: no cover
     headers = getattr(request, "headers", {}) or {}
     idempotency_key = str(headers.get("Idempotency-Key", "") or "").strip()
-    return _get_capability_service().search(
+    svc = _get_capability_service()
+    return await sync_to_async(svc.search)(
         payload=payload,
         user=getattr(request, "user", None),
         idempotency_key=idempotency_key,
@@ -103,10 +114,11 @@ def capability_search(request: Any, payload: AgentSearchRequestV1) -> AgentSearc
 
 
 @router.post("/capability/search/mcp", response=dict[str, Any])
-def capability_search_mcp(request: Any, payload: AgentSearchRequestV1) -> dict[str, Any]:  # pragma: no cover
+async def capability_search_mcp(request: Any, payload: AgentSearchRequestV1) -> dict[str, Any]:  # pragma: no cover
     headers = getattr(request, "headers", {}) or {}
     idempotency_key = str(headers.get("Idempotency-Key", "") or "").strip()
-    return _get_capability_mcp_wrapper().search(
+    svc = _get_capability_mcp_wrapper()
+    return await sync_to_async(svc.search)(
         payload=payload,
         user=getattr(request, "user", None),
         idempotency_key=idempotency_key,
@@ -114,56 +126,90 @@ def capability_search_mcp(request: Any, payload: AgentSearchRequestV1) -> dict[s
 
 
 @router.get("/tasks/{task_id}", response=LegalResearchTaskOut)
-def get_task(request: Any, task_id: int) -> LegalResearchTaskOut:  # pragma: no cover
-    task = _get_service().get_task(task_id=task_id, user=getattr(request, "user", None))
-    return _serialize_task(task)
+async def get_task(request: Any, task_id: int) -> LegalResearchTaskOut:  # pragma: no cover
+    service = _get_service()
+
+    def _do() -> Any:
+        task = service.get_task(
+            task_id=task_id, user=getattr(request, "user", None)
+        )
+        return _serialize_task(task)
+
+    return await sync_to_async(_do)()
 
 
 @router.get("/tasks/{task_id}/results", response=list[LegalResearchResultOut])
-def list_results(request: Any, task_id: int) -> list[LegalResearchResultOut]:  # pragma: no cover
-    results = _get_service().list_results(task_id=task_id, user=getattr(request, "user", None))
-    return [_serialize_result(x) for x in results]
+async def list_results(request: Any, task_id: int) -> list[LegalResearchResultOut]:  # pragma: no cover
+    service = _get_service()
+
+    def _do() -> Any:
+        results = service.list_results(
+            task_id=task_id, user=getattr(request, "user", None)
+        )
+        return [_serialize_result(x) for x in results]
+
+    return await sync_to_async(_do)()
 
 
 @router.get("/tasks/{task_id}/results/{result_id}/download")
 @rate_limit_from_settings("EXPORT", by_user=True)
-def download_single_result(request: Any, task_id: int, result_id: int) -> FileResponse:  # pragma: no cover
-    result = _get_service().get_result(task_id=task_id, result_id=result_id, user=getattr(request, "user", None))
-    if not result.pdf_file:
-        raise Http404("结果PDF不存在")
+async def download_single_result(request: Any, task_id: int, result_id: int) -> FileResponse:  # pragma: no cover
+    service = _get_service()
 
-    filename = (result.pdf_file.name or "").split("/")[-1]
-    return FileResponse(result.pdf_file.open("rb"), as_attachment=True, filename=filename)
+    def _do() -> Any:
+        result = service.get_result(
+            task_id=task_id, result_id=result_id, user=getattr(request, "user", None)
+        )
+        if not result.pdf_file:
+            raise Http404("结果PDF不存在")
+
+        filename = (result.pdf_file.name or "").split("/")[-1]
+        return result.pdf_file.open("rb"), filename
+
+    file_obj, filename = await sync_to_async(_do)()
+    return FileResponse(file_obj, as_attachment=True, filename=filename)
 
 
 @router.get("/tasks/{task_id}/results/download")
 @rate_limit_from_settings("EXPORT", by_user=True)
-def download_all_results(request: Any, task_id: int) -> HttpResponse:  # pragma: no cover
+async def download_all_results(request: Any, task_id: int) -> HttpResponse:  # pragma: no cover
     service = _get_service()
-    service.ensure_task_ready_for_download(task_id=task_id, user=getattr(request, "user", None))
-    results = service.list_results(task_id=task_id, user=getattr(request, "user", None))
 
-    if not results:
-        raise Http404("任务暂无可下载结果")
+    def _do_download_prep() -> Any:
+        service.ensure_task_ready_for_download(
+            task_id=task_id, user=getattr(request, "user", None)
+        )
+        results = service.list_results(
+            task_id=task_id, user=getattr(request, "user", None)
+        )
+        if not results:
+            raise Http404("任务暂无可下载结果")
+        return results
 
-    buffer = BytesIO()
-    with zipfile.ZipFile(buffer, "w", compression=zipfile.ZIP_DEFLATED) as zip_file:
-        has_file = False
-        for result in results:
-            if not result.pdf_file:
-                continue
-            has_file = True
-            raw_title = result.title or f"case_{result.rank}"
-            safe_title = re.sub(r"[^\w\u4e00-\u9fff-]+", "_", raw_title).strip("_") or f"case_{result.rank}"
-            entry_name = f"{result.rank:02d}_{safe_title}.pdf"
-            with result.pdf_file.open("rb") as fp:
-                zip_file.writestr(entry_name, fp.read())
+    results = await sync_to_async(_do_download_prep)()
 
-    if buffer.tell() == 0 or not has_file:
+    def _build_zip() -> tuple[bytes, bool]:
+        buffer = BytesIO()
+        with zipfile.ZipFile(buffer, "w", compression=zipfile.ZIP_DEFLATED) as zip_file:
+            has_file = False
+            for result in results:
+                if not result.pdf_file:
+                    continue
+                has_file = True
+                raw_title = result.title or f"case_{result.rank}"
+                safe_title = re.sub(r"[^\w一-鿿-]+", "_", raw_title).strip("_") or f"case_{result.rank}"
+                entry_name = f"{result.rank:02d}_{safe_title}.pdf"
+                with result.pdf_file.open("rb") as fp:
+                    zip_file.writestr(entry_name, fp.read())
+        return buffer.getvalue(), has_file
+
+    zip_bytes, has_file = await asyncio.to_thread(_build_zip)
+
+    if not has_file:
         raise Http404("任务暂无可下载PDF")
 
     filename = f"legal_research_{task_id}.zip"
-    response = HttpResponse(buffer.getvalue(), content_type="application/zip")
+    response = HttpResponse(zip_bytes, content_type="application/zip")
     response["Content-Disposition"] = f'attachment; filename="{filename}"'
     return response
 
@@ -174,81 +220,86 @@ def download_all_results(request: Any, task_id: int) -> HttpResponse:  # pragma:
 
 
 @router.post("/law-verification/check", response=dict[str, Any])
-def check_law_references(request: Any, payload: dict[str, Any]) -> dict[str, Any]:  # pragma: no cover
+async def check_law_references(request: Any, payload: dict[str, Any]) -> dict[str, Any]:  # pragma: no cover
     """核查文档中的法规引用.
 
     请求: {"text": "文档全文", "credential_id": 6}
     响应: {"references": [...], "total": N}
     """
-    text = str(payload.get("text") or "").strip()
-    credential_id = int(payload.get("credential_id") or 0)
 
-    if not text:
-        return {"error": "text 不能为空", "references": [], "total": 0}
+    def _do_check() -> dict[str, Any]:
+        text = str(payload.get("text") or "").strip()
+        credential_id = int(payload.get("credential_id") or 0)
 
-    # 检测插件是否可用
-    from plugins import has_law_verification_plugin  # type: ignore[attr-defined]
+        if not text:
+            return {"error": "text 不能为空", "references": [], "total": 0}
 
-    if not has_law_verification_plugin():
-        return {"error": "法规核查插件未安装", "references": [], "total": 0}
+        # 检测插件是否可用
+        from plugins import has_law_verification_plugin  # type: ignore[attr-defined]
 
-    # 获取威科先行凭证
-    from apps.organization.models import AccountCredential
-    from apps.core.security.secret_codec import SecretCodec
+        if not has_law_verification_plugin():
+            return {"error": "法规核查插件未安装", "references": [], "total": 0}
 
-    try:
-        cred = AccountCredential.objects.get(id=credential_id)
-    except AccountCredential.DoesNotExist:
-        return {"error": f"凭证 ID {credential_id} 不存在", "references": [], "total": 0}
+        # 获取威科先行凭证
+        from apps.organization.models import AccountCredential
+        from apps.core.security.secret_codec import SecretCodec
 
-    codec = SecretCodec()
-    password = codec.try_decrypt(cred.password)
+        try:
+            cred = AccountCredential.objects.get(id=credential_id)
+        except AccountCredential.DoesNotExist:
+            return {"error": f"凭证 ID {credential_id} 不存在", "references": [], "total": 0}
 
-    # 建立威科先行会话
-    from plugins.weike_api_private.adapter import PrivateWeikeApiAdapter
-    from apps.legal_research.services.sources.weike.client import WeikeCaseClient
+        codec = SecretCodec()
+        password = codec.try_decrypt(cred.password)
 
-    adapter = PrivateWeikeApiAdapter()
-    client = WeikeCaseClient()
+        # 建立威科先行会话
+        from plugins.weike_api_private.adapter import PrivateWeikeApiAdapter
+        from apps.legal_research.services.sources.weike.client import WeikeCaseClient
 
-    try:
-        session = adapter.open_http_session(
-            client=client,
-            username=cred.account,
-            password=password,
-            login_url=cred.url or None,
-        )
-    except Exception as e:
-        return {"error": f"威科先行登录失败: {e}", "references": [], "total": 0}
+        adapter = PrivateWeikeApiAdapter()
+        client = WeikeCaseClient()
 
-    # 定义回调函数
-    def search_laws(law_name: str) -> list[dict[str, Any]]:
-        return adapter.search_laws_via_api(session=session, keyword=law_name)  # type: ignore[no-any-return]
+        try:
+            session = adapter.open_http_session(
+                client=client,
+                username=cred.account,
+                password=password,
+                login_url=cred.url or None,
+            )
+        except Exception as e:
+            return {"error": f"威科先行登录失败: {e}", "references": [], "total": 0}
 
-    def fetch_article(doc_id: str, article_num: int) -> str | None:
-        return adapter.fetch_law_article_via_api(session=session, doc_id=doc_id, article_num=article_num)  # type: ignore[no-any-return]
+        # 定义回调函数
+        def search_laws(law_name: str) -> list[dict[str, Any]]:
+            return adapter.search_laws_via_api(session=session, keyword=law_name)  # type: ignore[no-any-return]
 
-    # 执行核查
-    from plugins.weike_api_private.law_verification import verify_references
+        def fetch_article(doc_id: str, article_num: int) -> str | None:
+            return adapter.fetch_law_article_via_api(session=session, doc_id=doc_id, article_num=article_num)  # type: ignore[no-any-return]
 
-    try:
-        results = verify_references(text, search_laws_fn=search_laws, fetch_article_fn=fetch_article)
-    except Exception as e:
-        return {"error": f"核查失败: {e}", "references": [], "total": 0}
+        # 执行核查
+        from plugins.weike_api_private.law_verification import verify_references
 
-    return {
-        "references": [
-            {
-                "law_name": r.law_name,
-                "article_num": r.article_num,
-                "status": r.status,
-                "validity": r.validity,
-                "article_text": r.article_text,
-                "reference_text": r.reference_text,
-                "similarity": r.similarity,
-                "weike_url": r.weike_url,
-            }
-            for r in results
-        ],
-        "total": len(results),
-    }
+        try:
+            results = verify_references(text, search_laws_fn=search_laws, fetch_article_fn=fetch_article)
+        except Exception as e:
+            return {"error": f"核查失败: {e}", "references": [], "total": 0}
+
+        return {
+            "references": [
+                {
+                    "law_name": r.law_name,
+                    "article_num": r.article_num,
+                    "status": r.status,
+                    "validity": r.validity,
+                    "article_text": r.article_text,
+                    "reference_text": r.reference_text,
+                    "similarity": r.similarity,
+                    "weike_url": r.weike_url,
+                }
+                for r in results
+            ],
+            "total": len(results),
+        }
+
+    loop = get_running_loop()
+    return await loop.run_in_executor(None, _do_check)

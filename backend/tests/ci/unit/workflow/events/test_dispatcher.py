@@ -27,7 +27,8 @@ class _AsyncListIter:
 
 @pytest.mark.asyncio
 class TestOnCourtReplyNoRuns:
-    @patch("apps.workflow.events.dispatcher.Client")
+    @patch("apps.workflow.events.dispatcher._client", None)
+    @patch("temporalio.client.Client")
     @patch("apps.workflow.events.dispatcher.WorkflowRun")
     async def test_no_matching_runs(self, mock_model, mock_client_cls):
         from apps.workflow.events.dispatcher import on_court_reply
@@ -39,7 +40,8 @@ class TestOnCourtReplyNoRuns:
 
         mock_client_cls.connect.assert_not_called()
 
-    @patch("apps.workflow.events.dispatcher.Client")
+    @patch("apps.workflow.events.dispatcher._client", None)
+    @patch("temporalio.client.Client")
     @patch("apps.workflow.events.dispatcher.WorkflowRun")
     async def test_filters_correctly(self, mock_model, mock_client_cls):
         from apps.workflow.events.dispatcher import on_court_reply
@@ -56,7 +58,8 @@ class TestOnCourtReplyNoRuns:
 
 @pytest.mark.asyncio
 class TestOnCourtReplySignal:
-    @patch("apps.workflow.events.dispatcher.Client")
+    @patch("apps.workflow.events.dispatcher._client", None)
+    @patch("temporalio.client.Client")
     @patch("apps.workflow.events.dispatcher.WorkflowRun")
     async def test_signals_and_updates_status(self, mock_model, mock_client_cls):
         from apps.workflow.events.dispatcher import on_court_reply
@@ -64,6 +67,7 @@ class TestOnCourtReplySignal:
         run = SimpleNamespace(
             temporal_workflow_id="wf-abc",
             status="waiting_event",
+            current_step_id="wait_court",
             asave=AsyncMock(),
         )
         mock_model.objects.filter.return_value = _AsyncListIter([run])
@@ -79,7 +83,7 @@ class TestOnCourtReplySignal:
         await on_court_reply(case_id=1, status="rejected", documents=["doc1.pdf"])
 
         mock_handle.signal.assert_awaited_once_with(
-            "court-reply", {"status": "rejected", "documents": ["doc1.pdf"]}
+            "gate_approved", {"step_id": "wait_court", "approved": True, "comment": "rejected", "documents": ["doc1.pdf"]}
         )
         run.asave.assert_awaited_once_with(update_fields=["status"])
         assert run.status == "running"
@@ -87,7 +91,8 @@ class TestOnCourtReplySignal:
 
 @pytest.mark.asyncio
 class TestOnCourtReplyEmptyDocuments:
-    @patch("apps.workflow.events.dispatcher.Client")
+    @patch("apps.workflow.events.dispatcher._client", None)
+    @patch("temporalio.client.Client")
     @patch("apps.workflow.events.dispatcher.WorkflowRun")
     async def test_empty_documents_default(self, mock_model, mock_client_cls):
         from apps.workflow.events.dispatcher import on_court_reply
@@ -95,6 +100,7 @@ class TestOnCourtReplyEmptyDocuments:
         run = SimpleNamespace(
             temporal_workflow_id="wf-def",
             status="waiting_event",
+            current_step_id="wait_court",
             asave=AsyncMock(),
         )
         mock_model.objects.filter.return_value = _AsyncListIter([run])
@@ -110,10 +116,11 @@ class TestOnCourtReplyEmptyDocuments:
         await on_court_reply(case_id=2, status="approved", documents=None)
 
         mock_handle.signal.assert_awaited_once_with(
-            "court-reply", {"status": "approved", "documents": []}
+            "gate_approved", {"step_id": "wait_court", "approved": True, "comment": "approved", "documents": []}
         )
 
-    @patch("apps.workflow.events.dispatcher.Client")
+    @patch("apps.workflow.events.dispatcher._client", None)
+    @patch("temporalio.client.Client")
     @patch("apps.workflow.events.dispatcher.WorkflowRun")
     async def test_empty_list_documents(self, mock_model, mock_client_cls):
         from apps.workflow.events.dispatcher import on_court_reply
@@ -121,6 +128,7 @@ class TestOnCourtReplyEmptyDocuments:
         run = SimpleNamespace(
             temporal_workflow_id="wf-ghi",
             status="waiting_event",
+            current_step_id="wait_court",
             asave=AsyncMock(),
         )
         mock_model.objects.filter.return_value = _AsyncListIter([run])
@@ -136,5 +144,5 @@ class TestOnCourtReplyEmptyDocuments:
         await on_court_reply(case_id=3, status="approved", documents=[])
 
         mock_handle.signal.assert_awaited_once_with(
-            "court-reply", {"status": "approved", "documents": []}
+            "gate_approved", {"step_id": "wait_court", "approved": True, "comment": "approved", "documents": []}
         )

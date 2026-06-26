@@ -5,9 +5,14 @@ from decimal import Decimal
 from unittest.mock import MagicMock, patch, AsyncMock
 
 import pytest
+try:
+    from plugins.court_automation import filing  # noqa: F401
+except ImportError:
+    pytest.skip("court_automation plugin not installed", allow_module_level=True)
 
-from apps.automation.services.insurance._insurance_http_mixin import InsuranceHttpMixin
-from apps.automation.services.insurance.court_insurance_client import (
+
+from plugins.court_automation.preservation_quote.insurance_http_mixin import InsuranceHttpMixin
+from plugins.court_automation.preservation_quote.court_insurance_client import (
     CourtInsuranceClient,
     InsuranceCompany,
     PremiumResult,
@@ -143,15 +148,15 @@ class TestInsuranceHttpMixin:
 
 
 class TestCourtInsuranceClient:
-    @patch("apps.automation.services.insurance.court_insurance_client.get_config")
-    @patch("apps.automation.services.insurance.court_insurance_client.httpx.AsyncClient")
+    @patch("plugins.court_automation.preservation_quote.court_insurance_client.get_config")
+    @patch("plugins.court_automation.preservation_quote.court_insurance_client.httpx.AsyncClient")
     def test_init(self, mock_client_cls, mock_get_config):
         mock_get_config.return_value = 60.0
         client = CourtInsuranceClient(token_service=MagicMock())
         assert client._token_service is not None
 
-    @patch("apps.automation.services.insurance.court_insurance_client.get_config")
-    @patch("apps.automation.services.insurance.court_insurance_client.httpx.AsyncClient")
+    @patch("plugins.court_automation.preservation_quote.court_insurance_client.get_config")
+    @patch("plugins.court_automation.preservation_quote.court_insurance_client.httpx.AsyncClient")
     def test_token_service_lazy_load(self, mock_client_cls, mock_get_config):
         mock_get_config.return_value = 60.0
         client = CourtInsuranceClient(token_service=None)
@@ -160,8 +165,8 @@ class TestCourtInsuranceClient:
             ts = client.token_service
             assert ts is not None
 
-    @patch("apps.automation.services.insurance.court_insurance_client.get_config")
-    @patch("apps.automation.services.insurance.court_insurance_client.httpx.AsyncClient")
+    @patch("plugins.court_automation.preservation_quote.court_insurance_client.get_config")
+    @patch("plugins.court_automation.preservation_quote.court_insurance_client.httpx.AsyncClient")
     def test_properties(self, mock_client_cls, mock_get_config):
         def config_side_effect(key, default=None):
             configs = {
@@ -181,8 +186,8 @@ class TestCourtInsuranceClient:
         assert "example.com" in client.insurance_list_url
         assert "example.com" in client.premium_query_url
 
-    @patch("apps.automation.services.insurance.court_insurance_client.get_config")
-    @patch("apps.automation.services.insurance.court_insurance_client.httpx.AsyncClient")
+    @patch("plugins.court_automation.preservation_quote.court_insurance_client.get_config")
+    @patch("plugins.court_automation.preservation_quote.court_insurance_client.httpx.AsyncClient")
     def test_parse_insurance_companies_from_dict(self, mock_client_cls, mock_get_config):
         mock_get_config.return_value = 60.0
         client = CourtInsuranceClient(token_service=MagicMock())
@@ -198,8 +203,8 @@ class TestCourtInsuranceClient:
         assert companies[0].c_code == "PICC"
         assert companies[1].c_code == "CPIC"
 
-    @patch("apps.automation.services.insurance.court_insurance_client.get_config")
-    @patch("apps.automation.services.insurance.court_insurance_client.httpx.AsyncClient")
+    @patch("plugins.court_automation.preservation_quote.court_insurance_client.get_config")
+    @patch("plugins.court_automation.preservation_quote.court_insurance_client.httpx.AsyncClient")
     def test_parse_insurance_companies_from_list(self, mock_client_cls, mock_get_config):
         mock_get_config.return_value = 60.0
         client = CourtInsuranceClient(token_service=MagicMock())
@@ -210,8 +215,8 @@ class TestCourtInsuranceClient:
         companies = client._parse_insurance_companies(data)
         assert len(companies) == 1
 
-    @patch("apps.automation.services.insurance.court_insurance_client.get_config")
-    @patch("apps.automation.services.insurance.court_insurance_client.httpx.AsyncClient")
+    @patch("plugins.court_automation.preservation_quote.court_insurance_client.get_config")
+    @patch("plugins.court_automation.preservation_quote.court_insurance_client.httpx.AsyncClient")
     def test_parse_insurance_companies_unknown_format(self, mock_client_cls, mock_get_config):
         mock_get_config.return_value = 60.0
         client = CourtInsuranceClient(token_service=MagicMock())
@@ -219,8 +224,8 @@ class TestCourtInsuranceClient:
         companies = client._parse_insurance_companies("unexpected")
         assert companies == []
 
-    @patch("apps.automation.services.insurance.court_insurance_client.get_config")
-    @patch("apps.automation.services.insurance.court_insurance_client.httpx.AsyncClient")
+    @patch("plugins.court_automation.preservation_quote.court_insurance_client.get_config")
+    @patch("plugins.court_automation.preservation_quote.court_insurance_client.httpx.AsyncClient")
     def test_parse_insurance_companies_incomplete(self, mock_client_cls, mock_get_config):
         mock_get_config.return_value = 60.0
         client = CourtInsuranceClient(token_service=MagicMock())
@@ -230,8 +235,8 @@ class TestCourtInsuranceClient:
         assert len(companies) == 1
         assert companies[0].c_name == "完整"
 
-    @patch("apps.automation.services.insurance.court_insurance_client.get_config")
-    @patch("apps.automation.services.insurance.court_insurance_client.httpx.AsyncClient")
+    @patch("plugins.court_automation.preservation_quote.court_insurance_client.get_config")
+    @patch("plugins.court_automation.preservation_quote.court_insurance_client.httpx.AsyncClient")
     def test_parse_insurance_companies_non_dict_item(self, mock_client_cls, mock_get_config):
         mock_get_config.return_value = 60.0
         client = CourtInsuranceClient(token_service=MagicMock())
@@ -242,8 +247,8 @@ class TestCourtInsuranceClient:
 
 
 class TestCourtInsuranceClientAsync:
-    @patch("apps.automation.services.insurance.court_insurance_client.get_config")
-    @patch("apps.automation.services.insurance.court_insurance_client.httpx.AsyncClient")
+    @patch("plugins.court_automation.preservation_quote.court_insurance_client.get_config")
+    @patch("plugins.court_automation.preservation_quote.court_insurance_client.httpx.AsyncClient")
     def test_fetch_all_premiums_empty_companies(self, mock_client_cls, mock_get_config):
         import asyncio
         mock_get_config.return_value = 60.0
@@ -256,8 +261,8 @@ class TestCourtInsuranceClientAsync:
         ))
         assert result == []
 
-    @patch("apps.automation.services.insurance.court_insurance_client.get_config")
-    @patch("apps.automation.services.insurance.court_insurance_client.httpx.AsyncClient")
+    @patch("plugins.court_automation.preservation_quote.court_insurance_client.get_config")
+    @patch("plugins.court_automation.preservation_quote.court_insurance_client.httpx.AsyncClient")
     def test_context_manager(self, mock_client_cls, mock_get_config):
         import asyncio
         mock_get_config.return_value = 60.0
