@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import asyncio
 import logging
 import uuid
 from typing import Any
 
+from asgiref.sync import sync_to_async
 from django.core.files.base import ContentFile
 from django.db import transaction
 
@@ -147,6 +149,46 @@ class ImageRotationJobService:
             except Exception:
                 logger.exception("OCR 重识别失败: page %s", page.id)
 
+        return pages
+
+    @staticmethod
+    async def arun_ocr(
+        job_id: str | uuid.UUID,
+        provider: str = "local",
+        ocr_service: IOcrService | None = None,
+    ) -> list[ImageRotationPage]:
+        """异步版本：并发对任务所有页面重跑 OCR + 建议重命名。"""
+        from apps.core.interfaces import ServiceLocator
+        from apps.image_rotation.services.auto_rename_service import AutoRenameService
+
+        job, pages = await sync_to_async(ImageRotationJobService.get_job_detail)(job_id)
+
+        if ocr_service is None:
+            if provider != "local":
+                from apps.automation.services.ocr.ocr_service import OCRService
+
+                ocr_service = OCRService(use_v5=True, provider=provider)
+            else:
+                ocr_service = ServiceLocator.get_ocr_service()
+
+        rename_service = AutoRenameService()
+
+        async def _process_page(page: ImageRotationPage) -> None:
+            try:
+                image_bytes = await sync_to_async(page.source_image.read)()
+                text_result = await sync_to_async(ocr_service.extract_text)(image_bytes)  # type: ignore[union-attr]
+                page.ocr_text = text_result.text
+
+                if text_result.text.strip():
+                    suggestion = rename_service.suggest_rename(page.original_filename, text_result.text)
+                    if suggestion.success:
+                        page.suggested_filename = suggestion.suggested_filename
+
+                await sync_to_async(page.save)(update_fields=["ocr_text", "suggested_filename", "updated_at"])
+            except Exception:
+                logger.exception("OCR 重识别失败: page %s", page.id)
+
+        await asyncio.gather(*[_process_page(page) for page in pages])
         return pages
 
     # ------------------------------------------------------------------
