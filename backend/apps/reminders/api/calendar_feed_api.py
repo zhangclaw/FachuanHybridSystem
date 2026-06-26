@@ -19,6 +19,18 @@ from ninja import Router
 
 from apps.core.security.auth import JWTOrSessionAuth
 
+class SessionAuth:
+    """仅使用 Django Session 认证（用于 Admin 后台 AJAX 调用）"""
+    openapi_scheme: str = "session"
+
+    def authenticate(self, request: Any) -> Any:
+        if hasattr(request, "user") and request.user and request.user.is_authenticated:
+            return request.user
+        return None
+
+    def __call__(self, request: Any) -> Any:
+        return self.authenticate(request)
+
 from apps.reminders.models import CalendarFeedToken, Reminder, ReminderType
 
 logger = logging.getLogger(__name__)
@@ -162,7 +174,7 @@ def calendar_feed(request: Any, token: str = "") -> HttpResponse:
     return response
 
 
-@router.get("/ics/feed/token", auth=JWTOrSessionAuth())
+@router.get("/ics/feed/token", auth=SessionAuth())
 def get_or_create_token(request: Any) -> dict[str, str]:
     """获取当前用户的日历订阅 Token（不存在则自动创建）。"""
     from apps.core.security import get_request_access_context
@@ -182,7 +194,7 @@ def get_or_create_token(request: Any) -> dict[str, str]:
     }
 
 
-@router.post("/ics/feed/token/regenerate", auth=JWTOrSessionAuth())
+@router.post("/ics/feed/token/regenerate", auth=SessionAuth())
 def regenerate_token(request: Any) -> dict[str, str]:
     """重新生成当前用户的日历订阅 Token（旧 Token 立即失效）。"""
     import secrets
