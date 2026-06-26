@@ -6,8 +6,8 @@
 from __future__ import annotations
 
 from django.http import HttpRequest
-from ninja import File, Router
-from ninja.files import UploadedFile
+from ninja import Router
+from ninja.files import UploadedFile  # noqa: F401 (kept for backward compat)
 
 from apps.core.security.auth import JWTOrSessionAuth
 from apps.organization.api.utils_api import get_request_user
@@ -45,8 +45,6 @@ def get_lawyer(request: HttpRequest, lawyer_id: int) -> LawyerOut:  # pragma: no
 def create_lawyer(  # pragma: no cover
     request: HttpRequest,
     payload: LawyerCreateIn,
-    license_pdf: UploadedFile | None = File(None),
-    avatar: UploadedFile | None = File(None),
 ) -> LawyerOut:
     dto = LawyerCreateDTO(
         username=payload.username,
@@ -61,7 +59,7 @@ def create_lawyer(  # pragma: no cover
         biz_team_ids=payload.biz_team_ids,
     )
     return _lawyer_service.create_lawyer(
-        data=dto, user=get_request_user(request), license_pdf=license_pdf, avatar=avatar
+        data=dto, user=get_request_user(request)
     )
 
 
@@ -70,8 +68,6 @@ def update_lawyer(  # pragma: no cover
     request: HttpRequest,
     lawyer_id: int,
     payload: LawyerUpdateIn,
-    license_pdf: UploadedFile | None = File(None),
-    avatar: UploadedFile | None = File(None),
 ) -> LawyerOut:
     dto = LawyerUpdateDTO(
         real_name=payload.real_name,
@@ -88,8 +84,6 @@ def update_lawyer(  # pragma: no cover
         lawyer_id=lawyer_id,
         data=dto,
         user=get_request_user(request),
-        license_pdf=license_pdf,
-        avatar=avatar,
     )
 
 

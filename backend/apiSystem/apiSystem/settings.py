@@ -301,6 +301,10 @@ STATIC_URL = "static/"
 # 静态文件收集目录（Docker 部署需要）
 STATIC_ROOT = os.environ.get("STATIC_ROOT", BASE_DIR / "staticfiles")
 
+# 快递鸟 API
+KDNIAO_EBUSINESS_ID = os.environ.get("KDNIAO_EBUSINESS_ID", "")
+KDNIAO_APP_KEY = os.environ.get("KDNIAO_APP_KEY", "")
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
