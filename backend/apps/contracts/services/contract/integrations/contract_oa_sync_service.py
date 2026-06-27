@@ -418,7 +418,7 @@ class ContractOASyncService:
         expanded_limit = max(effective_limit * 5, 30)
 
         for keyword in keywords:
-            candidates = script.search_cases_by_name(contract_name=keyword, limit=effective_limit)  # type: ignore
+            candidates = script.search_cases_by_name(contract_name=keyword, limit=effective_limit)
             filtered_candidates = self._filter_candidates_by_contract_name(
                 contract_name=contract_name,
                 candidates=candidates,  # type: ignore
@@ -436,7 +436,7 @@ class ContractOASyncService:
                 return filtered_candidates[:effective_limit]
 
             if len(candidates) >= effective_limit:  # type: ignore
-                expanded_candidates = script.search_cases_by_name(contract_name=keyword, limit=expanded_limit)  # type: ignore
+                expanded_candidates = script.search_cases_by_name(contract_name=keyword, limit=expanded_limit)
                 expanded_filtered_candidates = self._filter_candidates_by_contract_name(
                     contract_name=contract_name,
                     candidates=expanded_candidates,  # type: ignore
