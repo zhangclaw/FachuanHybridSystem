@@ -18,6 +18,7 @@ from django.db.models import Q
 from django.http import HttpResponse
 from django.utils import timezone
 from ninja import Router
+from ninja.errors import HttpError
 
 from apps.core.infrastructure.throttling import rate_limit_from_settings
 from apps.reminders.models import CalendarFeedToken, Reminder, ReminderType
@@ -218,8 +219,7 @@ async def get_or_create_token(request: Any) -> dict[str, str]:
     """获取当前用户的日历订阅 Token（不存在则自动创建）。"""
     user = _require_session_user(request)
     if user is None:
-        from django.http import JsonResponse
-        return JsonResponse({"detail": "Authentication required"}, status=401)
+        raise HttpError(401, "Authentication required")
 
     feed_token = await sync_to_async(CalendarFeedToken.get_or_create_for_user)(user)
 
@@ -240,8 +240,7 @@ async def regenerate_token(request: Any) -> dict[str, str]:
     """重新生成当前用户的日历订阅 Token（旧 Token 立即失效）。"""
     user = _require_session_user(request)
     if user is None:
-        from django.http import JsonResponse
-        return JsonResponse({"detail": "Authentication required"}, status=401)
+        raise HttpError(401, "Authentication required")
 
     new_token = secrets.token_urlsafe(48)
 
