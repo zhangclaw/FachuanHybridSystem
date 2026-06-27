@@ -21,7 +21,7 @@ from apps.core.services.pdf_merge_service import (
 from apps.evidence.models import EvidenceList
 
 # 向后兼容：测试 mock 需要
-from pathlib import Path  # noqa: F401
+from pathlib import Path
 
 
 def _get_pdf_merge_utils_module() -> Any:
@@ -52,14 +52,14 @@ class EvidencePDFMergeWorkflow(PDFMergeWorkflowBase):
         self.validator.assert_supported_format(ext, file_path)
         utils = _get_pdf_merge_utils_module()
         if ext in PDFMergeValidator.IMAGE_FORMATS:
-            return utils.convert_image_to_pdf(file_path)
+            return utils.convert_image_to_pdf(file_path)  # type: ignore[no-any-return]
         if ext in PDFMergeValidator.WORD_FORMATS:
-            return utils.convert_docx_to_pdf(file_path)
+            return utils.convert_docx_to_pdf(file_path)  # type: ignore[no-any-return]
         return file_path
 
     def add_page_numbers(self, pdf_input: io.BytesIO, start_page: int = 1) -> bytes:
         utils = _get_pdf_merge_utils_module()
-        return utils.add_page_numbers(pdf_input, start_page)
+        return utils.add_page_numbers(pdf_input, start_page)  # type: ignore[no-any-return]
 
     def generate_merged_filename(self, evidence_list: EvidenceList) -> str:
         case_name = evidence_list.case.name

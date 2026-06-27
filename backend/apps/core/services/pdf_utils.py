@@ -99,7 +99,7 @@ def render_page_to_image(
         page = doc.load_page(page_no)
         matrix = fitz.Matrix(dpi / 72, dpi / 72)
         pix = page.get_pixmap(matrix=matrix)
-        return pix.tobytes(fmt)
+        return pix.tobytes(fmt)  # type: ignore[no-any-return]
     finally:
         doc.close()
 
@@ -226,7 +226,7 @@ def _read_django_field_file(source: Any) -> bytes | None:  # pragma: no cover
         data = source.read()
         with contextlib.suppress(Exception):
             source.seek(0)
-        return data
+        return data  # type: ignore[no-any-return]
     except Exception:
         logger.debug("读取 Django FieldFile 失败", exc_info=True)
         return None
@@ -251,7 +251,7 @@ def _read_file_like(source: Any) -> bytes | None:
     if hasattr(source, "seek"):
         with contextlib.suppress(Exception):
             source.seek(pos if pos is not None else 0)
-    return data
+    return data  # type: ignore[no-any-return]
 
 
 def _read_from_path_attr(source: Any) -> bytes | None:  # pragma: no cover
